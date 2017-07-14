@@ -1,0 +1,73 @@
+See: http://www.20papercups.net/programming/kinect-on-ubuntu-with-openni/
+
+
+Install required packages:
+$ sudo apt-get install default-jdk
+
+
+
+******************
+* OpenNI
+******************
+
+The latest version of OpenNI is required:
+$ git clone https://github.com/OpenNI/OpenNI.git
+Switch to unstable to get kinect running
+$ cd OpenNI
+$ git checkout origin/unstable
+
+Create a redist with
+$ cd Platform/Linux/CreateRedist
+$ ./RedistMaker
+
+If there's a linking error due to missing glEnd symbol,
+append GL to the lines highlighted with
+$ grep glut ../Build/Samples/*/Makefile
+
+Then you'll find a tarball Final/OpenNI-Bin-Dev-Linux-x64-*.tar.bz2
+Extract it:
+$ tar xjf OpenNI-Bin-Dev-Linux-x64-*.tar.bz2
+and install it:
+$ cd OpenNI-*
+$ sudo ./install.sh
+
+
+
+******************
+* SensorKinect
+******************
+
+
+Get SensorKinect:
+$ git clone https://github.com/avin2/SensorKinect.git
+$ cd SensorKinect/Platform/Linux/CreateRedist
+$ ./RedistMaker
+
+Install SensorKinect:
+$ cd Final
+$ tar xjf Sensor-Bin*
+$ cd Sensor-Bin*
+$ sudo ./install.sh
+
+
+
+
+*******************
+* Download NITE for guesture detection
+*******************
+
+Get NiTE v1.5.2.21 from
+http://www.openni.org/files/nite/www.openni.org/openni-sdk/openni-sdk-history-2
+Extract & install:
+$ tar xjf NITE-Bin-Linux-x64-v1.5.2.21.tar.bz2
+$ cd NITE-*
+$ sudo ./install.sh
+
+
+
+*******************
+* test
+*******************
+
+$ cd OpenNI/Platform/Linux/Bin/x64-Release
+$ ./NiViewer

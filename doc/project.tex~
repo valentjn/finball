@@ -1,0 +1,433 @@
+\documentclass[11pt,a4paper]{article}
+
+%% Preamble
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{multicol}
+
+\lstset{%
+  showstringspaces=false,
+  breaklines=true,%
+  frame=single,%
+  language=C,%
+  basicstyle=\small,%
+  numbers=left,
+  numberstyle=\tiny,
+  basicstyle=\ttfamily\fontsize{10}{10}\selectfont,
+  showstringspaces=false,
+  showstringspaces=false}
+
+\renewcommand{\arraystretch}{1.5}
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Title-Needed: A framework for interactive computational fluid simulation and
+visualization}
+
+\maketitle
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTRODUCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+This is a framework for interactive simulation and visualization of
+steered computational fluid and rigid body simulations.
+It is based on pipelining concept further explained in Sec.\,\ref{sec:pipeline}
+and a modular communication infrastructure.
+
+This document gives an introduction to the basic concepts of the framework and
+describes the requirements of it.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Requirements \& Compilation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Requirements \& Compilation}
+
+The project was developed to be compiled and executed on Ubuntu 12.04 LTS
+\footnote{\url{http://www.ubuntu.com/download/desktop}}.
+
+After downloading and installing the system, several packages are required.
+Those can be installed using \textit{apt-get} from the command line.
+
+\begin{lstlisting}[language=sh]
+$ apt-get install libsdl-image1.2-dev libsdl1.2-dev libv4l-dev g++
+$ apt-get install git
+$ apt-get install libcv-dev libcvaux-dev libhighgui-dev libcv2.4 libhighgui2.4 libcvaux2.4 opencv-doc
+$ apt-get install cmake freeglut3-dev pkg-config build-essential libxmu-dev libxi-dev libusb-1.0-0-dev doxygen graphviz mono-complete git-core
+$ apt-get install libopenblas-dev liblapack-dev libarpack2-dev
+$ apt-get install valgrind
+\end{lstlisting}
+
+If you have an NVIDIA-GPU and want to use it, you should install CUDA as well. To do this, 
+first install the latest proprietary driver via the "Additional Drivers" Tool in Ubuntu.
+Then, follow the instructions of this \href{www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu}{How-To} 
+(but use the stuff for ubuntu 14.10 - there's no .deb-package for Ubuntu 15.04 yet,
+but this one works just fine)
+
+For eclipse development environment, additionally install java jre
+\begin{lstlisting}[language=sh]
+$ apt-get install default-jre
+\end{lstlisting}
+
+After installation of the required packages, the code can be compiled with
+
+\begin{lstlisting}[language=sh]
+$ make
+\end{lstlisting}
+
+In case that you get any compilation errors, please send your advisors an
+email. The program will be located in the build folder and can be run by
+
+\begin{lstlisting}[language=sh]
+$ ./build/fa_2014_release
+\end{lstlisting}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Classes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Classes}
+
+There are a bunch of existing classes which should be used by everyone to setup
+the interfaces among the groups.
+The following table gives an overview and short description of each class.
+
+\noindent
+\begin{tabular}{|l|l|}
+	\hline
+	CDataArray2D.hpp				&
+		Data storage for 2D arrays							\\
+	\hline
+	CDataDrawingInformation.hpp		&
+		Data storage for interactive drawing information	\\
+	\hline
+	CGlTexture.hpp					&
+		Abstraction for OpenGL Textures						\\
+	\hline
+	CParameters.hpp					&
+		Program and simulation parameters					\\
+	\hline
+	CPipelinePacket.hpp				&
+		Pipeline packet capable of being forwarded via the pipeline	\\
+	\hline
+	CPipelineStage.hpp				&
+		Pipeline stage providing interfaces for pipelining	\\
+	\hline
+	CSDLInterface.hpp				&
+		SDL Interface for visualization and interactivity	\\
+	\hline
+	CStage\_ImageInput.hpp			&
+		Pipeline stage for image input (single image from file)	\\
+	\hline
+	CStage\_ImageProcessing.hpp		&
+		Pipeline stage for image processing filter			\\
+	\hline
+	CStage\_VideoInput.hpp			&
+		Pipeline stage for video input, e.g.\,from webcam	\\
+	\hline
+	CStage\_VideoOutput.hpp			&
+		Pipeline stage for video output				\\			
+	\hline
+	main.cpp						&
+		main entry to setup pipelined scenarios		\\
+	\hline
+\end{tabular}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Pipeline
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pipeline}
+\label{sec:pipeline}
+
+The idea of a pipelining model is creating independent execution parts with
+particular input-output specifications.
+E.g.\,a webcam only provides images which are forwarded to the image filter.
+After processing of the image filter, this information is further forwarded to
+the simulation (not yet implemented) and then to the output for visualization.
+
+All those pipeline stages are independent and thus can be independently
+processed - e.g. Image filter and simulation computations in parallel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Pipeline stage
+%
+\subsection{Pipeline stage}
+
+We continue with an example given by the image processing filter
+\textit{CStage\_ImageProcessing.hpp}.
+For well-known interfaces, each new pipeline stage has to inherit the class
+CPipelineStage:
+
+\begin{lstlisting}
+class CStage_ImageProcessing	:	public
+	CPipelineStage
+...
+\end{lstlisting}
+
+\noindent
+For processing of the images, paramters are required to know which
+computations to do, at least a single input storage is required as well as an
+output storage to forward processes images to other classes:
+
+\begin{lstlisting}
+...
+/**
+ * global parameters
+ */
+CParameters &cParameters;
+
+/**
+ * input image
+ */
+CDataArray2D<unsigned char,3> input_cDataArray2D;
+
+/**
+ * processed image
+ */
+CDataArray2D<unsigned char,3> output_cDataArray2D;
+...
+\end{lstlisting}
+
+\noindent
+Since the parameters are shared with the other classes, they are
+setup in the constructor:
+
+\begin{lstlisting}
+public:
+/**
+ * constructor
+ */
+CStage_ImageProcessing(CParameters &i_cParameters):
+CPipelineStage("ImageProcessing"),
+cParameters(i_cParameters)
+{
+}
+\end{lstlisting}
+
+\noindent
+In case of an input sent via the pipeline of another stage such as the video
+input, the method \textit{pipeline\_process\_input} is executed and has to be
+implemented. This interface is particularly requested by the class
+\textit{CPipelineStage}.
+
+\begin{lstlisting}
+void pipeline_process_input(
+	CPipelinePacket &i_cPipelinePacket
+)
+{
+...
+\end{lstlisting}
+
+\noindent
+Since not all possible data types can be probably processed, we have to check
+for compatible input packages and unpack the data to make it available with our
+accessor class:
+\begin{lstlisting}
+// we are currently only able to process "unsigned char,3" data arrays.
+if (i_cPipelinePacket.type_info_name != typeid(CDataArray2D<unsigned char,3>).name())
+{
+	std::cerr << "ERROR: Video Output is only able to process (char,3) arrays" << std::endl;
+	exit(-1);
+}
+
+// unpack data
+CDataArray2D<unsigned char,3> *input = i_cPipelinePacket.getPayload<CDataArray2D<unsigned char,3> >();
+\end{lstlisting}
+
+\noindent
+After unpacking the data and processing the data with more details available in
+the source code file itself, the output data array is pushed to the pipeline and
+thus forwarded to the next pipeline stages:
+\begin{lstlisting}
+CPipelineStage::pipeline_push((CPipelinePacket&)output_cDataArray2D);
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Pipeline setup
+%
+\subsection{Pipeline setup}
+
+After programming several stages, their input and output has to be
+connected after instantiation.
+E.g.\,let us assume that we like to have an static input image with an image
+filter and the possibility to draw into the image, this would lead to the
+following pipeline:
+
+\begin{lstlisting}
+// static image input
+CStage_ImageInput cStage_ImageInput(cParameters);
+// video output
+CStage_VideoOutput cStage_VideoOutput(cParameters);
+
+// PIPELINE CONNECTIONS
+// forward image to video output
+cStage_ImageInput.connectOutput(cStage_VideoOutput);
+// forward mouse movements to image input
+cStage_VideoOutput.connectOutput(cStage_ImageInput);
+
+
+// initial push of static image
+cStage_ImageInput.pipeline_push();
+
+// main loop
+while (!cParameters.exit)
+{
+	// trigger image input to do something
+	cStage_VideoOutput.main_loop_callback();
+}
+\end{lstlisting}
+
+\noindent
+For our pipeline concept, only the outputs have to be connected.
+The initial push for the image input is required to initially forward the static
+image to the video output.
+
+The main loop is required to e.g.\,check for user input, to draw updates for the
+visualization and to run a simulation timestep.
+
+
+\section{Interaction}
+
+Several keystrokes currently exist updating some parameters in the class
+\textit{CParameters}.
+Note that all pipeline stages get a reference to this class during
+initialization.
+
+Since the Video output is closely connected to the input system, all
+input keystrokes which are not directly processed are forwarded to the method
+key\_down of the parameter class:
+
+\begin{lstlisting}
+/**
+ * return bool if processed
+ */
+bool key_down(char i_key)
+{
+	switch(i_key)
+	{
+	case SDLK_j:
+		stage_imageprocessing_filter_id--;
+		std::cout << "Using filter id " << stage_imageprocessing_filter_id << std::endl;
+		return true;
+
+	case SDLK_k:
+		stage_imageprocessing_filter_id++;
+		std::cout << "Using filter id " << stage_imageprocessing_filter_id << std::endl;
+		return true;
+\end{lstlisting}
+
+\noindent
+This allows the modification of the parameters during the programs runtime.
+So far the following keystrokes are defined:
+
+\noindent
+\begin{tabular}{|c|l|}
+	\hline
+	\multicolumn{2}{|l|}{\textbf{General}}	\\
+	\hline
+	q & quit program	\\
+	\hline
+	\hline
+
+	\multicolumn{2}{|l|}{\textbf{1: image Processing}}	\\
+	\hline
+	j,k & decrease / increase filter id\\
+	\hline
+	g,t & decrease/increase threshold value\\
+	\hline
+\end{tabular}
+
+
+\section{Programn start}
+
+Several program parameters currently exist and are also processed in
+CParameters:
+
+\noindent
+\begin{tabular}{|c|l|}
+	\hline
+	\multicolumn{2}{|l|}{\textbf{General}}	\\
+	\hline
+	p	& pipeline id to use (see main.cpp)	\\
+	\hline
+	v	& verbosity level	\\
+	\hline
+	\hline
+
+	\multicolumn{2}{|l|}{\textbf{0: image/videoinput}}	\\
+	\hline
+	d	& video device string to use\\
+	\hline
+	w	& request this width for video input\\
+	\hline
+	h	& request this height for video input\\
+	\hline
+	i	& path to input image to use\\
+	\hline
+	\hline
+
+	\multicolumn{2}{|l|}{\textbf{3: fluid simulation LBM}}	\\
+	\hline
+	v	& switch between flag field and velocity output	\\
+	\hline
+	\hline
+	
+	\multicolumn{2}{|l|}{\textbf{4: parallelization}}	\\
+	\hline
+	n	& number of threads to use\\
+	\hline
+	\hline
+
+\end{tabular}
+
+\section{Group 0: Management}
+\input{group_0_management.tex}
+
+
+\section{Group 1: Input devices}
+\input{group_1_input_devices.tex}
+
+
+\section{Group 2: Image processing}
+\input{group_2_image_processing.tex}
+
+
+\section{Group 3a: Lattice Boltzmann simulation}
+\input{group_3a_lattice_boltzmann_simulation.tex}
+
+
+\section{Group 3b: Navier-Stokes simulation}
+\input{group_3b_navier_stokes_simulation.tex}
+
+
+\section{Group 4: Parallelization}
+\input{group_4_parallelization.tex}
+
+
+\section{Group 5: Rigid body simulation}
+\input{group_5_rigid_body_simulation.tex}
+
+
+\section{Group 6: Visualization}
+\input{group_6_visualization.tex}
+
+  
+\end{document}

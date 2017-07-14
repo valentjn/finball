@@ -1,0 +1,33 @@
+----------------------------------------------------
+---------- INSTALLING THE WIIMOTE SOURCES ----------
+----------------------------------------------------
+
+Open a terminal pointing to this directory.
+
+Enter:
+sudo chmod +x install.sh
+
+Then, enter:
+sudo ./install.sh
+
+-------------- Additional Information --------------
+
+The installation includes everything needed to get a 
+wiimote connected to a PC (except for the required 
+Bluetooth hardware, obviously). 
+Libraries and Include files will be added globally.
+For samples, source code and documentation, see the 
+folder "WiiC" which is being created inside this 
+directory during the installation.
+To browse the HTML documentation, open 
+WiiC/doc/html/index.html.
+
+If the installation has been successful, standalone
+.cpp files using the WiiCpp framework should be
+compilable by executing 
+"g++ example.cpp -lwiic -lwiicpp".
+
+If you face any problems while installing, maybe
+I can help, so talk to me.
+
+-- Dominik Schreiber

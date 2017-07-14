@@ -1,0 +1,38 @@
+-----------------------------------------------------
+----------- INSTALLING THE KINECT SOURCES -----------
+-----------------------------------------------------
+
+Open a terminal pointing to this directory.
+
+Enter:
+sudo chmod +x install.sh
+
+Then, enter:
+sudo ./install.sh
+
+-------------- Additional Information ---------------
+
+The installation includes:
+
+* The general OpenNI framework;
+
+* the SensorKinect sources to communicate with a
+  kinect device; and
+
+* the NITE middleware interpreting the Kinect data
+  and providing high-level user interfaces.
+
+Libraries and Include files will be added globally.
+For samples, source code and documentation, see 
+the NITE folder.
+To browse the HTML documentation, open 
+NITE-Bin-Dev-Linux-x64-v1.5.2.21/Documentation/html/
+index.html.
+
+If the installation has been successful, standalone
+.cpp files using the OpenNI framework should be
+compilable by executing "g++ example.cpp -lOpenNI -lXnVNite_1_5_2 -I/usr/include/ni -I/usr/include/nite".
+If you face any problems while installing, maybe
+I can help, so talk to me.
+
+-- Dominik Schreiber

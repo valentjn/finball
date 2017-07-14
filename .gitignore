@@ -1,0 +1,8 @@
+build/
+CMakeFiles/
+data/ImageLog/
+
+CMakeCache.txt
+cmake_install.cmake
+fa_2015
+img_test

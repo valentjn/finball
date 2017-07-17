@@ -327,7 +327,7 @@ public:
 	 * callback from SDL for key down event
 	 */
 	void sdl_handle_key_down(
-			SDL_keysym &i_keysym
+			SDL_Keysym &i_keysym
 	)
 	{
 		char key;
@@ -345,7 +345,7 @@ public:
 
 
 	void sdl_handle_key_up(
-			SDL_keysym &i_keysym
+			SDL_Keysym &i_keysym
 	)
 	{
 		switch(i_keysym.sym)
@@ -409,6 +409,7 @@ public:
 			int i_mouse_y
 	)
 	{
+		(void)i_button_id;
 		interactiveStuff(i_mouse_buttons, i_mouse_x, i_mouse_y);
 	}
 
@@ -420,6 +421,7 @@ public:
 			int i_mouse_y
 	)
 	{
+		(void)i_button_id;
 		interactiveStuff(i_mouse_buttons, i_mouse_x, i_mouse_y);
 	}
 

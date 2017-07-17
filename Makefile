@@ -1,21 +1,21 @@
 
 
-DEBUG_CFLAGS:=-g3 -O0 -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl  --cflags`
-RELEASE_CFLAGS:= -O3 -mtune=native -march=native -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl  --cflags`
-LDFLAGS:= -lSDL_image -lv4l2 -lGL `pkg-config sdl  --libs`
+DEBUG_CFLAGS:=-g3 -O0 -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl2 --cflags`
+RELEASE_CFLAGS:= -O3 -mtune=native -march=native -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl2 --cflags`
+LDFLAGS:= -lSDL2_image -lGL `pkg-config sdl2 --libs`
 
 all:	release
 
 install_deb_packages:
-	sudo apt-get install libsdl-image1.2-dev libsdl1.2-dev libv4l-dev
+	sudo apt-get install libsdl2-image-dev libsdl2-dev
 
 release:
 	mkdir -p ./build
-	$(CXX) $(RELEASE_CFLAGS) src/main.cpp src/v4l/imageReader.cpp -o build/fa_2015_release $(LDFLAGS) 
+	$(CXX) $(RELEASE_CFLAGS) src/main.cpp -o build/fa_2017_release $(LDFLAGS)
 
 debug:
 	mkdir -p ./build
-	$(CXX) $(DEBUG_CFLAGS) src/main.cpp src/v4l/imageReader.cpp -o build/fa_2015_debug $(LDFLAGS) 
+	$(CXX) $(DEBUG_CFLAGS) src/main.cpp -o build/fa_2017_debug $(LDFLAGS)
 
 clean:
 	rm -rf build Debug Release

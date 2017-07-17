@@ -3,7 +3,7 @@
 
 #include "CParameters.hpp"
 #include "CPipelineStage.hpp"
-#include "SDL/SDL_image.h"
+#include "SDL2/SDL_image.h"
 #include "CDataArray2D.hpp"
 #include "CDataDrawingInformation.hpp"
 

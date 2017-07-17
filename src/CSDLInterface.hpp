@@ -2,9 +2,10 @@
 #define CSDLINTERFACE_HPP_
 
 #include <iostream>
+#include <string>
 #include <signal.h>
-#include "SDL.h"
-#include "SDL/SDL_video.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_video.h"
 #include "GL/gl.h"
 
 /**
@@ -20,8 +21,14 @@ public:
 	int height;
 
 private:
+	/* SDL Window object */
+	SDL_Window *window;
+
 	/* Color depth in bits of our window. */
 	int bpp;
+
+	/* Title of the window */
+	std::string window_title;
 
 	/* mouse position */
 	int mouse_x;
@@ -33,23 +40,33 @@ private:
 	/* bit flag for pressed mouse buttons */
 	unsigned int mouse_buttons;
 
-	void update_videomode()
+	void create_window()
 	{
-		int flags = SDL_OPENGL | SDL_RESIZABLE | SDL_DOUBLEBUF | SDL_HWSURFACE;// | SDL_FULLSCREEN;
+		int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;// | SDL_FULLSCREEN;
 		/*
 		 * Set the video mode
 		 */
-		if( SDL_SetVideoMode( width, height, bpp, flags ) == 0 )
+		window = SDL_CreateWindow( window_title.c_str(), SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED, width, height, flags );
+		if(window == nullptr)
 		{
 			/*
 			 * This could happen for a variety of reasons,
 			 * including DISPLAY not being set, the specified
 			 * resolution not being available, etc.
 			 */
-			std::cerr << "Video mode set failed: " << SDL_GetError() << std::endl;
+			std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
 			exit(-1);
 		}
 
+		/*
+		 * Create OpenGL context
+		 */
+		if(SDL_GL_CreateContext(window) == nullptr)
+		{
+			std::cerr << "OpenGL context creation failed: " << SDL_GetError() << std::endl;
+			exit(-1);
+		}
 	}
 
 	void resize(int i_width, int i_height)
@@ -64,7 +81,7 @@ private:
 	void setup()
 	{
 		/* Information about the current video settings. */
-		const SDL_VideoInfo* info = 0;
+		SDL_DisplayMode mode;
 
 
 		/* First, initialize SDL's video subsystem. */
@@ -77,18 +94,13 @@ private:
 		/* restore signal handler to allow ctrl-c */
 		signal(SIGINT, SIG_DFL);
 
-		/* Let's get some video information. */
-		info = SDL_GetVideoInfo();
-
-		if(!info)
+		/* Let's get the current display mode. */
+		if(SDL_GetCurrentDisplayMode(0, &mode) != 0)
 		{
 			/* This should probably never happen. */
 			std::cerr << "Video query failed: " << SDL_GetError() << std::endl;
 			exit(-1);
 		}
-
-		// enable key repeat
-		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 		/*
 		 * Set our width/height to 640/480 (you would
@@ -101,7 +113,8 @@ private:
 		 */
 		width = 640;
 		height = 480;
-		bpp = info->vfmt->BitsPerPixel;
+		bpp = SDL_BITSPERPIXEL(mode.format);
+		window_title = "My Window Title";
 
 		/*
 		 * Now, we want to setup our requested
@@ -136,7 +149,7 @@ private:
 		 * glViewport.
 		 */
 
-		update_videomode();
+		create_window();
 
 		/*********** OPEN GL SETUP ************/
 
@@ -180,11 +193,11 @@ public:
 
 
 	virtual void sdl_handle_key_down(
-			SDL_keysym &i_keysym
+			SDL_Keysym &i_keysym
 	) = 0;
 
 	virtual void sdl_handle_key_up(
-			SDL_keysym &i_keysym
+			SDL_Keysym &i_keysym
 	) = 0;
 
 	virtual void sdl_handle_mouse_button_down(
@@ -225,9 +238,9 @@ public:
 					sdl_handle_key_down(event.key.keysym);
 					break;
 
-				case SDL_VIDEORESIZE:
-					resize(event.resize.w, event.resize.h);
-					update_videomode();
+				case SDL_WINDOWEVENT_RESIZED:
+					resize(event.window.data1, event.window.data2);
+					create_window();
 					break;
 
 				case SDL_MOUSEBUTTONDOWN:
@@ -255,7 +268,7 @@ public:
 
 	void sdl_swap_buffers()
 	{
-		SDL_GL_SwapBuffers( );
+		SDL_GL_SwapWindow(window);
 
 		buffer_swaps_since_last_fps_update++;
 
@@ -268,7 +281,6 @@ public:
 			char buffer[1024];
 			sprintf(buffer, "FPS: %f", fps);
 
-			SDL_WM_SetCaption(buffer, 0);
 			buffer_swaps_since_last_fps_update = 0;
 			prev_fps_update_ticks += 1000;
 

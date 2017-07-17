@@ -3,7 +3,7 @@
 
 #include "CParameters.hpp"
 #include "CPipelineStage.hpp"
-#include "SDL/SDL_image.h"
+#include "SDL2/SDL_image.h"
 #include "CDataArray2D.hpp"
 #include "CDataDrawingInformation.hpp"
 
@@ -137,7 +137,6 @@ public:
 
 		for (int y = 0; y < input_cDataArray2D.height; y++)
 		{
-			int sum = 0;
 			for (int x = 0; x < input_cDataArray2D.width; x++)
 			{
 				unsigned char *d = &input_cDataArray2D.getRef(x, y);

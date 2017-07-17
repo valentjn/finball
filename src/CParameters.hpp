@@ -58,21 +58,6 @@ public:
 	 */
 	int pipeline_id;
 
-
-	/**
-	 * string to video device being used for, e.g., webcam input
-	 */
-	std::string video_device;
-
-	/**
-	 * request particular video width
-	 */
-	int input_video_width;
-	/**
-	 * request particular video height
-	 */
-	int input_video_height;
-
 	/**
 	 * return bool if processed
 	 */
@@ -121,7 +106,7 @@ public:
 		exit = false;
 		verbosity_level = -1;
 		threading_number_of_threads_to_use = -1;
-		stage_image_input_path = "data/fa_image_2012.jpg";
+		stage_image_input_path = "data/fa_image.jpg";
 
 		stage_imageprocessing_filter_id = 0;
 		stage_imageprocessing_threshold_value = 128;
@@ -129,10 +114,6 @@ public:
 		stage_fluidsimulation_visualize_flagfield = false;
 
 		pipeline_id = 0;
-
-		video_device = "/dev/video0";
-		input_video_width = -1;
-		input_video_height = -1;
 	}
 
 
@@ -144,13 +125,11 @@ public:
 			char *const i_argv[]	/// array of strings of arguments preprocessed by prefixed binary
 	)
 	{
+		(void)i_argc;
 		std::cout << "Parameters for " << i_argv[0] << std::endl;
-		std::cout << "	-d [device]			Use video device (default: /dev/video0)" << std::endl;
-		std::cout << "	-i [input image]	Input image (default: ../data/fa_image_2012.jpg)" << std::endl;
+		std::cout << "	-i [input image]	Input image (default: ../data/fa_image.jpg)" << std::endl;
 		std::cout << "	-v [level]			Verbosity level (default: -1)" << std::endl;
 		std::cout << "	-p [pipeline id]	Pipeline id (default: 0)" << std::endl;
-		std::cout << "	-w [video width]	(default: -1 [automatic])" << std::endl;
-		std::cout << "	-h [video height]	(default: -1 [automatic])" << std::endl;
 		::exit(EXIT_FAILURE);
 	}
 
@@ -184,14 +163,6 @@ public:
 
 
 			/*
-			 * input video device
-			 */
-			case 'd':
-				video_device = optarg;
-				break;
-
-
-			/*
 			 * input image
 			 */
 			case 'i':
@@ -214,12 +185,6 @@ public:
 				pipeline_id = atoi(optarg);
 				break;
 
-			case 'w':
-				input_video_width = atoi(optarg);
-				break;
-			case 'h':
-				input_video_height = atoi(optarg);
-				break;
 
 			default:
 				printMainParameterInfo(i_argc, i_argv);

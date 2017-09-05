@@ -58,26 +58,27 @@ describes the requirements of it.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Requirements \& Compilation}
 
-The project was developed to be compiled and executed on Ubuntu 12.04 LTS
+The project was developed to be compiled and executed on Ubuntu 16.04 LTS
 \footnote{\url{http://www.ubuntu.com/download/desktop}}.
 
 After downloading and installing the system, several packages are required.
 Those can be installed using \textit{apt-get} from the command line.
 
 \begin{lstlisting}[language=sh]
-$ apt-get install libsdl-image1.2-dev libsdl1.2-dev libv4l-dev g++
+$ apt-get install libsdl2-dev libsdl2-image-dev g++
 $ apt-get install git
-$ apt-get install libcv-dev libcvaux-dev libhighgui-dev libcv2.4 libhighgui2.4 libcvaux2.4 opencv-doc
-$ apt-get install cmake freeglut3-dev pkg-config build-essential libxmu-dev libxi-dev libusb-1.0-0-dev doxygen graphviz mono-complete git-core
-$ apt-get install libopenblas-dev liblapack-dev libarpack2-dev
-$ apt-get install valgrind
 \end{lstlisting}
+%$ apt-get install libcv-dev libcvaux-dev libhighgui-dev libcv2.4 libhighgui2.4 libcvaux2.4 opencv-doc
+%$ apt-get install cmake freeglut3-dev pkg-config build-essential libxmu-dev libxi-dev libusb-1.0-0-dev doxygen graphviz mono-complete git-core
+%$ apt-get install libopenblas-dev liblapack-dev libarpack2-dev
+%$ apt-get install valgrind
 
-If you have an NVIDIA-GPU and want to use it, you should install CUDA as well. To do this, 
-first install the latest proprietary driver via the "Additional Drivers" Tool in Ubuntu.
-Then, follow the instructions of this \href{www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu}{How-To} 
-(but use the stuff for ubuntu 14.10 - there's no .deb-package for Ubuntu 15.04 yet,
-but this one works just fine)
+
+%If you have an NVIDIA-GPU and want to use it, you should install CUDA as well. To do this, 
+%first install the latest proprietary driver via the "Additional Drivers" Tool in Ubuntu.
+%Then, follow the instructions of this \href{www.r-tutor.com/gpu-computing/cuda-installation/cuda7.0-ubuntu}{How-To} 
+%(but use the stuff for ubuntu 14.10 - there's no .deb-package for Ubuntu 15.04 yet,
+%but this one works just fine)
 
 For eclipse development environment, additionally install java jre
 \begin{lstlisting}[language=sh]
@@ -94,7 +95,7 @@ In case that you get any compilation errors, please send your advisors an
 email. The program will be located in the build folder and can be run by
 
 \begin{lstlisting}[language=sh]
-$ ./build/fa_2014_release
+$ ./build/fa_2017_release
 \end{lstlisting}
 
 

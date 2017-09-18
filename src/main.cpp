@@ -13,6 +13,7 @@
 #include "CStage_ImageProcessing.hpp"
 #include "CStage_FluidSimulationLBM.hpp"
 #include "CStage_VideoOutput.hpp"
+#include "visualization/CRenderer.hpp"
 
 
 /*
@@ -204,6 +205,10 @@ void main_sim_static_image()
 	}
 }
 
+void main_game()
+{
+	CRenderer renderer;
+}
 
 
 /**
@@ -219,7 +224,7 @@ int main(int argc, char *argv[])
 	switch(cParameters.pipeline_id)
 	{
 		case 0:
-			main_image_viewer();
+			main_game();
 			break;
 		case 1:
 			main_image_modifier();
@@ -229,6 +234,9 @@ int main(int argc, char *argv[])
 			break;
 		case 3:
 			main_sim_static_image();
+			break;
+		case 4:
+			main_image_viewer();
 			break;
 	}
 	return 0;

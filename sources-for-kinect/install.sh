@@ -5,16 +5,16 @@
 # Install dependencies (local packages from APT)
 sudo dpkg -i *.deb
 
-mkdir kinect
-cd ./kinect
+#mkdir kinect
+#cd ./kinect
 
 # Extract the archives
 tar -xzvf OpenNI-Unstable-1.5.4.0.tar.gz
-tar -xzvf SensorKinect-0.93-5.1.2.1
+tar -xzvf SensorKinect-0.93-5.1.2.1.tar.gz
 tar -xvjpf nite-bin-linux-x64-v1.5.2.21.tar.bz2
 
 # Install OpenNI
-cd ../OpenNI-Unstable-1.5.4.0/Platform/Linux/CreateRedist/
+cd OpenNI-Unstable-1.5.4.0/Platform/Linux/CreateRedist/
 chmod +x RedistMaker
 ./RedistMaker
 cd ..

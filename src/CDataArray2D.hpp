@@ -9,27 +9,10 @@
  * data storage array for type T and D components per array element
  */
 template <typename T, int D>
-class CDataArray2D	:
+class CDataArray2D :
 		public CPipelinePacket
 {
 public:
-	/**
-	 * enumerator for data types to allow casting
-	 */
-	enum CDataArray2DTypes
-	{
-		CDATA_ARRAY_2D_CHAR_1,	// e.g. for grey color
-		CDATA_ARRAY_2D_CHAR_3,	// e.g. for RBG
-		CDATA_ARRAY_2D_FLOAT_1,	// e.g. for density
-		CDATA_ARRAY_2D_FLOAT_2,	// e.g. for velocity
-		CDATA_ARRAY_2D_FLOAT_3,	// e.g. for 3d velocity
-		CDATA_ARRAY_2D_FLOAT_4	// e.g. for multi components
-	};
-
-	/**
-	 * data array type
-	 */
-	CDataArray2DTypes type;
 
 	/**
 	 * width of array
@@ -45,6 +28,19 @@ public:
 	 * data storage
 	 */
 	T *data;
+
+	inline CDataArray2D()	:
+		width(-1),
+		height(-1),
+		data(nullptr)
+	{
+		CPipelinePacket::setPacketTypeInfoName(typeid(*this).name());
+	}
+
+	virtual ~CDataArray2D()
+	{
+		cleanup();
+	}
 
 	/**
 	 * return true if data is valid
@@ -62,52 +58,11 @@ public:
 		return this;
 	}
 
-	/**
-	 * setup the type id do pack and unpack this data
-	 */
-	void setupType()
-	{
-		if (typeid(T) == typeid(char))
-		{
-			switch(D)
-			{
-				case 1:	type = CDATA_ARRAY_2D_CHAR_1;	break;
-				case 3:	type = CDATA_ARRAY_2D_CHAR_3;	break;
-				default:	std::cerr << "Unsupported data array type for type char" << std::endl;	exit(-1);
-			}
-		}
-
-		if (typeid(T) == typeid(float))
-		{
-			switch(D)
-			{
-				case 1:	type = CDATA_ARRAY_2D_FLOAT_1;	break;
-				case 2:	type = CDATA_ARRAY_2D_FLOAT_2;	break;
-				case 3:	type = CDATA_ARRAY_2D_FLOAT_3;	break;
-				case 4:	type = CDATA_ARRAY_2D_FLOAT_4;	break;
-				default:	std::cerr << "Unsupported data array type for type float " << std::endl;	exit(-1);
-			}
-		}
-	}
-
-
-	inline CDataArray2D()	:
-		width(-1),
-		height(-1),
-		data(nullptr)
-	{
-		setupType();
-
-		CPipelinePacket::setPacketTypeInfoName(typeid(*this).name());
-	}
-
 
 	/**
 	 * fill with data
 	 */
-	inline void loadData(
-			void *i_data		///< data to store to this 2d array
-	)
+	inline void loadData(void *i_data)
 	{
 		memcpy(data, i_data, sizeof(T)*D*width*height);
 	}
@@ -116,10 +71,7 @@ public:
 	/**
 	 * resize the array
 	 */
-	inline void resize(
-			int i_width,	///< new width
-			int i_height	///< new height
-	)
+	inline void resize(int i_width,	int i_height)
 	{
 		cleanup();
 
@@ -170,10 +122,6 @@ public:
 
 		width = -1;
 		height = -1;
-	}
-	virtual ~CDataArray2D()
-	{
-		cleanup();
 	}
 };
 

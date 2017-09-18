@@ -5,7 +5,7 @@
 #include <string.h>
 #include "CPipelinePacket.hpp"
 
-class CDataRigidBody : public CPipelinePacket {
+class CDataRigidBody {
 private:
 	std::vector<float> pos(2);
 	std::vector<float> vel(2);
@@ -20,10 +20,6 @@ public:
 	CDataRigidBody(const std::vector<float>& p, const std::vector<float>& v,
 		const float& t, const float& a, const float& m) :
 	pos(p), vel(v), theta(t), angVel(a), mass(m) {}
-
-	void *getPayloadRaw() {
-		return this;
-	}
 
 	virtual void displayRigidBody() {
 		std::cout << "-------------------------" << '\n';
@@ -68,6 +64,24 @@ public:
 	}
 
 	~CDataCircle();
+};
+
+class CDataRigidBodyList : public CPipelinePacket {
+private:
+	std::vector<CDataRigidBody> list;
+public:
+
+	CDataRigidBodyList () {
+		// TODO: Here we manually define for prototype
+		std::vector<float> p(1.0, 1.0);
+		std::vector<float> v(2.0, 2.0);
+		CDataCircle c(p, v, 10.0, 15.0, 20.0, 25.0);
+		list.push_back(c);
+	}
+	virtual ~CDataRigidBodyList ();
+	void *getPayloadRaw() {
+		return this;
+	}
 };
 
 #endif // CDATARIGIDBODY_HPP_

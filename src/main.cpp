@@ -14,6 +14,7 @@
 #include "CStage_FluidSimulationLBM.hpp"
 #include "CStage_VideoOutput.hpp"
 
+#include "Levels/CLevel.hpp"
 
 /*
  * program parameters

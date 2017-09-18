@@ -31,12 +31,12 @@ class CStage_FluidSimulationLBM	:	public
 	CDataArray2D<float,2> output_cDataArray2D_f2;
 
 	/**
-	 * processed rgb field
+	 * processed f_i field
 	 */
-	CDataArray2D<float,3> output_cDataArray2D_f3;
+	CDataArray2D<float,9> fi_Array2D;
 
 	/**
-	 * simulation array to run simulation on
+	 * simulation array to run simulation on ausgabe der geschwin
 	 */
 	CDataArray2D<float,2> simulationData_Buffer1;
 
@@ -106,7 +106,7 @@ public:
 		 */
 		for (int y = 0; y < simulationData_Buffer1.height; y++)
 		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
+ 			for (int x = 0; x < simulationData_Buffer1.width; x++)
 			{
 				unsigned char flag = input_cDataArray2D.getRef(x,y);
 
@@ -134,52 +134,6 @@ public:
 		}
 
 
-		/*
-		 * averaging of velocity field
-		 */
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
-		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
-			{
-				unsigned char flag = input_cDataArray2D.getRef(x,y);
-
-				static float s = 0.01;
-				static float is = 1.0-s;
-
-				float *v;
-				float a,b;
-				switch(flag)
-				{
-				case 0:	// fluid
-					v = &simulationData_Buffer1.getClampedRef(x-1,y);
-					a = v[0];
-					b = v[1];
-
-					v = &simulationData_Buffer1.getClampedRef(x+1,y);
-					a += v[0];
-					b += v[1];
-
-					v = &simulationData_Buffer1.getClampedRef(x,y-1);
-					a += v[0];
-					b += v[1];
-
-					v = &simulationData_Buffer1.getClampedRef(x,y+1);
-					a += v[0];
-					b += v[1];
-
-					a *= 0.25;
-					b *= 0.25;
-
-					v = &simulationData_Buffer1.getRef(x,y);
-					v[0] = v[0]*s+a*is;
-					v[1] = v[1]*s+b*is;
-					break;
-
-				default:
-					break;
-				}
-			}
-		}
 
 		pipeline_push();
 	}

@@ -14,8 +14,8 @@ public:
     RigidBody(Parameters parameters) : parameters(parameters)
     {}
 
-    void compute(UserInputData *userInputData,
-                 LatticeBoltzmannData *latticeBoltzmannData,
+    void compute(const UserInputData *userInputData,
+                 const LatticeBoltzmannData *latticeBoltzmannData,
                  RigidBodyData *rigidBodyData)
     {
         // TODO

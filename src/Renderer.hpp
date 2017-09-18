@@ -13,7 +13,7 @@ public:
     Renderer(Parameters parameters) : parameters(parameters)
     {}
 
-    void render(LatticeBoltzmannData *latticeBoltzmannData,
+    void render(const LatticeBoltzmannData *latticeBoltzmannData,
                 RigidBodyData *rigidBodyData)
     {
         // TODO

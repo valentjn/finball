@@ -14,8 +14,8 @@ public:
     LatticeBoltzmann(Parameters parameters) : parameters(parameters)
     {}
 
-    void compute(UserInputData *userInputData,
-                 RigidBodyData *rigidBodyData,
+    void compute(const UserInputData *userInputData,
+                 const RigidBodyData *rigidBodyData,
                  LatticeBoltzmannData *latticeBoltzmannData)
     {
         // TODO

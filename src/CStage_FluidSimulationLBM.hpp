@@ -25,20 +25,21 @@ class CStage_FluidSimulationLBM	:	public
 	 */
 	CDataArray2D<unsigned char,1> input_cDataArray2D;
 
+	//TODO input velocity field to set velocities behind bodies
+
 	/**
 	 * processed velocity field
 	 */
-	CDataArray2D<float,2> output_cDataArray2D_f2;
+	CDataArray2D<float,2> output_Velocity;
+
+	// processed density field
+	CDataArray2D<float,1> output_Density;
 
 	/**
 	 * processed f_i field
 	 */
-	CDataArray2D<float,9> fi_Array2D;
+	CDataArray2D<float,9> fi_Array;
 
-	/**
-	 * simulation array to run simulation on ausgabe der geschwin
-	 */
-	CDataArray2D<float,2> simulationData_Buffer1;
 
 public:
 	/**
@@ -55,7 +56,7 @@ public:
 	/**
 	 * manually triggered pushing of next image to the pipeline
 	 */
-	void pipeline_push()
+	void pipeline_push() // TODO
 	{
 		if (cParameters.stage_fluidsimulation_visualize_flagfield)
 			CPipelineStage::pipeline_push((CPipelinePacket&)input_cDataArray2D);
@@ -81,25 +82,19 @@ public:
 		if (!input_cDataArray2D.isValidData())
 			return;
 
-		if (	simulationData_Buffer1.width != input_cDataArray2D.width		||
-				simulationData_Buffer1.height != input_cDataArray2D.height
+		if (	output_Velocity.width != input_cDataArray2D.width		||
+				output_Velocity.height != input_cDataArray2D.height
 		)
 		{
-			simulationData_Buffer1.resize(input_cDataArray2D.width, input_cDataArray2D.height);
-			output_cDataArray2D_f2.resize(input_cDataArray2D.width, input_cDataArray2D.height);
-
-			// reset
-			for (int y = 0; y < output_cDataArray2D_f2.height; y++)
-			{
-				for (int x = 0; x < output_cDataArray2D_f2.width; x++)
-				{
-					simulationData_Buffer1.getRef(x, y, 0) = 0;
-					simulationData_Buffer1.getRef(x, y, 1) = 0;
-				}
-			}
+			output_Velocity.resize(input_cDataArray2D.width, input_cDataArray2D.height);
+			output_Density.resize(input_cDataArray2D.width, input_cDataArray2D.height);
+			fi_Array.resize(input_cDataArray2D.width, input_cDataArray2D.height);
 		}
 
+// TODO initialize fi in the first iteration
 
+
+// TODO find boundary cells and save their position them in a readable structure
 
 		/*
 		 * process input/output/boundary flags
@@ -133,6 +128,13 @@ public:
 			}
 		}
 
+//TODO Calculate fi collision
+
+//TODO Calculate fi streaming
+
+//TODO Consider Boundary in Col & STream
+
+//TODO Calculate macroscopic quantities
 
 
 		pipeline_push();
@@ -145,7 +147,7 @@ public:
 		simulation_timestep();
 	}
 
-public:
+public: //TODO data input of boundary cells (and later also velocity of bodies)
 	/**
 	 * process incoming pipeline input.
 	 *

@@ -1,4 +1,4 @@
-#include "Array2D.hpp"
+#include "Level.hpp"
 #include "LevelLoader.hpp"
 #include "GameController.hpp"
 
@@ -8,16 +8,12 @@ int main(int argc, char *argv[])
 {
 	parameters.setup(argc, argv);
 
+	Level level;
 	LevelLoader levelLoader(parameters);
-	Array2D<LevelLoader::CellType> *level = levelLoader.loadLevel("data/testLevel.txt");
+	levelLoader.loadLevel("data/testLevel.txt", level);
 
 	GameController gameController(parameters);
 	gameController.startGame(level);
-
-	if (level != nullptr)
-	{
-		delete level;
-	}
 
 	return 0;
 }

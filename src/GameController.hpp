@@ -2,7 +2,7 @@
 #define GAME_CONTROLLER_HPP_
 
 #include "Parameters.hpp"
-#include "Array2D.hpp"
+#include "Level.hpp"
 
 #include "LevelLoader.hpp"
 #include "GameLogic.hpp"
@@ -30,12 +30,12 @@ public:
             parameters(parameters)
     {}
 
-    void startGame(Array2D<LevelLoader::CellType> *level)
+    void startGame(Level &level)
     {
         GameLogic gameLogic(parameters);
         UserInput userInput(parameters);
-        LatticeBoltzmann latticeBoltzmann(parameters);
-        RigidBody rigidBody(parameters);
+        LatticeBoltzmann latticeBoltzmann(parameters, level);
+        RigidBody rigidBody(parameters, level);
         Renderer renderer(parameters);
 
         UserInputOutput userInputOutput;

@@ -74,6 +74,9 @@ CRenderer::CRenderer()
 	if (!m_glcontext)
 		throw std::runtime_error(SDL_GetError());
 
+	std::cout << "OpenGL " << glGetString(GL_VERSION) << '\n';
+	std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
+
 	m_shader_program_world = createProgram(
 		"src/visualization/world_vert.glsl",
 		"src/visualization/world_frag.glsl");

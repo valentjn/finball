@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
 
 	switch(cParameters.pipeline_id)
 	{
-		case 0:
+		case 4:
 			main_game();
 			break;
 		case 1:
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 		case 3:
 			main_sim_static_image();
 			break;
-		case 4:
+		case 0:
 			main_image_viewer();
 			break;
 	}

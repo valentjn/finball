@@ -14,7 +14,7 @@ LDFLAGS:= -lSDL2_image \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs`
 
-.PHONY: test
+.PHONY: test_all
 
 all: release
 

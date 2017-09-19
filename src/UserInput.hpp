@@ -1,6 +1,8 @@
 #ifndef USER_INPUT_HPP_
 #define USER_INPUT_HPP_
 
+#include <SDL2/SDL.h>
+
 #include "Parameters.hpp"
 #include "UserInputOutput.hpp"
 

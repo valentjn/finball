@@ -2,6 +2,9 @@
 #define GAME_CONTROLLER_HPP_
 
 #include "Parameters.hpp"
+#include "Array2D.hpp"
+
+#include "LevelLoader.hpp"
 #include "UserInput.hpp"
 #include "UserInputData.hpp"
 #include "LatticeBoltzmann.hpp"
@@ -14,6 +17,7 @@ class GameController {
 private:
     Parameters &parameters;
 
+    LevelLoader levelLoader;
     UserInput userInput;
     LatticeBoltzmann latticeBoltzmann;
     RigidBody rigidBody;
@@ -23,6 +27,7 @@ private:
 public:
     GameController(Parameters &parameters) :
             parameters(parameters),
+            levelLoader(parameters),
             userInput(parameters),
             latticeBoltzmann(parameters),
             rigidBody(parameters),
@@ -34,6 +39,8 @@ public:
         UserInputData userInputData;
         LatticeBoltzmannData latticeBoltzmannData;
         RigidBodyData rigidBodyData;
+
+        Array2D<LevelLoader::CellType> level = levelLoader.loadLevel("testLevel");
 
         while (parameters.running) {
             // 1. get user input (kinect)

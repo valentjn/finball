@@ -2,8 +2,7 @@
 #define RENDERER_HPP_
 
 #include "Parameters.hpp"
-#include "LatticeBoltzmannData.hpp"
-#include "RigidBodyData.hpp"
+#include "RendererInput.hpp"
 
 class Renderer {
 private:
@@ -13,8 +12,7 @@ public:
     Renderer(Parameters &parameters) : parameters(parameters)
     {}
 
-    void render(const LatticeBoltzmannData *latticeBoltzmannData,
-                RigidBodyData *rigidBodyData)
+    void render(const RendererInput *rendererInput)
     {
         // TODO
     }

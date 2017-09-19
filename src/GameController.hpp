@@ -4,15 +4,21 @@
 #include "Parameters.hpp"
 #include "Array2D.hpp"
 
-#include "GameLogic.hpp"
 #include "LevelLoader.hpp"
+#include "GameLogic.hpp"
+#include "GameLogicOutput.hpp"
 #include "UserInput.hpp"
-#include "UserInputData.hpp"
+#include "UserInputOutput.hpp"
 #include "LatticeBoltzmann.hpp"
-#include "LatticeBoltzmannData.hpp"
+#include "LatticeBoltzmannOutput.hpp"
 #include "RigidBody.hpp"
-#include "RigidBodyData.hpp"
+#include "RigidBodyOutput.hpp"
 #include "Renderer.hpp"
+
+#include "GameLogicInput.hpp"
+#include "RigidBodyInput.hpp"
+#include "LatticeBoltzmannInput.hpp"
+#include "RendererInput.hpp"
 
 class GameController {
 private:
@@ -32,24 +38,33 @@ public:
         RigidBody rigidBody(parameters);
         Renderer renderer(parameters);
 
-        UserInputData userInputData;
-        LatticeBoltzmannData latticeBoltzmannData;
-        RigidBodyData rigidBodyData;
-        GameLogicData gameLogicData;
+        UserInputOutput userInputOutput;
+        LatticeBoltzmannOutput latticeBoltzmannOutput;
+        RigidBodyOutput rigidBodyOutput;
+        GameLogicOutput gameLogicOutput;
 
+        LatticeBoltzmannInput latticeBoltzmannInput;
+        RigidBodyInput rigidBodyInput;
+        GameLogicInput gameLogicInput;
+        RendererInput rendererInput;
 
-        while (gameLogicData.running) {
+        while (gameLogicOutput.running) {
             // 1. get user input (kinect)
-            userInput.getInput(&userInputData);
+            userInput.getInput(&userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
-            latticeBoltzmann.compute(&userInputData, &rigidBodyData, &latticeBoltzmannData);
-            rigidBody.compute(&userInputData, &latticeBoltzmannData, &rigidBodyData);
+            latticeBoltzmannInput = LatticeBoltzmannInput(&userInputOutput, &rigidBodyOutput);
+            latticeBoltzmann.compute(&latticeBoltzmannInput, &latticeBoltzmannOutput);
 
-            gameLogic.update(&userInputData, &rigidBodyData, &latticeBoltzmannData, &gameLogicData);
+            rigidBodyInput = RigidBodyInput(&userInputOutput, &latticeBoltzmannOutput);
+            rigidBody.compute(&rigidBodyInput, &rigidBodyOutput);
+
+            gameLogicInput = GameLogicInput(&userInputOutput, &rigidBodyOutput, &latticeBoltzmannOutput);
+            gameLogic.update(&gameLogicInput, &gameLogicOutput);
 
             // 3. draw visualization
-            renderer.render(&latticeBoltzmannData, &rigidBodyData);
+            rendererInput = RendererInput(&rigidBodyOutput, &latticeBoltzmannOutput);
+            renderer.render(&rendererInput);
         }
     }
 };

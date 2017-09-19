@@ -2,7 +2,7 @@
 #define USER_INPUT_HPP_
 
 #include "Parameters.hpp"
-#include "UserInputData.hpp"
+#include "UserInputOutput.hpp"
 
 class UserInput {
 private:
@@ -12,7 +12,7 @@ public:
     UserInput(Parameters &parameters) : parameters(parameters)
     {}
 
-    void getInput(UserInputData *userInputData)
+    void getInput(UserInputOutput *userInputOutput)
     {
         // TODO
     }

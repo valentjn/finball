@@ -2,9 +2,8 @@
 #define RIGID_BODY_HPP_
 
 #include "Parameters.hpp"
-#include "UserInputData.hpp"
-#include "LatticeBoltzmannData.hpp"
-#include "RigidBodyData.hpp"
+#include "RigidBodyInput.hpp"
+#include "RigidBodyOutput.hpp"
 
 class RigidBody {
 private:
@@ -14,9 +13,8 @@ public:
     RigidBody(Parameters &parameters) : parameters(parameters)
     {}
 
-    void compute(const UserInputData *userInputData,
-                 const LatticeBoltzmannData *latticeBoltzmannData,
-                 RigidBodyData *rigidBodyData)
+    void compute(const RigidBodyInput *input,
+                 RigidBodyOutput *rigidBodyOutput)
     {
         // TODO
     }

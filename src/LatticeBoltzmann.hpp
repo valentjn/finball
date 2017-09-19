@@ -2,9 +2,8 @@
 #define LATTICE_BOLTZMANN_HPP_
 
 #include "Parameters.hpp"
-#include "UserInputData.hpp"
-#include "RigidBodyData.hpp"
-#include "LatticeBoltzmannData.hpp"
+#include "LatticeBoltzmannInput.hpp"
+#include "LatticeBoltzmannOutput.hpp"
 
 class LatticeBoltzmann {
 private:
@@ -14,9 +13,8 @@ public:
     LatticeBoltzmann(Parameters &parameters) : parameters(parameters)
     {}
 
-    void compute(const UserInputData *userInputData,
-                 const RigidBodyData *rigidBodyData,
-                 LatticeBoltzmannData *latticeBoltzmannData)
+    void compute(const LatticeBoltzmannInput *input,
+                 LatticeBoltzmannOutput *latticeBoltzmannOutput)
     {
         // TODO
     }

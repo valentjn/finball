@@ -2,10 +2,8 @@
 #define GAME_LOGIC_HPP_
 
 #include "Parameters.hpp"
-#include "UserInputData.hpp"
-#include "RigidBodyData.hpp"
-#include "LatticeBoltzmannData.hpp"
-#include "GameLogicData.hpp"
+#include "GameLogicInput.hpp"
+#include "GameLogicOutput.hpp"
 
 class GameLogic {
 private:
@@ -15,10 +13,8 @@ public:
     GameLogic(Parameters &parameters) : parameters(parameters)
     {}
 
-    void update(const UserInputData *userInputData,
-                const RigidBodyData *rigidBodyData,
-                const LatticeBoltzmannData *latticeBoltzmannData,
-                GameLogicData *gameLogicData)
+    void update(const GameLogicInput *input,
+                GameLogicOutput *gameLogicOutput)
     {
         // TODO
     }

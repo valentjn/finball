@@ -22,16 +22,16 @@ public:
 		const float& t, const float& a, const float& m) :
 	pos(p), vel(v), theta(t), angVel(a), mass(m) {}
 
-	void displayRigidBody() {
+	virtual void displayRigidBody() {
 		std::cout << "-------------------------" << '\n';
-		std::cout << "Position " << this->pos[0] << " | " << this->pos[1] << '\n';
-		// std::cout << "Velocity " << this->vel << '\n';
-		// std::cout << "Orientation " << this->theta << '\n';
-		// std::cout << "Angular velocity" << this->angVel << '\n';
-		// std::cout << "Mass " << mass << '\n';
+		std::cout << "Position " << this->pos[0] << ',' << this->pos[1] << '\n';
+		std::cout << "Velocity " << this->vel[0] << ',' << this->vel[1] << '\n';
+		std::cout << "Orientation " << this->theta << '\n';
+		std::cout << "Angular velocity " << this->angVel << '\n';
+		std::cout << "Mass " << mass << '\n';
 	}
 
-	virtual ~CDataRigidBody();
+	virtual ~CDataRigidBody() {}
 };
 
 class CDataCircle : public CDataRigidBody {
@@ -39,6 +39,10 @@ private:
 	float radius;
 
 public:
+	CDataCircle(): CDataRigidBody(), radius(1.0) {
+		std::cout << "Creating a rigid circle with radius " << radius << '\n';
+	}
+
 	CDataCircle(const float& r): CDataRigidBody(), radius(r) {
 		std::cout << "Creating a rigid circle with radius " << radius << '\n';
 	}
@@ -53,28 +57,35 @@ public:
 		return this->radius;
 	}
 
-	void displayRigidBody() {
+	virtual void displayRigidBody() {
 		CDataRigidBody::displayRigidBody();
 		std::cout << "Radius " << radius << '\n';
 		std::cout << "-------------------------" << '\n';
 	}
 
-	~CDataCircle();
+	~CDataCircle() {}
 };
 
 class CDataRigidBodyList : public CPipelinePacket {
-private:
-	std::vector<CDataRigidBody> list;
+	std::vector<CDataRigidBody*> list;
 public:
 
 	CDataRigidBodyList () {
-		// TODO: Here we manually define for prototype
+		// TODO: Here we manually define for prototyping
 		std::vector<float> p(1.0, 1.0);
 		std::vector<float> v(2.0, 2.0);
-		CDataCircle c(p, v, 10.0, 15.0, 20.0, 25.0);
+		CDataCircle *c = new CDataCircle(p, v, 10.0, 15.0, 20.0, 25.0);
 		list.push_back(c);
+		displayList();
 	}
-	virtual ~CDataRigidBodyList ();
+
+	void displayList() {
+		for (uint i = 0; i < list.size(); i++) {
+			list[i]->displayRigidBody();
+		}
+	}
+
+	~CDataRigidBodyList () {}
 	void *getPayloadRaw() {
 		return this;
 	}

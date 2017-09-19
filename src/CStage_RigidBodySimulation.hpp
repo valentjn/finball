@@ -16,30 +16,31 @@ private:
 	// Input comes from LBM sim. Grid with Velocities and Densities
 	/**
 	 * input velocity and density field
-	 * TODO: Discuss with LBM guys about how data is stored
+	 * TODO: Ask LBM guys about how data is stored
 	 */
 	CDataArray2D<float,3> input_cDataArray2D_vel_den;
 
 	/**
 	 * output velocity and flag field for LBM
+	 * TODO: Tell the LBM guys how the data is stored
 	 */
 	CDataArray2D<float,3> output_cDataArray2D_vel_flag;
 
 	/**
 	 * output list of rigid bodies for viz
+	 * TODO: Tell the viz guys how the data is stored
 	 */
 	CDataRigidBodyList output_cDataRigidBody;
 
 public:
-	// TODO: Maybe the parameters are not required. Check later.
 	CStage_RigidBodySimulation(CParameters &i_cParameters) :
 	 	CPipelineStage("RigidBodySimulation"),
 		cParameters(i_cParameters) {}
 
 	/**
 	 * manually triggered pushing into the pipeline
-	 TODO: Make sure that the other classes know what to look
-	 for when pipeline_process_input is called
+	 * TODO: Make sure that the other classes know what to look
+	 * for when pipeline_process_input is called
 	 */
 	void pipeline_push() {
 		// The following is for LBM
@@ -61,10 +62,12 @@ public:
 
 	// Obtain data from LBM
 	void pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
-		// if (i_cPipelinePacket.type_info_name == typeid(CDataArray2D<float, 3>)) {
-		// 	// Process LBM data
-		// }
+		if (i_cPipelinePacket.type_info_name != typeid(CDataArray2D<float, 3>).name()) {
+			// If we get data from someplace else just return
+			return;
+		}
 
+		// Process LBM data
 		// unpack data
 		CDataArray2D<float,3> *input = i_cPipelinePacket.getPayload<CDataArray2D<float,3>>();
 

@@ -4,6 +4,7 @@
 #include "Parameters.hpp"
 #include "Array2D.hpp"
 
+#include "GameLogic.hpp"
 #include "LevelLoader.hpp"
 #include "UserInput.hpp"
 #include "UserInputData.hpp"
@@ -17,38 +18,35 @@ class GameController {
 private:
     Parameters &parameters;
 
-    LevelLoader levelLoader;
-    UserInput userInput;
-    LatticeBoltzmann latticeBoltzmann;
-    RigidBody rigidBody;
-    Renderer renderer;
-
 
 public:
     GameController(Parameters &parameters) :
-            parameters(parameters),
-            levelLoader(parameters),
-            userInput(parameters),
-            latticeBoltzmann(parameters),
-            rigidBody(parameters),
-            renderer(parameters)
+            parameters(parameters)
     {}
 
-    void startGame()
+    void startGame(Array2D<LevelLoader::CellType> &level)
     {
+        GameLogic gameLogic(parameters);
+        UserInput userInput(parameters);
+        LatticeBoltzmann latticeBoltzmann(parameters);
+        RigidBody rigidBody(parameters);
+        Renderer renderer(parameters);
+
         UserInputData userInputData;
         LatticeBoltzmannData latticeBoltzmannData;
         RigidBodyData rigidBodyData;
+        GameLogicData gameLogicData;
 
-        Array2D<LevelLoader::CellType> level = levelLoader.loadLevel("testLevel");
 
-        while (parameters.running) {
+        while (gameLogicData.running) {
             // 1. get user input (kinect)
             userInput.getInput(&userInputData);
 
             // 2. do calculations (rigid body, LBM)
             latticeBoltzmann.compute(&userInputData, &rigidBodyData, &latticeBoltzmannData);
             rigidBody.compute(&userInputData, &latticeBoltzmannData, &rigidBodyData);
+
+            gameLogic.update(&userInputData, &rigidBodyData, &latticeBoltzmannData, &gameLogicData);
 
             // 3. draw visualization
             renderer.render(&latticeBoltzmannData, &rigidBodyData);

@@ -8,8 +8,6 @@
 class Parameters
 {
 public:
-	bool running;
-
 	/**
 	 * verbosity level.
 	 * the higher, the more output has to be generated
@@ -18,7 +16,6 @@ public:
 
 	Parameters()
 	{
-		running = true;
 		verbosity_level = -1;
 	}
 

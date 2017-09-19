@@ -111,6 +111,7 @@ public:
 	std::vector<CDataRigidBody*> list;
 
 	CDataRigidBodyList () {
+		CPipelinePacket::setPacketTypeInfoName(typeid(*this).name());
 		// TODO: Here we manually define for prototyping
 		std::vector<float> p(1.0, 1.0);
 		std::vector<float> v(2.0, 2.0);

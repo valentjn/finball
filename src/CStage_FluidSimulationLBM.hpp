@@ -18,10 +18,8 @@ class CStage_FluidSimulationLBM	:	public
 	// global parameters
 	CParameters &cParameters;
 
-	// input flag image
-	CDataArray2D<unsigned char,1> input_cDataArray2D;
-
-	//TODO input velocity field to set velocities behind bodies
+	// input flag image (0,1 velocity, 2 type flag)
+	CDataArray2D<float,3> input_cDataArray2D;
 
 	// processed output field (the first two components give the velocity the third one the density)
 	CDataArray2D<float,3> output_Field;

@@ -70,6 +70,9 @@ CRenderer::CRenderer()
 	if (!m_window)
 		throw std::runtime_error(SDL_GetError());
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GLContext m_glcontext = SDL_GL_CreateContext(m_window);
 	if (!m_glcontext)
 		throw std::runtime_error(SDL_GetError());

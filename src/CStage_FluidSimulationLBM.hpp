@@ -15,35 +15,24 @@
 class CStage_FluidSimulationLBM	:	public
 	CPipelineStage
 {
-	/**
-	 * global parameters
-	 */
+	// global parameters
 	CParameters &cParameters;
 
-	/**
-	 * input flag image
-	 */
-	CDataArray2D<unsigned char,1> input_cDataArray2D;
+	// input flag image (0,1 velocity, 2 type flag)
+	CDataArray2D<float,3> input_cDataArray2D;
 
-	/**
-	 * processed velocity field
-	 */
-	CDataArray2D<float,2> output_cDataArray2D_f2;
+	// processed output field (the first two components give the velocity the third one the density)
+	CDataArray2D<float,3> output_Field;
 
-	/**
-	 * processed rgb field
-	 */
-	CDataArray2D<float,3> output_cDataArray2D_f3;
+	// previous f_i field
+	CDataArray2D<float,9> fi_Old;
+	
+	// processed f_i field
+	CDataArray2D<float,9> fi_New;
 
-	/**
-	 * simulation array to run simulation on
-	 */
-	CDataArray2D<float,2> simulationData_Buffer1;
 
 public:
-	/**
-	 * constructor
-	 */
+	// constructor
 	CStage_FluidSimulationLBM(CParameters &i_cParameters)	:
 		CPipelineStage("FluidSimulationLBM"),
 		cParameters(i_cParameters)
@@ -52,25 +41,11 @@ public:
 
 
 public:
-	/**
-	 * manually triggered pushing of next image to the pipeline
-	 */
+	// trigger pushing to the pipeline
 	void pipeline_push()
 	{
-		if (cParameters.stage_fluidsimulation_visualize_flagfield)
-			CPipelineStage::pipeline_push((CPipelinePacket&)input_cDataArray2D);
-
-		float scale = 10;
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
-		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
-			{
-				output_cDataArray2D_f2.getRef(x,y,0) = simulationData_Buffer1.getRef(x,y,0)*scale + 0.5f;
-				output_cDataArray2D_f2.getRef(x,y,1) = simulationData_Buffer1.getRef(x,y,1)*scale + 0.5f;
-			}
-		}
-
-		CPipelineStage::pipeline_push((CPipelinePacket&)output_cDataArray2D_f2);
+	// changed output to output_Field
+	CPipelineStage::pipeline_push((CPipelinePacket&)output_Field);
 	}
 
 
@@ -81,107 +56,81 @@ public:
 		if (!input_cDataArray2D.isValidData())
 			return;
 
-		if (	simulationData_Buffer1.width != input_cDataArray2D.width		||
-				simulationData_Buffer1.height != input_cDataArray2D.height
-		)
+		// initialization in the first iteration
+		if (	output_Field.width != input_cDataArray2D.width || output_Field.height != input_cDataArray2D.height)
 		{
-			simulationData_Buffer1.resize(input_cDataArray2D.width, input_cDataArray2D.height);
-			output_cDataArray2D_f2.resize(input_cDataArray2D.width, input_cDataArray2D.height);
-
-			// reset
-			for (int y = 0; y < output_cDataArray2D_f2.height; y++)
-			{
-				for (int x = 0; x < output_cDataArray2D_f2.width; x++)
-				{
-					simulationData_Buffer1.getRef(x, y, 0) = 0;
-					simulationData_Buffer1.getRef(x, y, 1) = 0;
-				}
-			}
+			initialization();
 		}
 
 
-
-		/*
-		 * process input/output/boundary flags
-		 */
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
+//TODO Calculate fi collision
+	/*for (int y = 0; y < input_cDataArray2D.height; y++)
+	{
+		for (int x = 0; x < input_cDataArray2D.width; x++)
 		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
-			{
-				unsigned char flag = input_cDataArray2D.getRef(x,y);
-
-				switch(flag)
+			if (input_cDataArray2D.getRef(x,y) 
+				for (int i = 0; i < 9; i ++)
 				{
-				case 1:	// boundary
-					simulationData_Buffer1.getRef(x,y,0) = 0;
-					simulationData_Buffer1.getRef(x,y,1) = 0;
-					break;
-
-				case 2:	// inflow
-					simulationData_Buffer1.getRef(x,y,0) = 1;
-					simulationData_Buffer1.getRef(x,y,1) = 0;
-					break;
-
-				case 3:	// outflow
-					simulationData_Buffer1.getRef(x,y,0) = -1;
-					simulationData_Buffer1.getRef(x,y,1) = 0;
-					break;
-
-				default:
-					break;
+					
 				}
-			}
 		}
+	}*/
+
+//TODO Calculate fi streaming
 
 
-		/*
-		 * averaging of velocity field
-		 */
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
+//TODO Consider Boundary in Col & STream (0 = fluid, 1 = boundary, 2 = inflow, 3 = outflow)
+
+
+	// Calculate macroscopic quantities
+	for (int y = 0; y < input_cDataArray2D.height; y++)
+	{
+		for (int x = 0; x < input_cDataArray2D.width; x++)
 		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
+			output_Field.getRef(x,y,2) = 0;
+			for (int i = 0; i < 9; i ++)
 			{
-				unsigned char flag = input_cDataArray2D.getRef(x,y);
-
-				static float s = 0.01;
-				static float is = 1.0-s;
-
-				float *v;
-				float a,b;
-				switch(flag)
-				{
-				case 0:	// fluid
-					v = &simulationData_Buffer1.getClampedRef(x-1,y);
-					a = v[0];
-					b = v[1];
-
-					v = &simulationData_Buffer1.getClampedRef(x+1,y);
-					a += v[0];
-					b += v[1];
-
-					v = &simulationData_Buffer1.getClampedRef(x,y-1);
-					a += v[0];
-					b += v[1];
-
-					v = &simulationData_Buffer1.getClampedRef(x,y+1);
-					a += v[0];
-					b += v[1];
-
-					a *= 0.25;
-					b *= 0.25;
-
-					v = &simulationData_Buffer1.getRef(x,y);
-					v[0] = v[0]*s+a*is;
-					v[1] = v[1]*s+b*is;
-					break;
-
-				default:
-					break;
-				}
+					output_Field.getRef(x,y,2) += fi_New.getRef(x,y,i);	//density
 			}
+			output_Field.getRef(x,y,0) = fi_New.getRef(x,y,1) - fi_New.getRef(x,y,3) + fi_New.getRef(x,y,5) - fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) + fi_New.getRef(x,y,8); //x Velocity
+			output_Field.getRef(x,y,1) = fi_New.getRef(x,y,2) - fi_New.getRef(x,y,4)   + fi_New.getRef(x,y,5) + fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) - fi_New.getRef(x,y,8); //y Velocity
 		}
+	}
 
 		pipeline_push();
+
+	// Set fi_old = fi_new
+	for (int y = 0; y < input_cDataArray2D.height; y++)
+	{
+		for (int x = 0; x < input_cDataArray2D.width; x++)
+		{
+			for (int i = 0; i < 9; i ++)
+			{
+					fi_Old.getRef(x,y,i) = fi_New.getRef(x,y,i);	
+			}
+		}
+	}
+	}
+
+private:
+	void initialization()
+	{
+		// initialize all the array sizes
+		output_Field.resize(input_cDataArray2D.width, input_cDataArray2D.height);
+		fi_New.resize(input_cDataArray2D.width, input_cDataArray2D.height);
+		fi_Old.resize(input_cDataArray2D.width, input_cDataArray2D.height);
+		// initialize fi in the first iteration
+		for (int y = 0; y < input_cDataArray2D.height; y++)
+		{
+			for (int x = 0; x < input_cDataArray2D.width; x++)
+			{
+				for (int i = 0; i < 9; i ++)
+				{
+					fi_New.getRef(x,y,i) = -1;
+					fi_Old.getRef(x,y,i) = -1;	
+				}
+			}
+		}
 	}
 
 
@@ -191,7 +140,7 @@ public:
 		simulation_timestep();
 	}
 
-public:
+public: //TODO data input of boundary cells (and later also velocity of bodies)
 	/**
 	 * process incoming pipeline input.
 	 *

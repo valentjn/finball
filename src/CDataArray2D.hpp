@@ -14,6 +14,9 @@ class CDataArray2D :
 {
 public:
 
+	
+
+
 	/**
 	 * width of array
 	 */

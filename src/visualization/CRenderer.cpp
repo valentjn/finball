@@ -116,8 +116,8 @@ void CRenderer::pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
 	CDataCircle *circle = (CDataCircle*)(*input).list.at(0);
 	std::vector<float> pos (circle->getPosition());
 	object.position = glm::vec3{ pos.at(0), pos.at(1), 0.f };
-	object.scale = circle->getRadius();;
-
+	object.scale = circle->getRadius();
+	m_world_objects.push_back(object);
 }
 
 void CRenderer::renderUIObject(const CRenderObject& obj)
@@ -181,4 +181,3 @@ void CRenderer::present()
 	// Swap back and front buffer
 	SDL_GL_SwapWindow(m_window);
 }
-

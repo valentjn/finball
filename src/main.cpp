@@ -7,13 +7,13 @@
 
 #include <iostream>
 
+#include "visualization/CRenderer.hpp"
 #include "CPipelineStage.hpp"
 #include "CParameters.hpp"
 #include "CStage_ImageInput.hpp"
 #include "CStage_ImageProcessing.hpp"
 #include "CStage_FluidSimulationLBM.hpp"
 #include "CStage_VideoOutput.hpp"
-#include "visualization/CRenderer.hpp"
 
 
 /*
@@ -208,6 +208,25 @@ void main_sim_static_image()
 void main_game()
 {
 	CRenderer renderer;
+	CRenderObject object;
+	object.position = glm::vec3{ 0.f, 0.f, 0.f };
+	object.scale = 1.f;
+	renderer.renderWorldObject(object);
+	renderer.present();
+
+	while (true) {
+		// Poll available events
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+			case SDL_QUIT:
+				return;
+			}
+		}
+
+		// Delay 15ms
+		SDL_Delay(15);
+	}
 }
 
 

@@ -1,5 +1,5 @@
 
-
+CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
 DEBUG_CFLAGS:=-g3 -O0 -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl2 --cflags` -I src
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl2 --cflags` -I src
 LDFLAGS:= -lSDL2_image -lGL `pkg-config sdl2 --libs`
@@ -11,11 +11,11 @@ install_deb_packages:
 
 release:
 	mkdir -p ./build
-	$(CXX) $(RELEASE_CFLAGS) src/main.cpp -o build/fa_2017_release $(LDFLAGS)
+	$(CXX) $(RELEASE_CFLAGS) $(CPP_FILES) -o build/fa_2017_release $(LDFLAGS)
 
 debug:
 	mkdir -p ./build
-	$(CXX) $(DEBUG_CFLAGS) src/main.cpp -o build/fa_2017_debug $(LDFLAGS)
+	$(CXX) $(DEBUG_CFLAGS) $(CPP_FILES) -o build/fa_2017_debug $(LDFLAGS)
 
 clean:
 	rm -rf build Debug Release

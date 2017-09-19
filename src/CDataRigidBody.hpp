@@ -22,6 +22,48 @@ public:
 		const float& t, const float& a, const float& m) :
 	pos(p), vel(v), theta(t), angVel(a), mass(m) {}
 
+	std::vector<float>& getPosition() {
+		return pos;
+	}
+
+	void setPosition(const std::vector<float>& p) {
+		pos.at(0) = p.at(0);
+		pos.at(1) = p.at(1);
+	}
+
+	std::vector<float>& getVelocity() {
+		return vel;
+	}
+
+	void setVelocity(const std::vector<float>& v) {
+		vel.at(0) = v.at(0);
+		vel.at(1) = v.at(1);
+	}
+
+	float getOrientation() {
+		return theta;
+	}
+
+	void setOrientation(const float& t) {
+		this->theta = t;
+	}
+
+	float getAngVelocity() {
+		return angVel;
+	}
+
+	void setAngVelocity(const float& o) {
+		this->angVel = o;
+	}
+
+	float getMass() {
+		return mass;
+	}
+
+	void setMass(const float& m) {
+		this->mass = m;
+	}
+
 	virtual void displayRigidBody() {
 		std::cout << "-------------------------" << '\n';
 		std::cout << "Position " << this->pos[0] << ',' << this->pos[1] << '\n';
@@ -39,22 +81,20 @@ private:
 	float radius;
 
 public:
-	CDataCircle(): CDataRigidBody(), radius(1.0) {
-		std::cout << "Creating a rigid circle with radius " << radius << '\n';
-	}
+	CDataCircle(): CDataRigidBody(), radius(1.0) {}
 
-	CDataCircle(const float& r): CDataRigidBody(), radius(r) {
-		std::cout << "Creating a rigid circle with radius " << radius << '\n';
-	}
+	CDataCircle(const float& r): CDataRigidBody(), radius(r) {}
 
 	CDataCircle(const std::vector<float>& p, const std::vector<float>& v,
 		const float& t, const float& a, const float& m, const float& r) :
-	CDataRigidBody(p,v,t,a,m), radius(r) {
-		std::cout << "Creating a rigid circle with radius " << radius << '\n';
-	}
+	CDataRigidBody(p,v,t,a,m), radius(r) {}
 
 	float getRadius() {
 		return this->radius;
+	}
+
+	void setRadius(const float& r) {
+		this->radius = r;
 	}
 
 	virtual void displayRigidBody() {

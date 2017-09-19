@@ -52,7 +52,8 @@ public:
 
 	// Update method. Here all the magic happens. Collisions. Force computations. etc.
 	void simulation_timestep() {
-		// magic
+		// TODO: magic
+
 		pipeline_push();
 	}
 
@@ -60,13 +61,13 @@ public:
 		simulation_timestep();
 	}
 
-	// Obtain data from LBM
+	// Obtain data from LBM and/or UI
 	void pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
 		if (i_cPipelinePacket.type_info_name != typeid(CDataArray2D<float, 3>).name()) {
-			// If we get data from someplace else just return
+			// If we get data from someone other than LBM or UI just return
 			return;
 		}
-		
+
 		// Process LBM data
 		// unpack data
 		CDataArray2D<float,3> *input = i_cPipelinePacket.getPayload<CDataArray2D<float,3>>();
@@ -74,6 +75,8 @@ public:
 		// Process the input data
 		input_cDataArray2D_vel_den.resize(input->width, input->height);
 		input_cDataArray2D_vel_den.loadData(input->data);
+
+		// TODO: Process UI data
 	}
 
 	~CStage_RigidBodySimulation () {}

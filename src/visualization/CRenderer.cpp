@@ -84,6 +84,8 @@ CRenderer::CRenderer()
 	m_shader_program_world = createProgram(
 		"src/visualization/world_vert.glsl",
 		"src/visualization/world_frag.glsl");
+
+	glViewport(0, 0, resolution.x, resolution.y);
 }
 
 CRenderer::~CRenderer()
@@ -107,7 +109,6 @@ void CRenderer::present()
 {
 	glClearColor(0.4f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	SDL_GL_SwapWindow(m_window);
 
 	// set up rendering of the world objects
 	glUseProgram(m_shader_program_world);
@@ -116,9 +117,9 @@ void CRenderer::present()
 		m_camera_pos + glm::vec3{ 0, 0, -1 },	// center
 		glm::vec3{ 0, 1, 0 });					// up
 	glm::mat4 projection = glm::perspective(
-		glm::pi<float>() * 0.25f,							// vertical field of view
+		glm::pi<float>() * 0.25f,								// vertical field of view
 		static_cast<float>(m_resolution.x) / m_resolution.y,	// aspect ratio
-		0.1f, 10.f);										// distance near & far plane
+		0.1f, 10.f);											// distance near & far plane
 	glUniformMatrix4fv(
 		glGetUniformLocation(m_shader_program_world, "view"),
 		1,										// matrix count
@@ -145,9 +146,17 @@ void CRenderer::present()
 	// clear the list of world objects, the list has to be newly filled for the next frame
 	m_world_objects.clear();
 
+	// set up rendering of the ui objects
 	glUseProgram(m_shader_program_ui);
+
+	// actually render the ui objects
 	for (const CRenderObject& obj : m_ui_objects) {
 		// render 
 	}
+
+	// clear the list of ui objects, the list has to be newly filled for the next frame
 	m_ui_objects.clear();
+
+	// Swap back and front buffer
+	SDL_GL_SwapWindow(m_window);
 }

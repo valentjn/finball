@@ -44,27 +44,18 @@ public:
             }
         }
 
-        // for (int x = 0; x < 10; x++)
-        // {
-        //     for (int y = 0; y < 10; y++)
-        //     {
-        //         if (x == 0 || y == 0)
-        //             level.setValue(x, y, BC_INFLOW);
-        //         else if (x == 9 || y == 9)
-        //             level.setValue(x, y, BC_OUTFLOW);
-        //         else
-        //             level.setValue(x, y, EMPTY);
-        //     }
-        // }
-
-        for (int y = 0; y < height; y++)
+        if (parameters.verbosity_level >= 1)
         {
-            string line = "";
-            for (int x = 0; x < width; x++)
+            cout << "Loaded level:" << endl;
+            for (int y = 0; y < height; y++)
             {
-                line += to_string(level->getValue(x, y));
+                string line = "";
+                for (int x = 0; x < width; x++)
+                {
+                    line += to_string(level->getValue(x, y));
+                }
+                cout << line << endl;
             }
-            cout << line << endl;
         }
 
         return level;

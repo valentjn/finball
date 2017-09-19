@@ -15,7 +15,7 @@ private:
 	float mass;
 
 public:
-	CDataRigidBody(): pos(0.0, 0.0), vel(0.0, 0.0),
+	CDataRigidBody(): pos(2, 0.0), vel(2, 0.0),
 	theta(0.0), angVel(0.0), mass(1.0) {}
 
 	CDataRigidBody(const std::vector<float>& p, const std::vector<float>& v,
@@ -113,8 +113,8 @@ public:
 	CDataRigidBodyList () {
 		CPipelinePacket::setPacketTypeInfoName(typeid(*this).name());
 		// TODO: Here we manually define for prototyping
-		std::vector<float> p(1.0, 1.0);
-		std::vector<float> v(2.0, 2.0);
+		std::vector<float> p = {1.0, 1.0};
+		std::vector<float> v= {2.0, 2.0};
 		CDataCircle *c = new CDataCircle(p, v, 10.0, 15.0, 20.0, 25.0);
 		list.push_back(c);
 	}

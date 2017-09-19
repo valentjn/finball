@@ -114,9 +114,11 @@ void CRenderer::pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
 
 	CRenderObject object;
 	CDataCircle *circle = (CDataCircle*)(*input).list.at(0);
-	std::vector<float> pos (circle->getPosition());
-	object.position = glm::vec3{ pos.at(0), pos.at(1), 0.f };
 	object.scale = circle->getRadius();
+
+
+	std::vector<float>& pos = (circle->getPosition());
+	object.position = glm::vec3{ pos.at(0), pos.at(1), 0.f };
 	m_world_objects.push_back(object);
 }
 

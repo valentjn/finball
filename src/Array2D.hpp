@@ -43,6 +43,13 @@ public:
 		return data[y * width + x];
 	}
 
+	T &getRef(int x, int y)
+	{
+		assert(x >= 0 && y >= 0 && y < height && x < width);
+
+		return data[y * width + x];
+	}
+
 	T *getRawData()
 	{
 		return data;

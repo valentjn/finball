@@ -1,4 +1,4 @@
-#version 420
+#version 330
 
 varying vec2 coords; // fragment in question
 uniform sampler2D tex; // texture

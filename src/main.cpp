@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
 	Level level;
 	LevelLoader levelLoader(parameters);
-	levelLoader.loadLevel("data/testLevel.txt", level);
+	levelLoader.loadLevel(level);
 
 	GameController gameController(parameters);
 	gameController.startGame(level);

@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <string>
+
+using namespace std;
 
 class Parameters
 {
@@ -13,10 +16,12 @@ public:
 	 * the higher, the more output has to be generated
 	 */
 	int verbosity_level;
+	string level_file_path;
 
 	Parameters()
 	{
 		verbosity_level = -1;
+		level_file_path = "data/testLevel.txt";
 	}
 
 	/**
@@ -26,6 +31,7 @@ public:
 	{
 		std::cout << "Parameters for " << argv[0] << std::endl;
 		std::cout << "	-v [level]		Verbosity level (default: -1)" << std::endl;
+		std::cout << "	-l [file]		Level (default: data/testLevel.txt)" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -38,7 +44,7 @@ public:
 	void setup(int argc, char *const argv[])
 	{
 		int optchar;
-		const char *options = "v:";
+		const char *options = "v:l:";
 
 		while ((optchar = getopt(argc, argv, options)) > 0)
 		{
@@ -46,6 +52,10 @@ public:
 			{
 			case 'v':
 				verbosity_level = atoi(optarg);
+				break;
+
+			case 'l':
+				level_file_path = optarg;
 				break;
 
 			default:

@@ -21,10 +21,10 @@ public:
     LevelLoader(Parameters &parameters) : parameters(parameters)
     {}
 
-    void loadLevel(string filePath, Level &level)
+    void loadLevel(Level &level)
     {
         fstream file;
-        file.open(filePath, fstream::in);
+        file.open(parameters.level_file_path, fstream::in);
         if (!file.is_open())
         {
             if (parameters.verbosity_level >= 1)

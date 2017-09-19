@@ -13,14 +13,17 @@ private:
 	float theta;
 	float angVel;
 	float mass;
+	int objType;
 
 public:
+	enum typeOfRigidBody { CIRCLE, RECTANGLE, TRIANGLE, ARBITRARY };
+
 	CDataRigidBody(): pos(2, 0.0), vel(2, 0.0),
 	theta(0.0), angVel(0.0), mass(1.0) {}
 
 	CDataRigidBody(const std::vector<float>& p, const std::vector<float>& v,
-		const float& t, const float& a, const float& m) :
-	pos(p), vel(v), theta(t), angVel(a), mass(m) {}
+		const float& t, const float& a, const float& m, const int& obj) :
+	pos(p), vel(v), theta(t), angVel(a), mass(m), objType(obj) {}
 
 	std::vector<float>& getPosition() {
 		return pos;
@@ -64,6 +67,14 @@ public:
 		this->mass = m;
 	}
 
+	int getType() {
+		return this->objType;
+	}
+
+	void setType(typeOfRigidBody t) {
+		this->objType = t;
+	}
+
 	virtual void displayRigidBody() {
 		std::cout << "-------------------------" << '\n';
 		std::cout << "Position " << this->pos[0] << ',' << this->pos[1] << '\n';
@@ -81,13 +92,17 @@ private:
 	float radius;
 
 public:
-	CDataCircle(): CDataRigidBody(), radius(1.0) {}
+	CDataCircle(): CDataRigidBody(), radius(1.0) {
+		this->setType(CIRCLE);
+	}
 
-	CDataCircle(const float& r): CDataRigidBody(), radius(r) {}
+	CDataCircle(const float& r): CDataRigidBody(), radius(r) {
+		this->setType(CIRCLE);
+	}
 
 	CDataCircle(const std::vector<float>& p, const std::vector<float>& v,
 		const float& t, const float& a, const float& m, const float& r) :
-	CDataRigidBody(p,v,t,a,m), radius(r) {}
+	CDataRigidBody(p,v,t,a,m,CIRCLE), radius(r) {}
 
 	float getRadius() {
 		return this->radius;

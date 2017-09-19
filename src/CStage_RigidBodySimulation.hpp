@@ -66,7 +66,7 @@ public:
 			// If we get data from someplace else just return
 			return;
 		}
-
+		
 		// Process LBM data
 		// unpack data
 		CDataArray2D<float,3> *input = i_cPipelinePacket.getPayload<CDataArray2D<float,3>>();
@@ -76,6 +76,6 @@ public:
 		input_cDataArray2D_vel_den.loadData(input->data);
 	}
 
-	virtual ~CStage_RigidBodySimulation ();
+	~CStage_RigidBodySimulation () {}
 };
 #endif // CSTAGE_RIGIDBODYSIMULATION_HPP_

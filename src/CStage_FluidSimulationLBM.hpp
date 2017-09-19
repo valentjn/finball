@@ -30,6 +30,8 @@ class CStage_FluidSimulationLBM	:	public
 	// processed f_i field
 	CDataArray2D<float,9> fi_New;
 
+	// internal f_i eqilibrium field
+	CDataArray2d<float,9> fi_Eq;
 
 public:
 	// constructor
@@ -66,16 +68,26 @@ public:
 //TODO Calculate fi collision
 	/*for (int y = 0; y < input_cDataArray2D.height; y++)
 	{
-		for (int x = 0; x < input_cDataArray2D.width; x++)
+		for (int x = 0; x < input_cDataArray2D.width; x++) //collision in cell (x,y)
 		{
-			if (input_cDataArray2D.getRef(x,y) 
-				for (int i = 0; i < 9; i ++)
-				{
-					
-				}
+			float rho = 0;
+			for (int i = 0; i < 9; i ++)
+			{
+				rho += fi_Old.getRef(x,y,i);
+			}
+
+			//TODO calculate cu , w(i)
+
+			//TODO fi_Eq.getRef(x,y,i) = rho * w(i) * (1+cu + 0.5 * (cu)*(cu) + 3/2 *(ux*ux+uy*uy);
+
+			for (int i =0; i<9; i++)
+			{	//TODO define omega
+				fi_New.getRef(x,y,i) = fi_Old.getRef(x,y,i) + omega * (fi_Eq.getRef(x,y,i) - fi_Old(x,yi));
+			} 
 		}
 	}*/
 
+//TODO Set fi_old = fi_new to use fi new during streaming
 //TODO Calculate fi streaming
 
 
@@ -119,6 +131,7 @@ private:
 		output_Field.resize(input_cDataArray2D.width, input_cDataArray2D.height);
 		fi_New.resize(input_cDataArray2D.width, input_cDataArray2D.height);
 		fi_Old.resize(input_cDataArray2D.width, input_cDataArray2D.height);
+		fi_Eq.resize(input_cDataArray2D.width, input_cDataArray2D.height);
 		// initialize fi in the first iteration
 		for (int y = 0; y < input_cDataArray2D.height; y++)
 		{
@@ -126,6 +139,7 @@ private:
 			{
 				for (int i = 0; i < 9; i ++)
 				{
+					//TODO set some equilibrium distribution for fixed rho here
 					fi_New.getRef(x,y,i) = -1;
 					fi_Old.getRef(x,y,i) = -1;	
 				}

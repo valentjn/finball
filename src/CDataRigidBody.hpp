@@ -141,6 +141,14 @@ public:
 		}
 	}
 
+	size_t getSize() {
+		return list.size();
+	}
+
+	CDataRigidBody* getRigidBody(const int& idx) {
+		return list.at(idx);
+	}
+
 	~CDataRigidBodyList () {
 		std::vector<CDataRigidBody*>::iterator it;
 		for (it = list.begin(); it != list.end(); it++) {

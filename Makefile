@@ -11,11 +11,11 @@ install_deb_packages:
 
 release:
 	mkdir -p ./build
-	$(CXX) $(RELEASE_CFLAGS) src/main.cpp -o build/fa_2017_release $(LDFLAGS)
+	$(CXX) src/main.cpp $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
 
 debug:
 	mkdir -p ./build
-	$(CXX) $(DEBUG_CFLAGS) src/main.cpp -o build/fa_2017_debug $(LDFLAGS)
+	$(CXX) src/main.cpp $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
 clean:
 	rm -rf build Debug Release

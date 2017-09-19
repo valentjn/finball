@@ -50,21 +50,21 @@ public:
 
         while (gameLogicOutput.running) {
             // 1. get user input (kinect)
-            userInput.getInput(&userInputOutput);
+            userInput.getInput(userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
-            latticeBoltzmannInput = LatticeBoltzmannInput(&userInputOutput, &rigidBodyOutput);
-            latticeBoltzmann.compute(&latticeBoltzmannInput, &latticeBoltzmannOutput);
+            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyOutput);
+            latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
-            rigidBodyInput = RigidBodyInput(&userInputOutput, &latticeBoltzmannOutput);
-            rigidBody.compute(&rigidBodyInput, &rigidBodyOutput);
+            rigidBodyInput = RigidBodyInput(userInputOutput, latticeBoltzmannOutput);
+            rigidBody.compute(rigidBodyInput, rigidBodyOutput);
 
-            gameLogicInput = GameLogicInput(&userInputOutput, &rigidBodyOutput, &latticeBoltzmannOutput);
-            gameLogic.update(&gameLogicInput, &gameLogicOutput);
+            gameLogicInput = GameLogicInput(userInputOutput, rigidBodyOutput, latticeBoltzmannOutput);
+            gameLogic.update(gameLogicInput, gameLogicOutput);
 
             // 3. draw visualization
-            rendererInput = RendererInput(&rigidBodyOutput, &latticeBoltzmannOutput);
-            renderer.render(&rendererInput);
+            rendererInput = RendererInput(rigidBodyOutput, latticeBoltzmannOutput);
+            renderer.render(rendererInput);
         }
     }
 };

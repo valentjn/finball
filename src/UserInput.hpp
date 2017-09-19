@@ -12,7 +12,7 @@ public:
     UserInput(Parameters &parameters) : parameters(parameters)
     {}
 
-    void getInput(UserInputOutput *userInputOutput)
+    void getInput(UserInputOutput &userInputOutput)
     {
         // TODO
     }

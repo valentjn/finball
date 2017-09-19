@@ -13,8 +13,8 @@ public:
     GameLogic(Parameters &parameters) : parameters(parameters)
     {}
 
-    void update(const GameLogicInput *input,
-                GameLogicOutput *gameLogicOutput)
+    void update(const GameLogicInput &input,
+                GameLogicOutput &gameLogicOutput)
     {
         // TODO
     }

@@ -8,8 +8,8 @@ class LatticeBoltzmannInput {
 public:
     LatticeBoltzmannInput(){}
 
-    LatticeBoltzmannInput(const UserInputOutput *userInputOutput,
-                          const RigidBodyOutput *rigidBodyOutput)
+    LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
+                          const RigidBodyOutput &rigidBodyOutput)
     {}
 };
 

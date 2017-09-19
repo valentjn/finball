@@ -8,8 +8,8 @@ class RendererInput {
 public:
     RendererInput() {}
 
-    RendererInput(const RigidBodyOutput *rigidBodyOutput,
-                  const LatticeBoltzmannOutput *latticeBoltzmannOutput)
+    RendererInput(const RigidBodyOutput &rigidBodyOutput,
+                  const LatticeBoltzmannOutput &latticeBoltzmannOutput)
     {}
 };
 

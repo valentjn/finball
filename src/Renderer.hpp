@@ -12,7 +12,7 @@ public:
     Renderer(Parameters &parameters) : parameters(parameters)
     {}
 
-    void render(const RendererInput *rendererInput)
+    void render(const RendererInput &rendererInput)
     {
         // TODO
     }

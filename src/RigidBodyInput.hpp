@@ -8,8 +8,8 @@ class RigidBodyInput {
 public:
     RigidBodyInput() {}
 
-    RigidBodyInput(const UserInputOutput *userInputOutput,
-                   const LatticeBoltzmannOutput *latticeBoltzmannOutput)
+    RigidBodyInput(const UserInputOutput &userInputOutput,
+                   const LatticeBoltzmannOutput &latticeBoltzmannOutput)
     {}
 };
 

@@ -13,8 +13,8 @@ public:
     RigidBody(Parameters &parameters) : parameters(parameters)
     {}
 
-    void compute(const RigidBodyInput *input,
-                 RigidBodyOutput *rigidBodyOutput)
+    void compute(const RigidBodyInput &input,
+                 RigidBodyOutput &rigidBodyOutput)
     {
         // TODO
     }

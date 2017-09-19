@@ -13,8 +13,8 @@ public:
     LatticeBoltzmann(Parameters &parameters) : parameters(parameters)
     {}
 
-    void compute(const LatticeBoltzmannInput *input,
-                 LatticeBoltzmannOutput *latticeBoltzmannOutput)
+    void compute(const LatticeBoltzmannInput &input,
+                 LatticeBoltzmannOutput &latticeBoltzmannOutput)
     {
         // TODO
     }

@@ -13,6 +13,7 @@
 #include "CRenderObject.hpp"
 #include "../CDataRigidBody.hpp"
 #include "../CParameters.hpp"
+#include <memory>
 
 class CRenderer : public CPipelineStage
 {
@@ -29,7 +30,7 @@ class CRenderer : public CPipelineStage
 	glm::vec3 m_camera_pos;
 
 	// WIP
-	CMesh m_rectangle;
+	std::unique_ptr<CMesh> m_rectangle;
 
 public:
 	CRenderer();

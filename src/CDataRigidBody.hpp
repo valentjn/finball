@@ -76,16 +76,22 @@ public:
 		std::vector<float> v(2.0, 2.0);
 		CDataCircle *c = new CDataCircle(p, v, 10.0, 15.0, 20.0, 25.0);
 		list.push_back(c);
-		displayList();
 	}
 
 	void displayList() {
-		for (uint i = 0; i < list.size(); i++) {
-			list[i]->displayRigidBody();
+		std::vector<CDataRigidBody*>::iterator it;
+		for (it = list.begin(); it != list.end(); it++) {
+			(*it)->displayRigidBody();
 		}
 	}
 
-	~CDataRigidBodyList () {}
+	~CDataRigidBodyList () {
+		std::vector<CDataRigidBody*>::iterator it;
+		for (it = list.begin(); it != list.end(); it++) {
+			delete (*it);
+		}
+		list.clear();
+	}
 	void *getPayloadRaw() {
 		return this;
 	}

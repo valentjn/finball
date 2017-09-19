@@ -1,7 +1,6 @@
-
-
-DEBUG_CFLAGS:=-g3 -O0 -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl2 --cflags`
-RELEASE_CFLAGS:= -O3 -mtune=native -march=native -pedantic -Wall -Wextra -fmessage-length=0 -std=c++11 `pkg-config sdl2 --cflags` `pkg-config bullet --cflags` `pkg-config bullet --libs`
+COMMON_CFLAGS=-std=c++11 `pkg-config sdl2 --cflags` `pkg-config bullet --cflags` `pkg-config bullet --libs`
+DEBUG_CFLAGS:=-g3 -O0 -pedantic -Wall -Wextra -fmessage-length=0 $(COMMON_CFLAGS)
+RELEASE_CFLAGS:= -O3 -mtune=native -march=native -pedantic -Wall -Wextra -fmessage-length=0 $(COMMON_CFLAGS)
 LDFLAGS:= -lSDL2_image -lGL `pkg-config sdl2 --libs`
 
 all:	release

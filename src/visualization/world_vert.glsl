@@ -1,5 +1,5 @@
 #version 330
-#define GL_ARB_explicit_uniform_location 1
+#extension GL_ARB_explicit_uniform_location : require
 
 layout(location = 0) uniform mat4 model;
 layout(location = 1) uniform mat4 view;

@@ -21,6 +21,11 @@ CMesh::CMesh()
 
 	m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
 
+	// create vertex array object
+	m_vao = 0;
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+
 	// create and fill vertex buffer object
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -31,9 +36,6 @@ CMesh::CMesh()
 
 	std::cout << "1 : " << glGetError() << '\n';
 
-	// create vertex array object
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
 
 	std::cout << "2 : " << glGetError() << '\n';
 

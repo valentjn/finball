@@ -45,8 +45,10 @@ GLuint createProgram(const char* vert_path, const char* frag_path)
 	glAttachShader(shader_program, vert_shader);
 	glAttachShader(shader_program, frag_shader);
 	glLinkProgram(shader_program);
-	glDeleteProgram(vert_shader);
-	glDeleteProgram(frag_shader);
+	//glDetachShader(shader_program, vert_shader);
+	//glDetachShader(shader_program, frag_shader);
+	//glDeleteProgram(vert_shader);
+	//glDeleteProgram(frag_shader);
 	GLint success = 0;
 	glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
 	if (!success)
@@ -84,7 +86,7 @@ CRenderer::CRenderer()
 	m_shader_program_world = createProgram(
 		"src/visualization/world_vert.glsl",
 		"src/visualization/world_frag.glsl");
-	glBindAttribLocation(m_shader_program_world, 0, "in_pos");
+	//glBindAttribLocation(m_shader_program_world, 0, "in_pos");
 
 	// full window viewport
 	glViewport(0, 0, m_resolution.x, m_resolution.y);

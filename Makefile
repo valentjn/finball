@@ -2,6 +2,7 @@ CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
 COMMON_CFLAGS= -pedantic \
 		       -Wall \
 		       -Wextra \
+		       -Wno-unused-parameter \
 		       -fmessage-length=0 \
 		       -std=c++11 \
 		       `pkg-config sdl2 --cflags` \

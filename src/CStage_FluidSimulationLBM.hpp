@@ -66,11 +66,22 @@ public:
 
 
 //TODO Calculate fi collision
+	/*for (int y = 0; y < input_cDataArray2D.height; y++)
+	{
+		for (int x = 0; x < input_cDataArray2D.width; x++)
+		{
+			if (input_cDataArray2D.getRef(x,y) 
+				for (int i = 0; i < 9; i ++)
+				{
+					
+				}
+		}
+	}*/
 
 //TODO Calculate fi streaming
 
 
-//TODO Consider Boundary in Col & STream (1 = boundary, 2 = inflow, 3 = outflow)
+//TODO Consider Boundary in Col & STream (0 = fluid, 1 = boundary, 2 = inflow, 3 = outflow)
 
 
 	// Calculate macroscopic quantities

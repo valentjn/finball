@@ -7,12 +7,16 @@
 
 class GameLogicInput {
 public:
+    bool quit;
+
     GameLogicInput() {}
 
     GameLogicInput(const UserInputOutput &userInputOutput,
                    const RigidBodyOutput &rigidBodyOutput,
                    const LatticeBoltzmannOutput &latticeBoltzmannOutput)
-    {}
+    {
+        quit = userInputOutput.quit;
+    }
 };
 
 #endif

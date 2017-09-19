@@ -17,6 +17,11 @@ public:
                 GameLogicOutput &gameLogicOutput)
     {
         // TODO
+        if (input.quit)
+        {
+            gameLogicOutput.running = false;
+            return;
+        }
     }
 };
 

@@ -15,30 +15,22 @@
 class CStage_FluidSimulationLBM	:	public
 	CPipelineStage
 {
-	/**
-	 * global parameters
-	 */
+	// global parameters
 	CParameters &cParameters;
 
-	/**
-	 * input flag image
-	 */
+	// input flag image
 	CDataArray2D<unsigned char,1> input_cDataArray2D;
 
 	//TODO input velocity field to set velocities behind bodies
 
-	/**
-	 * processed velocity field
-	 */
-	CDataArray2D<float,2> output_Velocity;
+	// processed output field (the first two components give the velocity the third one the density)
+	CDataArray2D<float,3> output_Field;
 
-	// processed density field
-	CDataArray2D<float,1> output_Density;
-
-	/**
-	 * processed f_i field
-	 */
-	CDataArray2D<float,9> fi_Array;
+	// previous f_i field
+	CDataArray2D<float,9> fi_Old;
+	
+	// processed f_i field
+	DataArray2D<float,9> fi_New;
 
 
 public:

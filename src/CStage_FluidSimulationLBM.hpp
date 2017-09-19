@@ -40,6 +40,8 @@ public:
 	CStage_FluidSimulationLBM(CParameters &i_cParameters)	:
 		CPipelineStage("FluidSimulationLBM"),
 		cParameters(i_cParameters)
+
+	// TODO initialize fi in the first iteration
 	{
 	}
 
@@ -48,22 +50,13 @@ public:
 	/**
 	 * manually triggered pushing of next image to the pipeline
 	 */
-	void pipeline_push() // TODO
+	void pipeline_push()
 	{
-		if (cParameters.stage_fluidsimulation_visualize_flagfield)
-			CPipelineStage::pipeline_push((CPipelinePacket&)input_cDataArray2D);
+		
 
-		float scale = 10;
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
-		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
-			{
-				output_cDataArray2D_f2.getRef(x,y,0) = simulationData_Buffer1.getRef(x,y,0)*scale + 0.5f;
-				output_cDataArray2D_f2.getRef(x,y,1) = simulationData_Buffer1.getRef(x,y,1)*scale + 0.5f;
-			}
-		}
-
-		CPipelineStage::pipeline_push((CPipelinePacket&)output_cDataArray2D_f2);
+		
+		// changed output to output_Field
+		CPipelineStage::pipeline_push((CPipelinePacket&)output_Field);
 	}
 
 
@@ -83,23 +76,16 @@ public:
 			fi_Array.resize(input_cDataArray2D.width, input_cDataArray2D.height);
 		}
 
-// TODO initialize fi in the first iteration
 
 
-// TODO find boundary cells and save their position them in a readable structure
+//TODO Calculate fi collision
 
-		/*
-		 * process input/output/boundary flags
-		 */
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
-		{
- 			for (int x = 0; x < simulationData_Buffer1.width; x++)
-			{
-				unsigned char flag = input_cDataArray2D.getRef(x,y);
+//TODO Calculate fi streaming
 
-				switch(flag)
-				{
-				case 1:	// boundary
+//TODO Consider Boundary in Col & STream
+
+/*
+case 1:	// boundary
 					simulationData_Buffer1.getRef(x,y,0) = 0;
 					simulationData_Buffer1.getRef(x,y,1) = 0;
 					break;
@@ -113,18 +99,7 @@ public:
 					simulationData_Buffer1.getRef(x,y,0) = -1;
 					simulationData_Buffer1.getRef(x,y,1) = 0;
 					break;
-
-				default:
-					break;
-				}
-			}
-		}
-
-//TODO Calculate fi collision
-
-//TODO Calculate fi streaming
-
-//TODO Consider Boundary in Col & STream
+*/ 
 
 //TODO Calculate macroscopic quantities
 

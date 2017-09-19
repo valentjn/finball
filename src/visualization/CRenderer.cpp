@@ -8,6 +8,10 @@
 
 
 #include <iostream>
+#include <CPipelinePacket.hpp>
+#include <CDataRigidBody.hpp>
+#include "CRenderObject.hpp"
+
 
 GLuint createShader(const char* file_path, GLuint shader_type)
 {
@@ -55,8 +59,10 @@ GLuint createProgram(const char* vert_path, const char* frag_path)
 }
 
 CRenderer::CRenderer()
-	: m_resolution(960, 540)
-	, m_camera_pos(0.f, 0.f, 5.f)
+	: CPipelineStage("Visualization"),
+	m_resolution(960, 540),
+	m_camera_pos(0.f, 0.f, 5.f)
+
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(SDL_GetError());
@@ -99,6 +105,23 @@ CRenderer::~CRenderer()
 void CRenderer::renderWorldObject(const CRenderObject& obj)
 {
 	m_world_objects.push_back(obj);
+}
+
+void CRenderer::pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
+	if(i_cPipelinePacket.type_info_name != typeid(CDataRigidBodyList).name()) {
+		return;
+	}
+
+	CDataRigidBodyList* input = i_cPipelinePacket.getPayload<CDataRigidBodyList>();
+
+	CRenderObject object;
+	CDataCircle *circle = (CDataCircle*)(*input).list.at(0);
+	object.scale = circle->getRadius();
+
+
+	std::vector<float>& pos = (circle->getPosition());
+	object.position = glm::vec3{ pos.at(0), pos.at(1), 0.f };
+	m_world_objects.push_back(object);
 }
 
 void CRenderer::renderUIObject(const CRenderObject& obj)
@@ -152,7 +175,7 @@ void CRenderer::present()
 
 	// actually render the ui objects
 	for (const CRenderObject& obj : m_ui_objects) {
-		// render 
+		// render
 	}
 
 	// clear the list of ui objects, the list has to be newly filled for the next frame
@@ -160,4 +183,5 @@ void CRenderer::present()
 
 	// Swap back and front buffer
 	SDL_GL_SwapWindow(m_window);
+
 }

@@ -9,8 +9,12 @@
 #include <visualization/CMesh.hpp>
 #include <SDL2/SDL.h>
 #include <vector>
+#include "../CPipelineStage.hpp"
+#include "CRenderObject.hpp"
+#include "../CDataRigidBody.hpp"
+#include "../CParameters.hpp"
 
-class CRenderer
+class CRenderer : public CPipelineStage
 {
 	std::vector<CRenderObject> m_world_objects;
 	std::vector<CRenderObject> m_ui_objects;
@@ -30,6 +34,11 @@ class CRenderer
 public:
 	CRenderer();
 	~CRenderer();
+
+	//get data (interface to currently only rigit body)
+	void pipeline_process_input(CPipelinePacket &i_cPipelinePacket);
+
+
 	void renderWorldObject(const CRenderObject& obj);
 	void renderUIObject(const CRenderObject& obj);
 	void present();

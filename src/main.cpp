@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : fa_2014.cpp
-// Author      : 
+// Author      :
 // Version     :
 // Copyright   : Your copyright notice
 //============================================================================
@@ -13,8 +13,10 @@
 #include "CStage_ImageInput.hpp"
 #include "CStage_ImageProcessing.hpp"
 #include "CStage_FluidSimulationLBM.hpp"
+#include "CStage_RigidBodySimulation.hpp"
 #include "CStage_VideoOutput.hpp"
 
+#include "Levels/CLevel.hpp"
 
 /*
  * program parameters
@@ -207,8 +209,14 @@ void main_sim_static_image()
 
 void main_game()
 {
+	CStage_RigidBodySimulation cStage_RBS(cParameters);
 	CRenderer renderer;
+
+	cStage_RBS.connectOutput(renderer);
+	cStage_RBS.pipeline_push();
+	
 	CRenderObject object;
+
 	object.position = glm::vec3{ 0.f, 0.f, 0.f };
 	object.scale = 1.f;
 
@@ -241,7 +249,7 @@ int main(int argc, char *argv[])
 	 * setup program parameters
 	 */
 	cParameters.setup(argc, argv);
-	
+
 	switch(cParameters.pipeline_id)
 	{
 		case 0:

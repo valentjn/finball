@@ -1,5 +1,5 @@
 #version 330
-#define GL_ARB_explicit_uniform_location 1
+#extension GL_ARB_explicit_uniform_location : require
 
 varying vec2 coords; // fragment in question
 uniform sampler2D tex; // texture

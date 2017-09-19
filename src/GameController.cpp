@@ -1,16 +1,18 @@
 #include <GameController.hpp>
-
+#include <iostream>
 GameController::GameController() {}
 
-void GameController::run() {
+void GameController::run() const
+{
     while(true) {
         for (const auto& mapping : mappings) {
-            GameComponent& comp_to = *mapping.component;
-            for (const IngoingInteraction& ingoing : ingoings) {
+            GameComponentBase& component = *mapping.component;
+            for (const IngoingInteraction& ingoing : mapping.ingoings) {
                 const void* data_from = ingoing.from->output();
-                ingoing.process(data_from, comp_to);
+                ingoing.interaction->process(data_from, component);
             }
-            component.update();
+            if (!component.update())
+                return;
         }
     }
 }

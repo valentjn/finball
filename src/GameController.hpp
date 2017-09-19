@@ -1,11 +1,17 @@
 #ifndef GAME_CONTROLLER_HPP_
 #define GAME_CONTROLLER_HPP_
 
+#include <memory>
+#include <vector>
+
 class GameComponentBase
 {
+    friend class GameController;
+
+    virtual const void* output() const = 0;
+    virtual bool update() = 0;
+
 public:
-    virtual const ComponentData& output() = 0;
-    virtual void update() = 0;
     virtual ~GameComponentBase() = 0;
 };
 
@@ -14,36 +20,33 @@ inline GameComponentBase::~GameComponentBase() {}
 template<class T>
 class GameComponent : public GameComponentBase
 {
-    T wrapped;
-    std::unique_ptr<T::OutputData> current_output;
-    std::unique_ptr<T::OutputData> next_output;
+    template<class Other>
+    friend class GameInteraction;
 
-public:
-    const ComponentData& output() override
+    T wrapped;
+    std::unique_ptr<typename T::OutputData> current_output = std::make_unique<typename T::OutputData>();
+    std::unique_ptr<typename T::OutputData> next_output = std::make_unique<typename T::OutputData>();
+
+    const void* output() const override
     {
-        return *current_output;
+        return current_output.get();
     }
 
-    void update() override
+    bool update() override
     {
         *next_output = typename T::OutputData{};
-        wrapped.update(static_cast<typename T::OutputData&>(*next_output));
+        bool res = wrapped.update(*next_output);
         current_output.swap(next_output);
+        return res;
     }
-};
-
-class SpecGameInteraction
-{
-public:
-    using from_comp_t = SpecGameComponent;
-    using to_comp_t = SpecGameComponent;
-
-    void process(const typename from_comp_t::OutputData& data_from, to_comp_t& comp_to);
 };
 
 class GameInteractionBase {
+    friend class GameController;
+
+    virtual void process(const void* data_from, GameComponentBase& comp_to) const = 0;
+
 public:
-    virtual void process(const void* data_from, GameComponentBase& comp_to) = 0;
     virtual ~GameInteractionBase() = 0;
 };
 
@@ -51,12 +54,11 @@ inline GameInteractionBase::~GameInteractionBase() {}
 
 template<class T>
 class GameInteraction : public GameInteractionBase {
-public:
-    void process(const void* data_from, GameComponentBase& comp_to) override
+    void process(const void* data_from, GameComponentBase& comp_to) const override
     {
         T::process(
             *static_cast<const typename T::from_comp_t::OutputData*>(data_from),
-            static_cast<typename T::to_comp_t&>(comp_to));
+            static_cast<GameComponent<typename T::to_comp_t>&>(comp_to).wrapped);
     }
 };
 
@@ -75,20 +77,20 @@ class GameController {
 
 public:
     GameController();
-    void run();
+    void run() const;
 
     template<class ComponentT>
     int addComponent() {
         mappings.push_back(ComponentMapping{});
         mappings.back().component = std::make_unique<GameComponent<ComponentT>>();
-        return components.size() - 1;
+        return mappings.size() - 1;
     }
 
     template<class InteractionT>
     void addInteraction(int from, int to)
     {
-        const GameComponent& comp_from = *mappings[from].component;
-        mappings[to].ingoings.emplace_back({ &from, std::make_unique<GameInteraction<InteractionT>>() });
+        const GameComponentBase& comp_from = *mappings[from].component;
+        mappings[to].ingoings.push_back(IngoingInteraction{ &comp_from, std::make_unique<GameInteraction<InteractionT>>() });
     }
 
 

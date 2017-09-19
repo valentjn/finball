@@ -54,6 +54,15 @@ public:
 	{
 		
 
+
+
+
+
+
+
+
+
+
 		
 		// changed output to output_Field
 		CPipelineStage::pipeline_push((CPipelinePacket&)output_Field);
@@ -90,10 +99,10 @@ public:
 			output_Field.getRef(x,y,2) = 0;
 			for (int i = 0; i < 9; i ++)
 			{
-					output_Field.getRef(x,y,3) += fi_New.getRef(x,y,i);	//density
+					output_Field.getRef(x,y,2) += fi_New.getRef(x,y,i);	//density
 			}
-			output_Field.getRef(x,y,1) = fi_New.getRef(x,y,2) - fi_New.getRef(x,y,4) + fi_New.getRef(x,y,5) + fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) - fi_New.getRef(x,y,8); //x Velocity
-			output_Field.getRef(x,y,0) = fi_New.getRef(x,y,1) - fi_New.getRef(x,y,3) + fi_New.getRef(x,y,5) - fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) + fi_New.getRef(x,y,8); //y Velocity
+			output_Field.getRef(x,y,0) = fi_New.getRef(x,y,1) - fi_New.getRef(x,y,3) + fi_New.getRef(x,y,5) - fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) + fi_New.getRef(x,y,8); //x Velocity
+			output_Field.getRef(x,y,1) = fi_New.getRef(x,y,2) - fi_New.getRef(x,y,4)   + fi_New.getRef(x,y,5) + fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) - fi_New.getRef(x,y,8); //y Velocity
 		}
 	}
 

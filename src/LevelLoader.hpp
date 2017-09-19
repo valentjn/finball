@@ -24,7 +24,7 @@ public:
     LevelLoader(Parameters &parameters) : parameters(parameters)
     {}
 
-    Array2D<CellType> loadLevel(string filePath)
+    Array2D<CellType> *loadLevel(string filePath)
     {
         fstream file;
         file.open(filePath, fstream::in);
@@ -34,13 +34,13 @@ public:
         file >> width;
         file >> height;
 
-        Array2D<CellType> level(width, height);
+        Array2D<CellType> *level = new Array2D<CellType>(width, height);
         for (int y = 0; y < height; y++) {
             file >> file_line;
             for (int x = 0; x < width; x++)
             {
                 int cell = static_cast<int>(file_line[x]) - '0';
-                level.setValue(x, y, static_cast<CellType>(cell));
+                level->setValue(x, y, static_cast<CellType>(cell));
             }
         }
 
@@ -62,7 +62,7 @@ public:
             string line = "";
             for (int x = 0; x < width; x++)
             {
-                line += to_string(level.getValue(x, y));
+                line += to_string(level->getValue(x, y));
             }
             cout << line << endl;
         }

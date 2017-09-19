@@ -24,7 +24,7 @@ public:
             parameters(parameters)
     {}
 
-    void startGame(Array2D<LevelLoader::CellType> &level)
+    void startGame(Array2D<LevelLoader::CellType> *level)
     {
         GameLogic gameLogic(parameters);
         UserInput userInput(parameters);

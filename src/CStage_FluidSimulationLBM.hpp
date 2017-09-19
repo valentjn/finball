@@ -28,7 +28,7 @@ class CStage_FluidSimulationLBM	:	public
 	CDataArray2D<float,9> fi_Old;
 	
 	// processed f_i field
-	DataArray2D<float,9> fi_New;
+	CDataArray2D<float,9> fi_New;
 
 
 public:

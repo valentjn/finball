@@ -5,6 +5,7 @@
 #include "CPipelineStage.hpp"
 #include "CDataRigidBody.hpp"
 #include "CPipelinePacketRbLbm.hpp"
+#include "btBulletDynamicsCommon.h"
 
 class CStage_RigidBodySimulation : public CPipelineStage {
 private:

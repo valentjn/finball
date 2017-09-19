@@ -214,8 +214,6 @@ void main_game()
 
 	object.position = glm::vec3{ 0.f, 0.f, 0.f };
 	object.scale = 1.f;
-	renderer.renderWorldObject(object);
-	renderer.present();
 
 	while (true) {
 		// Poll available events
@@ -226,6 +224,10 @@ void main_game()
 				return;
 			}
 		}
+
+		// Render
+		renderer.renderWorldObject(object);
+		renderer.present();
 
 		// Delay 15ms
 		SDL_Delay(15);

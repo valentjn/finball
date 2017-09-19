@@ -6,10 +6,10 @@
 
 class UserInput {
 private:
-    Parameters parameters;
+    Parameters &parameters;
 
 public:
-    UserInput(Parameters parameters) : parameters(parameters)
+    UserInput(Parameters &parameters) : parameters(parameters)
     {}
 
     void getInput(UserInputData *userInputData)

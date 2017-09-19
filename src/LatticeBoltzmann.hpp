@@ -8,10 +8,10 @@
 
 class LatticeBoltzmann {
 private:
-    Parameters parameters;
+    Parameters &parameters;
 
 public:
-    LatticeBoltzmann(Parameters parameters) : parameters(parameters)
+    LatticeBoltzmann(Parameters &parameters) : parameters(parameters)
     {}
 
     void compute(const UserInputData *userInputData,

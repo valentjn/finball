@@ -7,10 +7,10 @@
 
 class Renderer {
 private:
-    Parameters parameters;
+    Parameters &parameters;
 
 public:
-    Renderer(Parameters parameters) : parameters(parameters)
+    Renderer(Parameters &parameters) : parameters(parameters)
     {}
 
     void render(const LatticeBoltzmannData *latticeBoltzmannData,

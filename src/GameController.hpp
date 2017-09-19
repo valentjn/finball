@@ -12,7 +12,7 @@
 
 class GameController {
 private:
-    Parameters parameters;
+    Parameters &parameters;
 
     UserInput userInput;
     LatticeBoltzmann latticeBoltzmann;
@@ -21,7 +21,7 @@ private:
 
 
 public:
-    GameController(Parameters parameters) :
+    GameController(Parameters &parameters) :
             parameters(parameters),
             userInput(parameters),
             latticeBoltzmann(parameters),

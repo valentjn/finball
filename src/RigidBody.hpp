@@ -8,10 +8,10 @@
 
 class RigidBody {
 private:
-    Parameters parameters;
+    Parameters &parameters;
 
 public:
-    RigidBody(Parameters parameters) : parameters(parameters)
+    RigidBody(Parameters &parameters) : parameters(parameters)
     {}
 
     void compute(const UserInputData *userInputData,

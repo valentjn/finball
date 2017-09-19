@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	parameters.setup(argc, argv);
 
 	LevelLoader levelLoader(parameters);
-	Array2D<LevelLoader::CellType> *level = levelLoader.loadLevel("testLevel");
+	Array2D<LevelLoader::CellType> *level = levelLoader.loadLevel("../data/testLevel.txt");
 
 	GameController gameController(parameters);
 	gameController.startGame(level);

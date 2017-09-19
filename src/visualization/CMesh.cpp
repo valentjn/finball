@@ -22,8 +22,6 @@ CMesh::CMesh()
 	m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
 
 	// create vertex array object
-	m_vao = 0;
-	m_vbo = 0;
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
@@ -35,11 +33,6 @@ CMesh::CMesh()
 		vertices.data(),										// data pointer
 		GL_STATIC_DRAW); // hint that the data won't be updated
 
-	std::cout << "1 : " << glGetError() << '\n';
-
-
-	std::cout << "2 : " << glGetError() << '\n';
-
 	// attach the vertex buffer to the vertex array object
 	glVertexAttribPointer(
 		0,
@@ -48,8 +41,6 @@ CMesh::CMesh()
 		0,								// stride between consecutive position attributes in the buffer
 		offsetof(Vertex, position));	// offset (in bytes) of the position attribute in the Vertex struct
 	glEnableVertexAttribArray(0);
-
-	std::cout << "3 : " << glGetError() << '\n';
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -63,13 +54,7 @@ CMesh::~CMesh()
 
 void CMesh::render()
 {
-	GLuint temp_vao;
-	glGenVertexArrays(1, &temp_vao);
-	std::cout << "4 : " << glGetError() << '\n';
 	glBindVertexArray(m_vao);
-	std::cout << "5 : " << glGetError() << '\n';
 	glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);
-	std::cout << "6 : " << glGetError() << '\n';
 	glBindVertexArray(0);
-	std::cout << "7 : " << glGetError() << '\n';
 }

@@ -90,7 +90,7 @@ CRenderer::CRenderer()
 	// full window viewport
 	glViewport(0, 0, m_resolution.x, m_resolution.y);
 
-	m_rectangle = new CMesh();
+	m_rectangle = std::unique_ptr<CMesh>(new CMesh());
 }
 
 CRenderer::~CRenderer()
@@ -164,6 +164,4 @@ void CRenderer::present()
 
 	// Swap back and front buffer
 	SDL_GL_SwapWindow(m_window);
-
-	std::cout << "Attrib: " << glGetAttribLocation(m_shader_program_world, "in_pos") << '\n';
 }

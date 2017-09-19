@@ -18,5 +18,4 @@ const vec3 verts[6] = vec3[](
 
 void main() {
 	gl_Position = projection * (view * (model * vec4(in_pos, 1)));
-	//gl_Position = vec4(verts[gl_VertexID], 1);
 }

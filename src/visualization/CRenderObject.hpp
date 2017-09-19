@@ -9,6 +9,7 @@ struct CRenderObject
 	float scale;
 	
 	// Todo: object type
+
 };
 
 #endif // CRENDEROBJECT_HPP_

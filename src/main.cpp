@@ -211,6 +211,7 @@ void main_game()
 {
 	CRenderer renderer;
 	CRenderObject object;
+
 	object.position = glm::vec3{ 0.f, 0.f, 0.f };
 	object.scale = 1.f;
 	renderer.renderWorldObject(object);

@@ -8,6 +8,9 @@
 
 
 #include <iostream>
+#include <CPipelinePacket.hpp>
+#include <CDataRigidBody.hpp>
+#include "CRenderObject.hpp"
 
 GLuint createShader(const char* file_path, GLuint shader_type)
 {
@@ -89,6 +92,21 @@ CRenderer::~CRenderer()
 void CRenderer::renderWorldObject(const CRenderObject& obj)
 {
 	m_world_objects.push_back(obj);
+}
+
+void CRenderer::pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
+	if(i_cPipelinePacket.type_info_name != typeid(CDataRigidBodyList).name()) {
+		return;
+	}
+
+	CDataRigidBodyList* input = i_cPipelinePacket.getPayload<CDataRigidBodyList>();
+
+	CRenderObject object;
+
+	std::vector<float> pos (input->list.at(0)->getPosition());
+	object.position = glm::vec3{ pos.at(0), pos.at(1), 0.f };
+	object.scale = input->list.at(0)->getRadius();;
+
 }
 
 void CRenderer::renderUIObject(const CRenderObject& obj)

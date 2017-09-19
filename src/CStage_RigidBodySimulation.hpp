@@ -54,7 +54,12 @@ public:
 	// Update method. Here all the magic happens. Collisions. Force computations. etc.
 	void simulation_timestep() {
 		// TODO: magic
-
+		// As of now mock simulation with updating positions by 0.1
+		for (size_t i = 0; i < output_cDataRigidBody.getSize(); i++) {
+			std::vector<float>& p = output_cDataRigidBody.getRigidBody(i)->getPosition();
+			p.at(0) += 0.1;
+			p.at(1) += 0.1;
+		}
 		pipeline_push();
 	}
 

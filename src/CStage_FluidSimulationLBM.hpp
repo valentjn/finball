@@ -34,38 +34,20 @@ class CStage_FluidSimulationLBM	:	public
 
 
 public:
-	/**
-	 * constructor
-	 */
+	// constructor
 	CStage_FluidSimulationLBM(CParameters &i_cParameters)	:
 		CPipelineStage("FluidSimulationLBM"),
 		cParameters(i_cParameters)
-
-	// TODO initialize fi in the first iteration
 	{
 	}
 
 
 public:
-	/**
-	 * manually triggered pushing of next image to the pipeline
-	 */
+	// trigger pushing to the pipeline
 	void pipeline_push()
 	{
-		
-
-
-
-
-
-
-
-
-
-
-		
-		// changed output to output_Field
-		CPipelineStage::pipeline_push((CPipelinePacket&)output_Field);
+	// changed output to output_Field
+	CPipelineStage::pipeline_push((CPipelinePacket&)output_Field);
 	}
 
 

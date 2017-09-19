@@ -87,7 +87,20 @@ public:
 
 //TODO Consider Boundary in Col & STream (1 = boundary, 2 = inflow, 3 = outflow)
 
-//TODO Calculate macroscopic quantities
+	// Calculate macroscopic quantities
+	for (int y = 0; y < input_cDataArray2D.height; y++)
+	{
+		for (int x = 0; x < input_cDataArray2D.width; x++)
+		{
+			output_Field.getRef(x,y,2) = 0;
+			for (int i = 0; i < 9; i ++)
+			{
+					output_Field.getRef(x,y,3) += fi_New.getRef(x,y,i);	//density
+			}
+			output_Field.getRef(x,y,1) = fi_New.getRef(x,y,2) - fi_New.getRef(x,y,4) + fi_New.getRef(x,y,5) + fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) - fi_New.getRef(x,y,8); //x Velocity
+			output_Field.getRef(x,y,0) = fi_New.getRef(x,y,1) - fi_New.getRef(x,y,3) + fi_New.getRef(x,y,5) - fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) + fi_New.getRef(x,y,8); //y Velocity
+		}
+	}
 
 
 		pipeline_push();

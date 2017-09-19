@@ -9,6 +9,7 @@
 #include <visualization/CMesh.hpp>
 #include <SDL2/SDL.h>
 #include <vector>
+#include <memory>
 
 class CRenderer
 {
@@ -25,7 +26,7 @@ class CRenderer
 	glm::vec3 m_camera_pos;
 
 	// WIP
-	CMesh m_rectangle;
+	std::unique_ptr<CMesh> m_rectangle;
 
 public:
 	CRenderer();

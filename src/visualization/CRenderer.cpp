@@ -86,12 +86,11 @@ CRenderer::CRenderer()
 	m_shader_program_world = createProgram(
 		"src/visualization/world_vert.glsl",
 		"src/visualization/world_frag.glsl");
-	//glBindAttribLocation(m_shader_program_world, 0, "in_pos");
 
 	// full window viewport
 	glViewport(0, 0, m_resolution.x, m_resolution.y);
 
-	
+	m_rectangle = new CMesh();
 }
 
 CRenderer::~CRenderer()
@@ -146,7 +145,7 @@ void CRenderer::present()
 			1,
 			GL_FALSE,
 			glm::value_ptr(model));
-		m_rectangle.render();
+		m_rectangle->render();
 	}
 
 	// clear the list of world objects, the list has to be newly filled for the next frame

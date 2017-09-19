@@ -23,6 +23,7 @@ CMesh::CMesh()
 
 	// create vertex array object
 	m_vao = 0;
+	m_vbo = 0;
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
@@ -65,7 +66,7 @@ void CMesh::render()
 	GLuint temp_vao;
 	glGenVertexArrays(1, &temp_vao);
 	std::cout << "4 : " << glGetError() << '\n';
-	glBindVertexArray(temp_vao);
+	glBindVertexArray(m_vao);
 	std::cout << "5 : " << glGetError() << '\n';
 	glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);
 	std::cout << "6 : " << glGetError() << '\n';

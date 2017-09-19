@@ -24,6 +24,7 @@ public:
 		CDATA_ARRAY_2D_FLOAT_2,	// e.g. for velocity
 		CDATA_ARRAY_2D_FLOAT_3,	// e.g. for 3d velocity
 		CDATA_ARRAY_2D_FLOAT_4	// e.g. for multi components
+		CDATA_ARRAY_2D_FLOAT_9  // e.g. for 9 point stencil 
 	};
 
 	/**
@@ -85,6 +86,7 @@ public:
 				case 2:	type = CDATA_ARRAY_2D_FLOAT_2;	break;
 				case 3:	type = CDATA_ARRAY_2D_FLOAT_3;	break;
 				case 4:	type = CDATA_ARRAY_2D_FLOAT_4;	break;
+				case 9: type = CDATA_ARRAY_2D_FLOAT_4;  break;
 				default:	std::cerr << "Unsupported data array type for type float " << std::endl;	exit(-1);
 			}
 		}

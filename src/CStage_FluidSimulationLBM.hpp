@@ -40,6 +40,8 @@ public:
 	CStage_FluidSimulationLBM(CParameters &i_cParameters)	:
 		CPipelineStage("FluidSimulationLBM"),
 		cParameters(i_cParameters)
+
+	// TODO initialize fi in the first iteration
 	{
 	}
 
@@ -48,22 +50,13 @@ public:
 	/**
 	 * manually triggered pushing of next image to the pipeline
 	 */
-	void pipeline_push() // TODO
+	void pipeline_push()
 	{
-		if (cParameters.stage_fluidsimulation_visualize_flagfield)
-			CPipelineStage::pipeline_push((CPipelinePacket&)input_cDataArray2D);
+		
 
-		float scale = 10;
-		for (int y = 0; y < simulationData_Buffer1.height; y++)
-		{
-			for (int x = 0; x < simulationData_Buffer1.width; x++)
-			{
-				output_cDataArray2D_f2.getRef(x,y,0) = simulationData_Buffer1.getRef(x,y,0)*scale + 0.5f;
-				output_cDataArray2D_f2.getRef(x,y,1) = simulationData_Buffer1.getRef(x,y,1)*scale + 0.5f;
-			}
-		}
-
-		CPipelineStage::pipeline_push((CPipelinePacket&)output_cDataArray2D_f2);
+		
+		// changed output to output_Field
+		CPipelineStage::pipeline_push((CPipelinePacket&)output_Field);
 	}
 
 
@@ -85,7 +78,9 @@ public:
 
 //TODO Calculate fi streaming
 
+
 //TODO Consider Boundary in Col & STream (1 = boundary, 2 = inflow, 3 = outflow)
+
 
 	// Calculate macroscopic quantities
 	for (int y = 0; y < input_cDataArray2D.height; y++)
@@ -101,7 +96,6 @@ public:
 			output_Field.getRef(x,y,0) = fi_New.getRef(x,y,1) - fi_New.getRef(x,y,3) + fi_New.getRef(x,y,5) - fi_New.getRef(x,y,6) - fi_New.getRef(x,y,7) + fi_New.getRef(x,y,8); //y Velocity
 		}
 	}
-
 
 		pipeline_push();
 

@@ -4,6 +4,7 @@
 #include "CParameters.hpp"
 #include "CPipelineStage.hpp"
 #include "CDataRigidBody.hpp"
+#include "CPipelinePacketRbLbm.hpp"
 
 class CStage_RigidBodySimulation : public CPipelineStage {
 private:
@@ -60,9 +61,9 @@ public:
 
 	// Obtain data from LBM
 	void pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
-		if (i_cPipelinePacket.type_info_name == typeid(CDataArray2D<float,3>)) {
-			// Process LBM data
-		}
+		// if (i_cPipelinePacket.type_info_name == typeid(CDataArray2D<float, 3>)) {
+		// 	// Process LBM data
+		// }
 
 		// unpack data
 		CDataArray2D<float,3> *input = i_cPipelinePacket.getPayload<CDataArray2D<float,3>>();

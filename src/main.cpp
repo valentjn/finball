@@ -12,6 +12,7 @@
 #include "CStage_ImageInput.hpp"
 #include "CStage_ImageProcessing.hpp"
 #include "CStage_FluidSimulationLBM.hpp"
+#include "CStage_RigidBodySimulation.hpp"
 #include "CStage_VideoOutput.hpp"
 
 #include "Levels/CLevel.hpp"

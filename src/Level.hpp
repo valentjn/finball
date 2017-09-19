@@ -1,7 +1,10 @@
 #ifndef LEVEL_HPP_
 #define LEVEL_HPP_
 
+#include <vector>
+
 #include "Array2D.hpp"
+#include "Vector2.hpp"
 
 class Level {
 public:
@@ -11,8 +14,11 @@ public:
     };
 
     Array2D<CellType> *matrix;
+    std::vector<Vector2> *obstacles;
 
-    Level() : matrix(nullptr)
+    Level() :
+        matrix(nullptr),
+        obstacles(nullptr)
     {}
 
     ~Level()
@@ -20,6 +26,10 @@ public:
         if (matrix != nullptr)
         {
             delete matrix;
+        }
+        if (obstacles != nullptr)
+        {
+            delete obstacles;
         }
     }
 };

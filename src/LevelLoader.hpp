@@ -3,10 +3,12 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "Parameters.hpp"
 #include "Level.hpp"
 #include "Array2D.hpp"
+#include "Vector2.hpp"
 
 using namespace std;
 
@@ -38,16 +40,22 @@ public:
         file >> height;
 
         Array2D<Level::CellType> *level_matrix = new Array2D<Level::CellType>(width, height);
+        vector<Vector2> *obstacles = new vector<Vector2>();
         for (int y = 0; y < height; y++) {
             file >> file_line;
             for (int x = 0; x < width; x++)
             {
-                int cell = static_cast<int>(file_line[x]) - '0';
-                level_matrix->setValue(x, y, static_cast<Level::CellType>(cell));
+                Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
+                level_matrix->setValue(x, y, cell);
+                if (cell == Level::OBSTACLE)
+                {
+                    obstacles->push_back(Vector2(x, y));
+                }
             }
         }
 
         level.matrix = level_matrix;
+        level.obstacles = obstacles;
 
         if (parameters.verbosity_level >= 1)
         {
@@ -60,6 +68,14 @@ public:
                     line += to_string(level_matrix->getValue(x, y));
                 }
                 cout << line << endl;
+            }
+            if (parameters.verbosity_level >= 2)
+            {
+                cout << "With obstacles at:" << endl;
+                for (Vector2 const& point: *obstacles)
+                {
+                    cout << "(" << point.x << "|" << point.y << ")" << endl;
+                }
             }
         }
     }

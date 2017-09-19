@@ -7,4 +7,5 @@ data/ImageLog/
 
 # CLion
 .idea/
-cmake-build-debug/CMakeFiles/clion-log.txt
+cmake-build-debug/
+CMakeLists.txt

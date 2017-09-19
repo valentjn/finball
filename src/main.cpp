@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include "visualization/CRenderer.hpp"
 #include "CPipelineStage.hpp"
 #include "CParameters.hpp"
 #include "CStage_ImageInput.hpp"
@@ -206,6 +207,29 @@ void main_sim_static_image()
 	}
 }
 
+void main_game()
+{
+	CRenderer renderer;
+	CRenderObject object;
+	object.position = glm::vec3{ 0.f, 0.f, 0.f };
+	object.scale = 1.f;
+	renderer.renderWorldObject(object);
+	renderer.present();
+
+	while (true) {
+		// Poll available events
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+			case SDL_QUIT:
+				return;
+			}
+		}
+
+		// Delay 15ms
+		SDL_Delay(15);
+	}
+}
 
 
 /**
@@ -221,7 +245,7 @@ int main(int argc, char *argv[])
 	switch(cParameters.pipeline_id)
 	{
 		case 0:
-			main_image_viewer();
+			main_game();
 			break;
 		case 1:
 			main_image_modifier();
@@ -231,6 +255,9 @@ int main(int argc, char *argv[])
 			break;
 		case 3:
 			main_sim_static_image();
+			break;
+		case 4:
+			main_image_viewer();
 			break;
 	}
 	return 0;

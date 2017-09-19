@@ -50,8 +50,8 @@ CMesh::CMesh()
 
 	std::cout << "3 : " << glGetError() << '\n';
 
-	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 CMesh::~CMesh()
@@ -62,8 +62,10 @@ CMesh::~CMesh()
 
 void CMesh::render()
 {
+	GLuint temp_vao;
+	glGenVertexArrays(1, &temp_vao);
 	std::cout << "4 : " << glGetError() << '\n';
-	glBindVertexArray(m_vao);
+	glBindVertexArray(temp_vao);
 	std::cout << "5 : " << glGetError() << '\n';
 	glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);
 	std::cout << "6 : " << glGetError() << '\n';

@@ -1,4 +1,4 @@
-#version 420
+#version 320
 
 layout(location = 0) uniform mat4 model;
 layout(location = 1) uniform mat4 view;

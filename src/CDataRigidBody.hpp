@@ -122,14 +122,15 @@ public:
 };
 
 class CDataRigidBodyList : public CPipelinePacket {
-	std::vector<CDataRigidBody*> list;
 public:
+	std::vector<CDataRigidBody*> list;
 
 	CDataRigidBodyList () {
 		CPipelinePacket::setPacketTypeInfoName(typeid(*this).name());
 		// TODO: Here we manually define for prototyping
-		std::vector<float> p(2,1.0);
-		std::vector<float> v(2,2.0);
+
+		std::vector<float> p = {1.0, 1.0};
+		std::vector<float> v= {2.0, 2.0};
 		CDataCircle *c = new CDataCircle(p, v, 10.0, 15.0, 20.0, 25.0);
 		list.push_back(c);
 	}

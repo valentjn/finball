@@ -4,7 +4,7 @@ COMMON_CFLAGS= -pedantic \
 		       -Wextra \
 		       -Wno-unused-parameter \
 		       -fmessage-length=0 \
-		       -std=c++11 \
+		       -std=c++14 \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src

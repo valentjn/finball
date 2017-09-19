@@ -1,23 +1,34 @@
-#include "Array2D.hpp"
-#include "LevelLoader.hpp"
-#include "GameController.hpp"
+#include <GameController.hpp>
+#include <renderer/CompRenderer.hpp>
+#include <gamelogic/CompGameLogic.hpp>
 
-Parameters parameters;
-
-int main(int argc, char *argv[])
+int main()
 {
-	parameters.setup(argc, argv);
+    GameController game;
 
-	LevelLoader levelLoader(parameters);
-	Array2D<LevelLoader::CellType> *level = levelLoader.loadLevel("data/testLevel.txt");
+    auto game_logic = game.addComponent<CompGameLogic>();
+    auto renderer = game.addComponent<CompRenderer>();
 
-	GameController gameController(parameters);
-	gameController.startGame(level);
+    game.addInteraction<InterGameLogicToRenderer>(game_logic, renderer);
+    
+    game.run();
 
-	if (level != nullptr)
-	{
-		delete level;
-	}
+	/*while (true) {
+		// Poll available events
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+			case SDL_QUIT:
+				return;
+			}
+		}
 
-	return 0;
+		// Render
+		renderer.renderWorldObject(object);
+		renderer.present();
+
+		// Delay 15ms
+		SDL_Delay(15);
+	}*/
 }
+

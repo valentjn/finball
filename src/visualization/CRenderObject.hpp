@@ -3,11 +3,12 @@
 
 #include <glm/glm.hpp>
 
-class CRenderObject
+struct CRenderObject
 {
-	glm::vec2 position;
+	glm::vec3 position;
 	float scale;
-	// CSprite sprite;
+	
+	// Todo: object type
 };
 
 #endif // CRENDEROBJECT_HPP_

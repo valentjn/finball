@@ -1,43 +1,38 @@
 #ifndef CRENDERER_HPP_
 #define CRENDERER_HPP_
 
-#include <visualization/CRenderObject.hpp>
+// include this first
+#define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
+
+#include <visualization/CRenderObject.hpp>
+#include <visualization/CMesh.hpp>
+#include <SDL2/SDL.h>
 #include <vector>
 
 class CRenderer
 {
-	std::vector<CRenderObject> world_objects;
-	std::vector<CRenderObject> ui_objects;
+	std::vector<CRenderObject> m_world_objects;
+	std::vector<CRenderObject> m_ui_objects;
 
-	GLuint shader_program_world;
-	GLuint shader_program_ui;
+	GLuint m_shader_program_world;
+	GLuint m_shader_program_ui;
+
+	glm::ivec2 m_resolution;
+	SDL_Window* m_window;
+	SDL_GLContext m_glcontext;
+
+	glm::vec3 m_camera_pos;
+
+	// WIP
+	CMesh m_rectangle;
 
 public:
 	CRenderer();
-
-	void renderWorldObject(const CRenderObject& obj)
-	{
-		world_objects.push_back(obj);
-	}
-
-	void renderUIObject(const CRenderObject& obj)
-	{
-		ui_objects.push_back(obj);
-	}
-
-	void present()
-	{
-		glUseProgram(shader_program_world);
-		for (const CRenderObject& obj : world_objects) {
-			// render obj
-		}
-
-		glUseProgram(shader_program_ui);
-		for (const CRenderObject& obj : ui_objects) {
-			// render 
-		}
-	}
+	~CRenderer();
+	void renderWorldObject(const CRenderObject& obj);
+	void renderUIObject(const CRenderObject& obj);
+	void present();
 };
 
 #endif //CRENDERER_HPP_

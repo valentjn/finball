@@ -1,10 +1,10 @@
 #version 420
 
-uniform(binding = 0) mat4 model;
-uniform(binding = 1) mat4 view;
-uniform(binding = 2) mat4 projection;
+layout(location = 0) uniform mat4 model;
+layout(location = 1) uniform mat4 view;
+layout(location = 2) uniform mat4 projection;
 
-layout(location = 0) vec3 in_pos;
+layout(location = 0) in vec3 in_pos;
 
 void main() {
 	gl_Position = projection * (view * (model * vec4(in_pos, 1)));

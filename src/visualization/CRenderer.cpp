@@ -65,7 +65,7 @@ CRenderer::CRenderer()
 	m_window = SDL_CreateWindow(
 		"Game",											// title
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,	// position
-		m_resolution.x, m_resolution.y,						// size
+		m_resolution.x, m_resolution.y,					// size
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 	if (!m_window)
 		throw std::runtime_error(SDL_GetError());
@@ -84,9 +84,12 @@ CRenderer::CRenderer()
 	m_shader_program_world = createProgram(
 		"src/visualization/world_vert.glsl",
 		"src/visualization/world_frag.glsl");
+	glBindAttribLocation(m_shader_program_world, 0, "in_pos");
 
 	// full window viewport
 	glViewport(0, 0, m_resolution.x, m_resolution.y);
+
+	
 }
 
 CRenderer::~CRenderer()
@@ -109,7 +112,7 @@ void CRenderer::renderUIObject(const CRenderObject& obj)
 void CRenderer::present()
 {
 	glClearColor(0.4f, 0.f, 0.f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set up rendering of the world objects
 	glUseProgram(m_shader_program_world);
@@ -131,13 +134,13 @@ void CRenderer::present()
 		1,										// matrix count
 		GL_FALSE,								// is not transposed
 		glm::value_ptr(projection));			// data pointer
-	auto model_location = glGetUniformLocation(m_shader_program_world, "model");
+	//auto model_location = glGetUniformLocation(m_shader_program_world, "model");
 
 	// actually render the world objects
 	for (const CRenderObject& obj : m_world_objects) {
 		glm::mat4 model = glm::translate(glm::mat4{}, obj.position);
 		glUniformMatrix4fv(
-			model_location,
+			glGetUniformLocation(m_shader_program_world, "model"),
 			1,
 			GL_FALSE,
 			glm::value_ptr(model));
@@ -148,7 +151,7 @@ void CRenderer::present()
 	m_world_objects.clear();
 
 	// set up rendering of the ui objects
-	glUseProgram(m_shader_program_ui);
+	// glUseProgram(m_shader_program_ui);
 
 	// actually render the ui objects
 	for (const CRenderObject& obj : m_ui_objects) {
@@ -160,4 +163,6 @@ void CRenderer::present()
 
 	// Swap back and front buffer
 	SDL_GL_SwapWindow(m_window);
+
+	std::cout << "Attrib: " << glGetAttribLocation(m_shader_program_world, "in_pos") << '\n';
 }

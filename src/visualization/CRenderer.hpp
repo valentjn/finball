@@ -38,15 +38,11 @@ public:
 	CRenderer();
 	~CRenderer();
 
-	// CRenderer(CParameters& i_cParameters) :
-	// 	CPipelineStage("Visualization"),
-	// 	cParameters(i_cParameters) {}
-
 	void pipeline_process_input(CPipelinePacket &i_cPipelinePacket);
+
 
 	void renderWorldObject(const CRenderObject& obj);
 	void renderUIObject(const CRenderObject& obj);
 	void present();
 };
-
 #endif //CRENDERER_HPP_

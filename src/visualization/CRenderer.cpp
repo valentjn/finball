@@ -12,6 +12,7 @@
 #include <CDataRigidBody.hpp>
 #include "CRenderObject.hpp"
 
+
 GLuint createShader(const char* file_path, GLuint shader_type)
 {
 	std::ifstream file_stream{ file_path };
@@ -61,6 +62,7 @@ CRenderer::CRenderer()
 	: CPipelineStage("Visualization"),
 	m_resolution(960, 540),
 	m_camera_pos(0.f, 0.f, 5.f)
+
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(SDL_GetError());
@@ -178,7 +180,6 @@ void CRenderer::present()
 
 	// clear the list of ui objects, the list has to be newly filled for the next frame
 	m_ui_objects.clear();
-
 
 	// Swap back and front buffer
 	SDL_GL_SwapWindow(m_window);

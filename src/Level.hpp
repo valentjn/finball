@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Array2D.hpp"
-#include "Vector2.hpp"
+#include "glm/vec2.hpp"
 
 class Level {
 public:
@@ -14,7 +14,7 @@ public:
     };
 
     Array2D<CellType> *matrix;
-    std::vector<Vector2> *obstacles;
+    std::vector<glm::vec2> *obstacles;
 
     Level() :
         matrix(nullptr),

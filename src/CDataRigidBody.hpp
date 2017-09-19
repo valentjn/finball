@@ -107,8 +107,8 @@ public:
 };
 
 class CDataRigidBodyList : public CPipelinePacket {
-	std::vector<CDataRigidBody*> list;
 public:
+	std::vector<CDataRigidBody*> list;
 
 	CDataRigidBodyList () {
 		// TODO: Here we manually define for prototyping

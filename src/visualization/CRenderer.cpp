@@ -58,8 +58,9 @@ GLuint createProgram(const char* vert_path, const char* frag_path)
 }
 
 CRenderer::CRenderer()
-	: m_resolution(960, 540)
-	, m_camera_pos(0.f, 0.f, 5.f)
+	: CPipelineStage("Visualization"),
+	m_resolution(960, 540),
+	m_camera_pos(0.f, 0.f, 5.f)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(SDL_GetError());
@@ -102,10 +103,10 @@ void CRenderer::pipeline_process_input(CPipelinePacket& i_cPipelinePacket) {
 	CDataRigidBodyList* input = i_cPipelinePacket.getPayload<CDataRigidBodyList>();
 
 	CRenderObject object;
-
-	std::vector<float> pos (input->list.at(0)->getPosition());
+	CDataCircle *circle = (CDataCircle*)(*input).list.at(0);
+	std::vector<float> pos (circle->getPosition());
 	object.position = glm::vec3{ pos.at(0), pos.at(1), 0.f };
-	object.scale = input->list.at(0)->getRadius();;
+	object.scale = circle->getRadius();;
 
 }
 
@@ -158,7 +159,7 @@ void CRenderer::present()
 
 	glUseProgram(m_shader_program_ui);
 	for (const CRenderObject& obj : m_ui_objects) {
-		// render 
+		// render
 	}
 	m_ui_objects.clear();
 }

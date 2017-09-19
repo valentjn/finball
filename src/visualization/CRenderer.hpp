@@ -17,7 +17,7 @@
 class CRenderer : public CPipelineStage
 {
 //Stage stuff
-	CParameters &cParameters;
+	// CParameters &cParameters;
 
 	std::vector<CRenderObject> m_world_objects;
 	std::vector<CRenderObject> m_ui_objects;
@@ -38,9 +38,9 @@ public:
 	CRenderer();
 	~CRenderer();
 
-	CRenderer(CParameters& i_cParameters) :
-		CPipelineStage("Visualization"),
-		cParameters(i_cParameters) {}
+	// CRenderer(CParameters& i_cParameters) :
+	// 	CPipelineStage("Visualization"),
+	// 	cParameters(i_cParameters) {}
 
 	void pipeline_process_input(CPipelinePacket &i_cPipelinePacket);
 

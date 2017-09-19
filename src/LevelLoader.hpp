@@ -54,6 +54,8 @@ public:
             }
         }
 
+        level.width = width;
+        level.height = height;
         level.matrix = level_matrix;
         level.obstacles = obstacles;
 

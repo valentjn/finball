@@ -15,7 +15,7 @@ public:
     Renderer(Parameters &parameters) : parameters(parameters)
     {
         SDL_Init(SDL_INIT_VIDEO);
-        window = SDL_CreateWindow("Smiley in SDL",
+        window = SDL_CreateWindow("Finball",
                                   SDL_WINDOWPOS_UNDEFINED,
                                   SDL_WINDOWPOS_UNDEFINED,
                                   500, 500, SDL_WINDOW_SHOWN);

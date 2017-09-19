@@ -15,8 +15,7 @@ GLuint createShader(const char* file_path, GLuint shader_type)
 	if (!file_stream)
 		throw std::runtime_error(std::string{ "Can't find " } + file_path);
 	std::string file_content{ std::istreambuf_iterator<char>(file_stream), std::istreambuf_iterator<char>() };
-	//const GLchar* file_data = file_content.c_str();
-	const GLchar* file_data = "";
+	const GLchar* file_data = file_content.c_str();
 	GLuint shader = glCreateShader(shader_type);
 	glShaderSource(shader, 1, &file_data, nullptr);
 	glCompileShader(shader);
@@ -27,7 +26,6 @@ GLuint createShader(const char* file_path, GLuint shader_type)
 		msg += file_path;
 		GLint length = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-		std::cout << file_data << '\n';
 		if (length != 0) {
 			msg += '\n';
 			std::vector<GLchar> log(length);
@@ -60,10 +58,6 @@ CRenderer::CRenderer()
 	: m_resolution(960, 540)
 	, m_camera_pos(0.f, 0.f, 5.f)
 {
-	m_shader_program_world = createProgram(
-		"src/visualization/world_vert.glsl",
-		"src/visualization/world_frag.glsl");
-
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(SDL_GetError());
 
@@ -79,6 +73,10 @@ CRenderer::CRenderer()
 	SDL_GLContext m_glcontext = SDL_GL_CreateContext(m_window);
 	if (!m_glcontext)
 		throw std::runtime_error(SDL_GetError());
+
+	m_shader_program_world = createProgram(
+		"src/visualization/world_vert.glsl",
+		"src/visualization/world_frag.glsl");
 }
 
 CRenderer::~CRenderer()

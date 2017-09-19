@@ -85,7 +85,8 @@ CRenderer::CRenderer()
 		"src/visualization/world_vert.glsl",
 		"src/visualization/world_frag.glsl");
 
-	glViewport(0, 0, resolution.x, resolution.y);
+	// full window viewport
+	glViewport(0, 0, m_resolution.x, m_resolution.y);
 }
 
 CRenderer::~CRenderer()

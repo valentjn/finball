@@ -23,18 +23,22 @@ private:
 	// processed f_i field
 	Array2D<FICell> fi_New;
 
+	// internal f_i equilibrium field
+	Array2D<FICell> fi_Eq;
+
 public:
 	LatticeBoltzmann(Parameters &parameters, Level &level) :
 		parameters(parameters),
 		level(level),
 		fi_Old(level.width, level.height),
-		fi_New(level.width, level.height)
+		fi_New(level.width, level.height),
+		fi_Eq(level.width, level.height)
 	{
-		// initialize fi in the first iteration
 		for (int y = 0; y < level.height; y++)
 		{
 			for (int x = 0; x < level.width; x++)
 			{
+				//TODO set some equilibrium distribution for fixed rho here
 				fi_New.setValue(x, y, FICell());
 				fi_Old.setValue(x, y, FICell());
 			}
@@ -50,18 +54,28 @@ public:
 		}
 
 		//TODO Calculate fi collision
-		/*for (int y = 0; y < input_cDataArray2D.height; y++)
+		/*for (int y = 0; y < level.height; y++)
 		{
-			for (int x = 0; x < input_cDataArray2D.width; x++)
+			for (int x = 0; x < level.width; x++)
 			{
-				if (input_cDataArray2D.getRef(x,y)
-					for (int i = 0; i < 9; i ++)
-					{
+				float rho = 0;
+				for (int i = 0; i < 9; i ++)
+				{
+					rho += fi_Old.getRef(x,y)[i];
+				}
 
-					}
+				//TODO calculate cu , w(i)
+
+				//TODO fi_Eq.getRef(x,y)[i] = rho * w(i) * (1+cu + 0.5 * (cu)*(cu) + 3/2 *(ux*ux+uy*uy);
+
+				for (int i = 0; i < 9; i++)
+				{	//TODO define omega
+					fi_New.getRef(x,y)[i] = fi_Old.getRef(x,y)[i] + omega * (fi_Eq.getRef(x,y)[i] - fi_Old.getRef(x,y)[i]);
+				}
 			}
 		}*/
 
+		//TODO Set fi_old = fi_new to use fi new during streaming
 		//TODO Calculate fi streaming
 
 		//TODO Consider Boundary in Col & STream (0 = fluid, 1 = boundary, 2 = inflow, 3 = outflow)

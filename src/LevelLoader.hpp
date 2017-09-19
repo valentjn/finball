@@ -1,11 +1,13 @@
 #ifndef LEVL_LOADER_HPP_
 #define LEVL_LOADER_HPP_
 
-#include <iostream>
+#include <fstream>
 #include <string>
 
 #include "Parameters.hpp"
 #include "Array2D.hpp"
+
+using namespace std;
 
 class LevelLoader
 {
@@ -22,33 +24,47 @@ public:
     LevelLoader(Parameters &parameters) : parameters(parameters)
     {}
 
-    // TODO: level name/path from parameters??
-    Array2D<CellType> loadLevel(std::string filePath)
+    Array2D<CellType> loadLevel(string filePath)
     {
-        // TODO: Load level from file
+        fstream file;
+        file.open(filePath, fstream::in);
 
-        Array2D<CellType> level(10, 10);
-        for (int x = 0; x < 10; x++)
-        {
-            for (int y = 0; y < 10; y++)
+        string file_line;
+        int width, height;
+        file >> width;
+        file >> height;
+
+        Array2D<CellType> level(width, height);
+        for (int y = 0; y < height; y++) {
+            file >> file_line;
+            for (int x = 0; x < width; x++)
             {
-                if (x == 0 || y == 0)
-                    level.setValue(x, y, BC_INFLOW);
-                else if (x == 9 || y == 9)
-                    level.setValue(x, y, BC_OUTFLOW);
-                else
-                    level.setValue(x, y, EMPTY);
+                int cell = static_cast<int>(file_line[x]) - '0';
+                level.setValue(x, y, static_cast<CellType>(cell));
             }
         }
 
-        for (int y = 0; y < 10; y++)
+        // for (int x = 0; x < 10; x++)
+        // {
+        //     for (int y = 0; y < 10; y++)
+        //     {
+        //         if (x == 0 || y == 0)
+        //             level.setValue(x, y, BC_INFLOW);
+        //         else if (x == 9 || y == 9)
+        //             level.setValue(x, y, BC_OUTFLOW);
+        //         else
+        //             level.setValue(x, y, EMPTY);
+        //     }
+        // }
+
+        for (int y = 0; y < height; y++)
         {
-            std::string line = "";
-            for (int x = 0; x < 10; x++)
+            string line = "";
+            for (int x = 0; x < width; x++)
             {
-                line += std::to_string(level.getValue(x, y));
+                line += to_string(level.getValue(x, y));
             }
-            std::cout << line << std::endl;
+            cout << line << endl;
         }
 
         return level;

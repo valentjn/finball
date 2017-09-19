@@ -28,6 +28,14 @@ public:
     {
         fstream file;
         file.open(filePath, fstream::in);
+        if (!file.is_open())
+        {
+            if (parameters.verbosity_level >= 1)
+            {
+                cerr << "Failed to load level" << endl;
+            }
+            exit(EXIT_FAILURE);
+        }
 
         string file_line;
         int width, height;

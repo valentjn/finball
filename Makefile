@@ -31,6 +31,16 @@ debug:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
+tidy:
+	clang-tidy src/main.cpp -- $(COMMON_CFLAGS)
+	scan-build -analyze-headers -v make debug
+	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
+		-exec /bin/bash ./clang-format-diff.sh {} \;
+
+format:
+	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
+		-exec /bin/bash clang-format -i {} \;
+
 clean:
 	rm -rf build
 

@@ -4,21 +4,17 @@
 #include <assert.h>
 
 template <typename T> class Array2D {
-  private:
+private:
     int width;
     int height;
     T *data;
 
-  public:
-    Array2D(int width, int height) : width(width), height(height) {
-        data = new T[width * height];
-    }
+public:
+    Array2D(int width, int height) : width(width), height(height) { data = new T[width * height]; }
 
     ~Array2D() { delete[] data; }
 
-    void loadData(void *data) {
-        memcpy(this->data, data, sizeof(T) * width * height);
-    }
+    void loadData(void *data) { memcpy(this->data, data, sizeof(T) * width * height); }
 
     void setValue(int x, int y, T value) {
         assert(x >= 0 && y >= 0 && y < height && x < width);

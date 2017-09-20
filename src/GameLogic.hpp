@@ -7,11 +7,11 @@
 #include "renderer/RenderObject.hpp"
 
 class GameLogic {
-  private:
+private:
     Parameters &parameters;
     RenderObject testRenderObject;
 
-  public:
+public:
     GameLogic(Parameters &parameters) : parameters(parameters) {
         testRenderObject.position = {0.f, 0.f, 0.f};
         testRenderObject.scale = 1.f;

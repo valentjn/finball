@@ -12,7 +12,7 @@
 #include "RendererInput.hpp"
 
 class Renderer {
-  private:
+private:
     Parameters &parameters;
 
     GLuint m_shader_program_world;
@@ -29,7 +29,7 @@ class Renderer {
 
     void render(const RenderObject &object, GLint model_location) const;
 
-  public:
+public:
     void update(const RendererInput &input);
 
     Renderer(Parameters &parameters);

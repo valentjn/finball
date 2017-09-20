@@ -7,7 +7,7 @@
 #include "glm/vec3.hpp"
 
 class LatticeBoltzmannOutput {
-  public:
+public:
     // processed output field (the first two components give the velocity the
     // third one the density)
     std::unique_ptr<Array2D<glm::vec3>> matrix = nullptr;

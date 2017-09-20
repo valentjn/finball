@@ -7,15 +7,8 @@
 #include "glm/vec2.hpp"
 
 class Level {
-  public:
-    enum CellType {
-        EMPTY,
-        OBSTACLE,
-        BC_BOUNCE_BACK,
-        BC_NO_SLIP,
-        BC_INFLOW,
-        BC_OUTFLOW
-    };
+public:
+    enum CellType { EMPTY, OBSTACLE, BC_BOUNCE_BACK, BC_NO_SLIP, BC_INFLOW, BC_OUTFLOW };
 
     int width, height;
     Array2D<CellType> *matrix;

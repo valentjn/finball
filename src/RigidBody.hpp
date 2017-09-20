@@ -8,7 +8,7 @@
 #include "glm/vec2.hpp"
 
 class RigidBody {
-  private:
+private:
     glm::vec2 pos;
     glm::vec2 vel;
     float theta;
@@ -16,14 +16,13 @@ class RigidBody {
     float mass;
     int objType;
 
-  public:
+public:
     enum typeOfRigidBody { CIRCLE, RECTANGLE, TRIANGLE, ARBITRARY };
 
-    RigidBody()
-        : pos(2.f, 0.f), vel(2.f, 0.f), theta(0.f), angVel(0.f), mass(1.f) {}
+    RigidBody() : pos(2.f, 0.f), vel(2.f, 0.f), theta(0.f), angVel(0.f), mass(1.f) {}
 
-    RigidBody(const glm::vec2 &p, const glm::vec2 &v, const float &t,
-              const float &a, const float &m, const int &obj)
+    RigidBody(const glm::vec2 &p, const glm::vec2 &v, const float &t, const float &a,
+              const float &m, const int &obj)
         : pos(p), vel(v), theta(t), angVel(a), mass(m), objType(obj) {}
 
     glm::vec2 &getPosition() { return pos; }
@@ -69,10 +68,10 @@ class RigidBody {
 };
 
 class RigidBodyCircle : public RigidBody {
-  private:
+private:
     float radius;
 
-  public:
+public:
     RigidBodyCircle()
         : RigidBodyCircle(1.f)
 
@@ -81,8 +80,8 @@ class RigidBodyCircle : public RigidBody {
         setType(CIRCLE);
     }
 
-    RigidBodyCircle(const glm::vec2 &p, const glm::vec2 &v, const float &t,
-                    const float &a, const float &m, const float &r)
+    RigidBodyCircle(const glm::vec2 &p, const glm::vec2 &v, const float &t, const float &a,
+                    const float &m, const float &r)
         : RigidBody(p, v, t, a, m, CIRCLE), radius(r) {}
 
     float getRadius() { return radius; }
@@ -99,7 +98,7 @@ class RigidBodyCircle : public RigidBody {
 };
 
 class RigidBodyList {
-  public:
+public:
     std::vector<RigidBody *> list;
 
     RigidBodyList() {

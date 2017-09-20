@@ -20,10 +20,10 @@
 #include "renderer/RendererInput.hpp"
 
 class GameController {
-  private:
+private:
     Parameters &parameters;
 
-  public:
+public:
     GameController(Parameters &parameters) : parameters(parameters) {}
 
     void startGame(Level &level) {
@@ -48,25 +48,19 @@ class GameController {
             userInput.getInput(userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
-            latticeBoltzmannInput =
-                LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
-            latticeBoltzmann.compute(latticeBoltzmannInput,
-                                     latticeBoltzmannOutput);
+            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
+            latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
-            rigidBodyPhysicsInput =
-                RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
-            rigidBodyPhysics.compute(rigidBodyPhysicsInput,
-                                     rigidBodyPhysicsOutput);
+            rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+            rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
             gameLogicInput =
-                GameLogicInput(userInputOutput, rigidBodyPhysicsOutput,
-                               latticeBoltzmannOutput);
+                GameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             gameLogic.update(gameLogicInput, gameLogicOutput);
 
             // 3. draw visualization
             rendererInput =
-                RendererInput(gameLogicOutput, rigidBodyPhysicsOutput,
-                              latticeBoltzmannOutput);
+                RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             renderer.update(rendererInput);
         }
     }

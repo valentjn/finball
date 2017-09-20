@@ -9,7 +9,7 @@ class Mesh {
     GLuint m_vbo;
     GLsizei m_vertex_count;
 
-  public:
+public:
     Mesh();
     ~Mesh();
     void render();

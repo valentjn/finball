@@ -4,7 +4,7 @@
 #include "SDL2/SDL.h"
 
 class UserInputOutput {
-  public:
+public:
     bool quit;
 
     UserInputOutput() : quit(false) {}

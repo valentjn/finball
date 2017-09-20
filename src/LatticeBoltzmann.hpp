@@ -13,7 +13,7 @@
 using namespace glm;
 
 class LatticeBoltzmann {
-  private:
+private:
     Parameters &parameters;
     Level &level;
 
@@ -26,11 +26,10 @@ class LatticeBoltzmann {
     // internal f_i equilibrium field
     Array2D<FICell> fi_Eq;
 
-  public:
+public:
     LatticeBoltzmann(Parameters &parameters, Level &level)
-        : parameters(parameters), level(level),
-          fi_Old(level.width, level.height), fi_New(level.width, level.height),
-          fi_Eq(level.width, level.height) {
+        : parameters(parameters), level(level), fi_Old(level.width, level.height),
+          fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
                 // TODO set some equilibrium distribution for fixed rho here
@@ -40,11 +39,9 @@ class LatticeBoltzmann {
         }
     }
 
-    void compute(const LatticeBoltzmannInput &input,
-                 LatticeBoltzmannOutput &output) {
+    void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output) {
         if (output.matrix.get() == nullptr) {
-            output.matrix =
-                std::make_unique<Array2D<vec3>>(level.width, level.height);
+            output.matrix = std::make_unique<Array2D<vec3>>(level.width, level.height);
         }
 
         // TODO Calculate fi collision
@@ -82,19 +79,16 @@ class LatticeBoltzmann {
             for (int x = 0; x < level.width; x++) {
                 output.matrix->getRef(x, y).z = 0;
                 for (int i = 0; i < 9; i++) {
-                    output.matrix->getRef(x, y).z +=
-                        fi_New.getRef(x, y)[i]; // density
+                    output.matrix->getRef(x, y).z += fi_New.getRef(x, y)[i]; // density
                 }
-                output.matrix->getRef(x, y).x =
-                    fi_New.getRef(x, y)[1] - fi_New.getRef(x, y)[3] +
-                    fi_New.getRef(x, y)[5] - fi_New.getRef(x, y)[6] -
-                    fi_New.getRef(x, y)[7] +
-                    fi_New.getRef(x, y)[8]; // x Velocity
-                output.matrix->getRef(x, y).y =
-                    fi_New.getRef(x, y)[2] - fi_New.getRef(x, y)[4] +
-                    fi_New.getRef(x, y)[5] + fi_New.getRef(x, y)[6] -
-                    fi_New.getRef(x, y)[7] -
-                    fi_New.getRef(x, y)[8]; // y Velocity
+                output.matrix->getRef(x, y).x = fi_New.getRef(x, y)[1] - fi_New.getRef(x, y)[3] +
+                                                fi_New.getRef(x, y)[5] - fi_New.getRef(x, y)[6] -
+                                                fi_New.getRef(x, y)[7] +
+                                                fi_New.getRef(x, y)[8]; // x Velocity
+                output.matrix->getRef(x, y).y = fi_New.getRef(x, y)[2] - fi_New.getRef(x, y)[4] +
+                                                fi_New.getRef(x, y)[5] + fi_New.getRef(x, y)[6] -
+                                                fi_New.getRef(x, y)[7] -
+                                                fi_New.getRef(x, y)[8]; // y Velocity
             }
         }
 

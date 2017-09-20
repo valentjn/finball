@@ -6,7 +6,7 @@
 #include "UserInputOutput.hpp"
 
 class GameLogicInput {
-  public:
+public:
     bool quit;
 
     GameLogicInput() {}

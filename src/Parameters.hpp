@@ -9,7 +9,7 @@
 using namespace std;
 
 class Parameters {
-  public:
+public:
     /**
      * verbosity level.
      * the higher, the more output has to be generated
@@ -27,8 +27,7 @@ class Parameters {
      */
     void printHelp(char *const argv[]) {
         std::cout << "Parameters for " << argv[0] << std::endl;
-        std::cout << "	-v [level]		Verbosity level (default: -1)"
-                  << std::endl;
+        std::cout << "	-v [level]		Verbosity level (default: -1)" << std::endl;
         std::cout << "	-l [file]		Level (default: "
                      "data/testLevel.txt)"
                   << std::endl;

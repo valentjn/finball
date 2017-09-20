@@ -13,10 +13,10 @@
 using namespace std;
 
 class LevelLoader {
-  private:
+private:
     Parameters &parameters;
 
-  public:
+public:
     LevelLoader(Parameters &parameters) : parameters(parameters) {}
 
     void loadLevel(Level &level) {
@@ -34,14 +34,13 @@ class LevelLoader {
         file >> width;
         file >> height;
 
-        Array2D<Level::CellType> *level_matrix =
-            new Array2D<Level::CellType>(width, height);
+        Array2D<Level::CellType> *level_matrix = new Array2D<Level::CellType>(width, height);
         vector<glm::vec2> *obstacles = new vector<glm::vec2>();
         for (int y = 0; y < height; y++) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
-                Level::CellType cell = static_cast<Level::CellType>(
-                    static_cast<int>(file_line[x]) - '0');
+                Level::CellType cell =
+                    static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                 level_matrix->setValue(x, y, cell);
                 if (cell == Level::OBSTACLE) {
                     obstacles->push_back(glm::vec2(x, y));

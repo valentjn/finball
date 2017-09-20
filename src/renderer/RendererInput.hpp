@@ -9,7 +9,7 @@
 #include "RigidBodyPhysicsOutput.hpp"
 
 class RendererInput {
-  public:
+public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
 
@@ -18,8 +18,7 @@ class RendererInput {
     RendererInput(const GameLogicOutput &gameLogicOutput,
                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
                   const LatticeBoltzmannOutput &latticeBoltzmannOutput) {
-        world_objects.insert(world_objects.end(),
-                             gameLogicOutput.objectsToRender.begin(),
+        world_objects.insert(world_objects.end(), gameLogicOutput.objectsToRender.begin(),
                              gameLogicOutput.objectsToRender.end());
     }
 };

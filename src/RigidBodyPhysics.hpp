@@ -12,7 +12,7 @@
 #include "RigidBodyPhysicsOutput.hpp"
 
 class RigidBodyPhysics {
-  private:
+private:
     Parameters &parameters;
     Level &level;
 
@@ -24,23 +24,18 @@ class RigidBodyPhysics {
     std::unique_ptr<btConstraintSolver> solver;
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
-  public:
+public:
     RigidBodyPhysics(Parameters &parameters, Level &level)
         : parameters(parameters), level(level),
-          collision_shapes(
-              std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
-          collision_configuration(
-              std::make_unique<btDefaultCollisionConfiguration>()),
-          dispatcher(std::make_unique<btCollisionDispatcher>(
-              collision_configuration.get())),
+          collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
+          collision_configuration(std::make_unique<btDefaultCollisionConfiguration>()),
+          dispatcher(std::make_unique<btCollisionDispatcher>(collision_configuration.get())),
           broadphase(std::make_unique<btDbvtBroadphase>()),
           solver(std::make_unique<btSequentialImpulseConstraintSolver>()),
           dynamics_world(std::make_unique<btDiscreteDynamicsWorld>(
-              dispatcher.get(), broadphase.get(), solver.get(),
-              collision_configuration.get())) {}
+              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())) {}
 
-    void compute(const RigidBodyPhysicsInput &input,
-                 RigidBodyPhysicsOutput &output) {
+    void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {

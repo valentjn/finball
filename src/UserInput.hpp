@@ -7,10 +7,10 @@
 #include "UserInputOutput.hpp"
 
 class UserInput {
-  private:
+private:
     Parameters &parameters;
 
-  public:
+public:
     UserInput(Parameters &parameters) : parameters(parameters) {}
 
     void getInput(UserInputOutput &userInputOutput) {

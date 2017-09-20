@@ -57,8 +57,7 @@ GLuint createProgram(const char *vert_path, const char *frag_path) {
 }
 
 Renderer::Renderer(Parameters &parameters)
-    : parameters(parameters), m_resolution(960, 540),
-      m_camera_pos(0.f, 0.f, 5.f) {
+    : parameters(parameters), m_resolution(960, 540), m_camera_pos(0.f, 0.f, 5.f) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         throw std::runtime_error(SDL_GetError());
 
@@ -83,13 +82,12 @@ Renderer::Renderer(Parameters &parameters)
 
     if (parameters.verbosity_level >= 1) {
         std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
-        std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION)
-                  << std::endl;
+        std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     }
 
     // create shader programs
-    m_shader_program_world = createProgram("src/renderer/world_vert.glsl",
-                                           "src/renderer/world_frag.glsl");
+    m_shader_program_world =
+        createProgram("src/renderer/world_vert.glsl", "src/renderer/world_frag.glsl");
     m_shader_program_ui = createProgram( // TODO: use different shaders
         "src/renderer/world_vert.glsl", "src/renderer/world_frag.glsl");
 
@@ -124,19 +122,17 @@ void Renderer::update(const RendererInput &input) {
                        glm::value_ptr(view)); // data pointer
 
     // update projection matrix in shader_program_world
-    glm::mat4 projection = glm::perspective(
-        glm::pi<float>() * 0.25f, // vertical field of view
-        static_cast<float>(m_resolution.x) / m_resolution.y, // aspect ratio
-        0.1f, 10.f); // distance near & far plane
-    glUniformMatrix4fv(
-        glGetUniformLocation(m_shader_program_world, "projection"),
-        1,                           // matrix count
-        GL_FALSE,                    // is not transposed
-        glm::value_ptr(projection)); // data pointer
+    glm::mat4 projection =
+        glm::perspective(glm::pi<float>() * 0.25f, // vertical field of view
+                         static_cast<float>(m_resolution.x) / m_resolution.y, // aspect ratio
+                         0.1f, 10.f); // distance near & far plane
+    glUniformMatrix4fv(glGetUniformLocation(m_shader_program_world, "projection"),
+                       1,                           // matrix count
+                       GL_FALSE,                    // is not transposed
+                       glm::value_ptr(projection)); // data pointer
 
     // render the world objects
-    GLint model_location =
-        glGetUniformLocation(m_shader_program_world, "model");
+    GLint model_location = glGetUniformLocation(m_shader_program_world, "model");
     for (const RenderObject &object : input.world_objects)
         render(object, model_location);
     // input.world_objects.clear(); // unneccessary, because input is a new
@@ -159,10 +155,9 @@ void Renderer::render(const RenderObject &object, GLint model_location) const {
     glm::mat4 model;
     model = glm::translate(model, object.position);
     // model = glm::scale(model, glm::vec3{ object.scale });
-    glUniformMatrix4fv(
-        model_location, // uniform location of the model matrix in the shader
-        1,              // matrix count
-        GL_FALSE,       // is not transposed
-        glm::value_ptr(model)); // data pointer
+    glUniformMatrix4fv(model_location,         // uniform location of the model matrix in the shader
+                       1,                      // matrix count
+                       GL_FALSE,               // is not transposed
+                       glm::value_ptr(model)); // data pointer
     m_rectangle->render();
 }

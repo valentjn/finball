@@ -5,12 +5,11 @@
 #include "UserInputOutput.hpp"
 
 class RigidBodyPhysicsInput {
-  public:
+public:
     RigidBodyPhysicsInput() {}
 
-    RigidBodyPhysicsInput(
-        const UserInputOutput &userInputOutput,
-        const LatticeBoltzmannOutput &latticeBoltzmannOutput) {}
+    RigidBodyPhysicsInput(const UserInputOutput &userInputOutput,
+                          const LatticeBoltzmannOutput &latticeBoltzmannOutput) {}
 };
 
 #endif

@@ -21,7 +21,7 @@ LDFLAGS:= -lSDL2_image \
 all: release
 
 install_deb_packages:
-	sudo apt-get install libsdl2-image-dev libsdl2-dev libbullet-dev
+	sudo apt-get install libsdl2-image-dev libsdl2-dev libbullet-dev clang-tidy clang-format colordiff
 
 release:
 	mkdir -p ./build
@@ -34,6 +34,8 @@ debug:
 tidy:
 	clang-tidy src/main.cpp -- $(COMMON_CFLAGS)
 	scan-build -analyze-headers -v make debug
+
+format-diff:
 	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
 		-exec /bin/bash ./clang-format-diff.sh {} \;
 

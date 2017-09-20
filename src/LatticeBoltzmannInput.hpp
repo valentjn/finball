@@ -3,23 +3,23 @@
 
 #include <memory>
 
-#include "UserInputOutput.hpp"
-#include "RigidBodyPhysicsOutput.hpp"
 #include "Array2D.hpp"
+#include "RigidBodyPhysicsOutput.hpp"
+#include "UserInputOutput.hpp"
 #include "glm/vec3.hpp"
 
 class LatticeBoltzmannInput {
-public:
-	// input flag image (0,1 velocity, 2 type flag)
-	std::unique_ptr<Array2D<glm::vec3>> matrix = nullptr;
+  public:
+    // input flag image (0,1 velocity, 2 type flag)
+    std::unique_ptr<Array2D<glm::vec3>> matrix = nullptr;
 
-	LatticeBoltzmannInput(){}
+    LatticeBoltzmannInput() {}
 
-	LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-						  const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput)
-	{
-		//TODO set matrix to some value
-	}
+    LatticeBoltzmannInput(
+        const UserInputOutput &userInputOutput,
+        const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {
+        // TODO set matrix to some value
+    }
 };
 
 #endif

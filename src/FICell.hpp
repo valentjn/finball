@@ -4,7 +4,7 @@
 struct FICell {
     float components[9] = {-1, -1, -1, -1, -1, -1, -1, -1, -1};
 
-    float &operator [](int index) {
+    float &operator[](int index) {
         assert(index >= 0 && index < 9);
         return components[index];
     }

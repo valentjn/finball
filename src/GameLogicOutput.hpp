@@ -6,12 +6,11 @@
 #include "renderer/RenderObject.hpp"
 
 class GameLogicOutput {
-public:
+  public:
     bool running;
     std::vector<RenderObject> objectsToRender;
 
-    GameLogicOutput() : running(true)
-    {}
+    GameLogicOutput() : running(true) {}
 };
 
 #endif

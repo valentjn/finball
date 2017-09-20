@@ -3,12 +3,11 @@
 
 #include <glm/glm.hpp>
 
-struct RenderObject
-{
-	glm::vec3 position;
-	float scale;
+struct RenderObject {
+    glm::vec3 position;
+    float scale;
 
-	// Todo: object type
+    // Todo: object type
 };
 
 #endif // RENDEROBJECT_HPP_

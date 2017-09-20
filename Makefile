@@ -21,7 +21,7 @@ LDFLAGS:= -lSDL2_image \
 all: release
 
 install_deb_packages:
-	sudo apt-get install libsdl2-image-dev libsdl2-dev libbullet-dev clang-tidy clang-format colordiff
+	sudo apt-get install libsdl2-image-dev libsdl2-dev libbullet-dev clang clang-tidy clang-format colordiff
 
 release:
 	mkdir -p ./build

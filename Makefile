@@ -8,7 +8,8 @@ COMMON_CFLAGS= -pedantic \
 		       -std=c++14 \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
-		       -I src
+		       -I src \
+		       -I ext
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
 LDFLAGS:= -lSDL2_image \
@@ -56,8 +57,8 @@ test_test: test_deps
 
 
 
-GTEST_DIR = googletest/googletest/
-GTEST_BUILD_CFLAGS = -I $(GTEST_DIR)/include/ -I googletest/googletest/ -pthread
+GTEST_DIR = ext/googletest/googletest/
+GTEST_BUILD_CFLAGS = -I $(GTEST_DIR)/include/ -I $(GTEST_DIR) -pthread
 GTEST_BUILD_CFLAGS_MAIN = $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS)
 
 GTEST_CFLAGS = -I $(GTEST_DIR)/include -pthread build/gtest-all.o

@@ -35,11 +35,11 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test
+	$(CXX) -pthread test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test
 	build/test
 
 test_test: test_deps
-	$(CXX) test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
+	$(CXX) -ptrhead test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
 	build/test_test
 
 
@@ -52,10 +52,12 @@ GTEST_CFLAGS = -I $(GTEST_DIR)/include -lpthread build/gtest-all.o
 GTEST_MAIN_CFLAGS = $(GTEST_CFLAGS) build/gtest_main.o
 
 build/gtest-all.o:
-	$(CXX) $(GTEST_DIR)/src/gtest-all.cc $(GTEST_BUILD_CFLAGS) -c -o $@
+	mkdir -p build
+	$(CXX) -pthread $(GTEST_DIR)/src/gtest-all.cc $(GTEST_BUILD_CFLAGS) -c -o $@
 
 build/gtest_main.o:
-	$(CXX) $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS) -c -o $@
+	mkdir -p build
+	$(CXX) -pthread $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS) -c -o $@
 
 test_deps: build/gtest-all.o build/gtest_main.o
 

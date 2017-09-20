@@ -1,10 +1,10 @@
-#include <visualization/CRenderer.hpp>
 #include <glm/glm.hpp>
 #include <vector>
-
 #include <iostream>
 
-CMesh::CMesh()
+#include <renderer/Mesh.hpp>
+
+Mesh::Mesh()
 {
 	struct Vertex
 	{
@@ -46,13 +46,13 @@ CMesh::CMesh()
 	glBindVertexArray(0);
 }
 
-CMesh::~CMesh()
+Mesh::~Mesh()
 {
 	glDeleteBuffers(1, &m_vbo);
 	glDeleteVertexArrays(1, &m_vao);
 }
 
-void CMesh::render()
+void Mesh::render()
 {
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);

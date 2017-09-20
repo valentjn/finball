@@ -29,19 +29,29 @@ public:
 		memcpy(this->data, data, sizeof(T)*width*height);
 	}
 
-	void setValue(int x, int y, T value) {
-		assert(x > 0 && y > 0 && y < height && x < width);
+	void setValue(int x, int y, T value)
+	{
+		assert(x >= 0 && y >= 0 && y < height && x < width);
 
 		data[y * width + x] = value;
 	}
 
-	T getValue(int x, int y) {
-		assert(x > 0 && y > 0 && y < height && x < width);
+	T getValue(int x, int y)
+	{
+		assert(x >= 0 && y >= 0 && y < height && x < width);
 
 		return data[y * width + x];
 	}
 
-	T *getRawData() {
+	T &getRef(int x, int y)
+	{
+		assert(x >= 0 && y >= 0 && y < height && x < width);
+
+		return data[y * width + x];
+	}
+
+	T *getRawData()
+	{
 		return data;
 	}
 };

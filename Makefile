@@ -3,7 +3,9 @@ COMMON_CFLAGS= -pedantic \
 		       -Wall \
 		       -Wextra \
 		       -fmessage-length=0 \
-		       -std=c++11 \
+		       -Wno-unused-parameter \
+		       -fmessage-length=0 \
+		       -std=c++14 \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src
@@ -14,7 +16,7 @@ LDFLAGS:= -lSDL2_image \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs`
 
-.PHONY: test
+.PHONY: test_all
 
 all: release
 

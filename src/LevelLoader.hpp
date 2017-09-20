@@ -71,6 +71,7 @@ public:
                 }
                 cout << line << endl;
             }
+            cout << endl;
             if (parameters.verbosity_level >= 2)
             {
                 cout << "With obstacles at:" << endl;
@@ -79,6 +80,7 @@ public:
                     cout << "(" << point.x << "|" << point.y << ")" << endl;
                 }
             }
+            cout << endl;
         }
     }
 };

@@ -35,29 +35,29 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) -pthread test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test
+	$(CXX) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test
 	build/test
 
 test_test: test_deps
-	$(CXX) -ptrhead test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
+	$(CXX) test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
 	build/test_test
 
 
 
 GTEST_DIR = googletest/googletest/
-GTEST_BUILD_CFLAGS = -I $(GTEST_DIR)/include/ -I googletest/googletest/ -lpthread
+GTEST_BUILD_CFLAGS = -I $(GTEST_DIR)/include/ -I googletest/googletest/ -pthread
 GTEST_BUILD_CFLAGS_MAIN = $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS)
 
-GTEST_CFLAGS = -I $(GTEST_DIR)/include -lpthread build/gtest-all.o
+GTEST_CFLAGS = -I $(GTEST_DIR)/include -pthread build/gtest-all.o
 GTEST_MAIN_CFLAGS = $(GTEST_CFLAGS) build/gtest_main.o
 
 build/gtest-all.o:
 	mkdir -p build
-	$(CXX) -pthread $(GTEST_DIR)/src/gtest-all.cc $(GTEST_BUILD_CFLAGS) -c -o $@
+	$(CXX) $(GTEST_DIR)/src/gtest-all.cc $(GTEST_BUILD_CFLAGS) -c -o $@
 
 build/gtest_main.o:
 	mkdir -p build
-	$(CXX) -pthread $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS) -c -o $@
+	$(CXX) $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS) -c -o $@
 
 test_deps: build/gtest-all.o build/gtest_main.o
 

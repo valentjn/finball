@@ -5,20 +5,19 @@
 #include "Level.hpp"
 
 #include "LevelLoader.hpp"
-#include "GameLogic.hpp"
-#include "GameLogicOutput.hpp"
 #include "UserInput.hpp"
 #include "UserInputOutput.hpp"
+#include "GameLogic.hpp"
+#include "GameLogicInput.hpp"
+#include "GameLogicOutput.hpp"
 #include "LatticeBoltzmann.hpp"
+#include "LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "RigidBody.hpp"
-#include "RigidBodyOutput.hpp"
-#include "Renderer.hpp"
-
-#include "GameLogicInput.hpp"
 #include "RigidBodyInput.hpp"
-#include "LatticeBoltzmannInput.hpp"
-#include "RendererInput.hpp"
+#include "RigidBodyOutput.hpp"
+#include "renderer/Renderer.hpp"
+#include "renderer/RendererInput.hpp"
 
 class GameController {
 private:
@@ -63,8 +62,8 @@ public:
             gameLogic.update(gameLogicInput, gameLogicOutput);
 
             // 3. draw visualization
-            rendererInput = RendererInput(rigidBodyOutput, latticeBoltzmannOutput);
-            renderer.render(rendererInput);
+            rendererInput = RendererInput(gameLogicOutput, rigidBodyOutput, latticeBoltzmannOutput);
+            renderer.update(rendererInput);
         }
     }
 };

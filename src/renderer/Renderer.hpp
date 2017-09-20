@@ -2,35 +2,41 @@
 #define RENDERER_HPP_
 
 #include <SDL2/SDL.h>
+#include <glm/glm.hpp>
+#include <memory>
+#include <vector>
 
 #include "Parameters.hpp"
 #include "RendererInput.hpp"
+#include "Mesh.hpp"
+#include "RenderObject.hpp"
 
 class Renderer {
 private:
     Parameters &parameters;
-    SDL_Window *window;
+
+	GLuint m_shader_program_world;
+	GLuint m_shader_program_ui;
+
+	glm::ivec2 m_resolution;
+	SDL_Window *m_window;
+	SDL_GLContext m_glcontext;
+
+	glm::vec3 m_camera_pos;
+
+	// WIP
+	std::unique_ptr<Mesh> m_rectangle;
+
+    void render(const RenderObject &object, GLint model_location) const;
 
 public:
-    Renderer(Parameters &parameters) : parameters(parameters)
-    {
-        SDL_Init(SDL_INIT_VIDEO);
-        window = SDL_CreateWindow("Finball",
-                                  SDL_WINDOWPOS_UNDEFINED,
-                                  SDL_WINDOWPOS_UNDEFINED,
-                                  500, 500, SDL_WINDOW_SHOWN);
-    }
+    void update(const RendererInput &input);
 
-    ~Renderer()
-    {
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-    }
+	Renderer(Parameters &parameters);
+	~Renderer();
 
-    void render(const RendererInput &rendererInput)
-    {
-        // TODO
-    }
+	void renderWorldObject(const RenderObject &obj);
+	void renderUIObject(const RenderObject &obj);
 };
 
 #endif

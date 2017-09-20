@@ -5,7 +5,7 @@
 
 #include "RenderObject.hpp"
 #include "GameLogicOutput.hpp"
-#include "RigidBodyOutput.hpp"
+#include "RigidBodyPhysicsOutput.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 
 class RendererInput {
@@ -16,7 +16,7 @@ public:
     RendererInput() {}
 
     RendererInput(const GameLogicOutput &gameLogicOutput,
-                  const RigidBodyOutput &rigidBodyOutput,
+                  const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
                   const LatticeBoltzmannOutput &latticeBoltzmannOutput)
     {
         world_objects.insert(

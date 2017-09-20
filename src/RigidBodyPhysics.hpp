@@ -1,5 +1,5 @@
-#ifndef RIGID_BODY_HPP_
-#define RIGID_BODY_HPP_
+#ifndef RIGID_BODY_PHYSICS_HPP_
+#define RIGID_BODY_PHYSICS_HPP_
 
 #include <memory>
 
@@ -8,10 +8,10 @@
 
 #include "Parameters.hpp"
 #include "Level.hpp"
-#include "RigidBodyInput.hpp"
-#include "RigidBodyOutput.hpp"
+#include "RigidBodyPhysicsInput.hpp"
+#include "RigidBodyPhysicsOutput.hpp"
 
-class RigidBody {
+class RigidBodyPhysics {
 private:
     Parameters &parameters;
     Level &level;
@@ -25,7 +25,7 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
 public:
-    RigidBody(Parameters &parameters, Level &level) :
+    RigidBodyPhysics(Parameters &parameters, Level &level) :
         parameters(parameters),
         level(level),
         collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
@@ -37,18 +37,17 @@ public:
             dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get()))
     {}
 
-    void compute(const RigidBodyInput &input,
-                 RigidBodyOutput &rigidBodyOutput)
+    void compute(const RigidBodyPhysicsInput &input,
+                 RigidBodyPhysicsOutput &output)
     {
-        auto &grid_obj = rigidBodyOutput.grid_objects;
-        auto &grid_vel = rigidBodyOutput.grid_velocities;
+        auto &grid_obj = output.grid_objects;
+        auto &grid_vel = output.grid_velocities;
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
             auto &obj = dynamics_world->getCollisionObjectArray()[j];
             // TODO: determine which cells are occupied by obj
-            grid_obj->setValue(1, 3, RigidBodyOutput::type::DYNAMIC);
+            grid_obj->setValue(1, 3, RigidBodyPhysicsOutput::type::DYNAMIC);
             grid_vel->setValue(1, 3, glm::vec2 {1.0, 0.5});
         }
-
     }
 };
 

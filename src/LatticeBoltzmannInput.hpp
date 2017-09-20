@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "UserInputOutput.hpp"
-#include "RigidBodyOutput.hpp"
+#include "RigidBodyPhysicsOutput.hpp"
 #include "Array2D.hpp"
 #include "glm/vec3.hpp"
 
@@ -16,7 +16,7 @@ public:
 	LatticeBoltzmannInput(){}
 
 	LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-						  const RigidBodyOutput &rigidBodyOutput)
+						  const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput)
 	{
 		//TODO set matrix to some value
 	}

@@ -13,9 +13,9 @@
 #include "LatticeBoltzmann.hpp"
 #include "LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmannOutput.hpp"
-#include "RigidBody.hpp"
-#include "RigidBodyInput.hpp"
-#include "RigidBodyOutput.hpp"
+#include "RigidBodyPhysics.hpp"
+#include "RigidBodyPhysicsInput.hpp"
+#include "RigidBodyPhysicsOutput.hpp"
 #include "renderer/Renderer.hpp"
 #include "renderer/RendererInput.hpp"
 
@@ -34,16 +34,16 @@ public:
         GameLogic gameLogic(parameters);
         UserInput userInput(parameters);
         LatticeBoltzmann latticeBoltzmann(parameters, level);
-        RigidBody rigidBody(parameters, level);
+        RigidBodyPhysics rigidBodyPhysics(parameters, level);
         Renderer renderer(parameters);
 
         UserInputOutput userInputOutput;
         LatticeBoltzmannOutput latticeBoltzmannOutput;
-        RigidBodyOutput rigidBodyOutput;
+        RigidBodyPhysicsOutput rigidBodyPhysicsOutput;
         GameLogicOutput gameLogicOutput;
 
         LatticeBoltzmannInput latticeBoltzmannInput;
-        RigidBodyInput rigidBodyInput;
+        RigidBodyPhysicsInput rigidBodyPhysicsInput;
         GameLogicInput gameLogicInput;
         RendererInput rendererInput;
 
@@ -52,17 +52,17 @@ public:
             userInput.getInput(userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
-            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyOutput);
+            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
             latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
-            rigidBodyInput = RigidBodyInput(userInputOutput, latticeBoltzmannOutput);
-            rigidBody.compute(rigidBodyInput, rigidBodyOutput);
+            rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+            rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
-            gameLogicInput = GameLogicInput(userInputOutput, rigidBodyOutput, latticeBoltzmannOutput);
+            gameLogicInput = GameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             gameLogic.update(gameLogicInput, gameLogicOutput);
 
             // 3. draw visualization
-            rendererInput = RendererInput(gameLogicOutput, rigidBodyOutput, latticeBoltzmannOutput);
+            rendererInput = RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             renderer.update(rendererInput);
         }
     }

@@ -38,7 +38,7 @@ tidy:
 
 format-diff:
 	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
-		-exec /bin/bash ./clang-format-diff.sh {} \;
+		-exec scripts/clang-format-diff {} \;
 
 format:
 	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \

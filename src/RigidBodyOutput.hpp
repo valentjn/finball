@@ -2,8 +2,9 @@
 #define RIGID_BODY_OUTPUT_HPP_
 
 #include <memory>
-
 #include <glm/vec2.hpp>
+
+#include "Array2D.hpp"
 
 // TODO: coordinate this with other teams
 const int GRID_Y = 42;

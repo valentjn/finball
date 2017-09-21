@@ -32,6 +32,15 @@ UserInput::~UserInput()
 
 void UserInput::getInput(UserInputOutput &userInputOutput)
 {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            userInputOutput.quit = true;
+            break;
+        }
+    }
+
     //TODO: handle error codes
     XnStatus errorCode = XN_STATUS_OK;
 

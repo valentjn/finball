@@ -4,3 +4,8 @@ data/ImageLog/
 
 .project
 .cproject
+
+# CLion
+.idea/
+cmake-build-debug/
+/CMakeLists.txt

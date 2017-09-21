@@ -10,6 +10,7 @@ private:
     std::vector<T> m_data;
 
 public:
+    Array2D() : m_width(0), m_height(0) {}
     Array2D(int width, int height) : m_width(width), m_height(height), m_data(width * height) {}
 
     void loadData(void *data) {
@@ -36,7 +37,7 @@ public:
     int width() const { return m_width; }
     int height() const { return m_height; }
 
-    const T *getData() { return m_data.data(); }
+    const T* getData() const { return m_data.data(); }
 };
 
 #endif /* ARRAY2D_HPP_ */

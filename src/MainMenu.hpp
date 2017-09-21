@@ -105,12 +105,12 @@ public:
         TTF_Quit();
         SDL_Quit();
 
-        Level level;
+        /*Level level;
         LevelLoader levelLoader(parameters);
         levelLoader.loadLevel(level);
 
         GameController gameController(parameters);
-        gameController.startGame(level);
+        gameController.startGame(level);*/
     }
 
 private:

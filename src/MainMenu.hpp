@@ -32,20 +32,24 @@ public:
 
 
         SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        TTF_Font *font = TTF_OpenFont("assets/OpenSans-regular.ttf", 25);
-        SDL_Color color = { 255, 255, 255 };
+        TTF_Font *font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 70);
+        SDL_Color color = { 255, 255, 255, 150 };
         
         SDL_Surface *background_surface = IMG_Load("assets/background.jpg");
         SDL_Texture *background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
-        SDL_Surface *highscore_surface = TTF_RenderText_Solid(font, "FinBall - The Game", color);
+        SDL_Surface *highscore_surface = TTF_RenderText_Solid(font, "FinBall", color);
         SDL_Texture *highscore_texture = SDL_CreateTextureFromSurface(renderer, highscore_surface);
 
         SDL_FreeSurface(background_surface);
         SDL_FreeSurface(highscore_surface);
 
+        int textWidth, textHeight;
+        SDL_QueryTexture(highscore_texture, NULL, NULL, &textWidth, &textHeight);
+        SDL_Rect highscore_rect = { 400 - textWidth / 2 , 50, textWidth, textHeight };
+
         SDL_RenderCopy(renderer, background_texture, NULL, NULL);
-        SDL_RenderCopy(renderer, highscore_texture, NULL, NULL);
+        SDL_RenderCopy(renderer, highscore_texture, NULL, &highscore_rect);
         SDL_RenderPresent(renderer);
             
         
@@ -53,7 +57,6 @@ public:
         bool quit = false;
             
         SDL_Event event;
-
 
         while (!quit) {
             SDL_PollEvent(&event);

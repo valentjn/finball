@@ -1,9 +1,9 @@
 #ifndef LOG_HPP_
 #define LOG_HPP_
 
-#include <string>
 #include <cstdarg>
 #include <cstdio>
+#include <string>
 
 using namespace std;
 
@@ -17,8 +17,10 @@ private:
 
     static FILE *getOutStream(LogLevel logLevel) {
         switch (logLevel) {
-            case ERROR: return stderr;
-            default:    return stdout;
+        case ERROR:
+            return stderr;
+        default:
+            return stdout;
         }
     }
 
@@ -32,9 +34,7 @@ private:
     }
 
 public:
-    static void setLogLevel(int level) {
-        logLevel = static_cast<LogLevel>(level);
-    }
+    static void setLogLevel(int level) { logLevel = static_cast<LogLevel>(level); }
 
     static void error(string message, ...) {
         va_list format_args;

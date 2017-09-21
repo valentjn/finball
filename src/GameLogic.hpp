@@ -6,8 +6,9 @@
 
 #include "GameLogicInput.hpp"
 #include "GameLogicOutput.hpp"
-#include "renderer/RenderObject.hpp"
+#include "Highscores.hpp"
 #include "Log.hpp"
+#include "renderer/RenderObject.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -33,7 +34,7 @@ public:
 
         if (input.quit) {
             output.running = false;
-            saveHighscore(output.highscore);
+            Highscores::saveHighscore(output.highscore);
             return;
         }
 

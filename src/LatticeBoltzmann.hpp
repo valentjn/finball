@@ -7,14 +7,12 @@
 #include "LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "Level.hpp"
-#include "Parameters.hpp"
 #include "glm/vec3.hpp"
 
 using namespace glm;
 
 class LatticeBoltzmann {
 private:
-    Parameters &parameters;
     Level &level;
 
     // previous f_i field
@@ -33,8 +31,8 @@ private:
     int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6}; 
 
 public:
-    LatticeBoltzmann(Parameters &parameters, Level &level)
-        : parameters(parameters), level(level), fi_Old(level.width, level.height),
+    LatticeBoltzmann(Level &level)
+        : level(level), fi_Old(level.width, level.height),
           fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {

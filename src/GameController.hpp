@@ -44,6 +44,8 @@ class GameComponent : public GameComponentBase
 
 public:
     GameComponent<T>(Level& level) : wrapped(level) {}
+    GameComponent (const GameComponent &obj) = delete;
+  	GameComponent & operator= (const GameComponent & other) = delete;
 };
 
 class GameInteractionBase {

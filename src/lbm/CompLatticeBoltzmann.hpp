@@ -52,6 +52,8 @@ public:
         }
     }
 
+    CompLatticeBoltzmann (const CompLatticeBoltzmann &obj) = delete;
+	CompLatticeBoltzmann & operator= (const CompLatticeBoltzmann & other) = delete;
 	// writes the output of this component to output
     bool update(OutputData& output)
 	{   

@@ -25,6 +25,9 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
 public:
+    RigidBodyPhysics (const RigidBodyPhysics &obj) = delete;
+    RigidBodyPhysics & operator= (const RigidBodyPhysics & other) = delete;
+
     RigidBodyPhysics(Parameters &parameters, Level &level)
         : parameters(parameters), level(level),
           collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),

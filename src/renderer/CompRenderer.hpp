@@ -44,6 +44,8 @@ public:
 
 	CompRenderer(const Level& level);
 	~CompRenderer();
+	CompRenderer (const CompRenderer &obj) = delete;
+	CompRenderer & operator= (const CompRenderer & other) = delete;
 
 	void renderWorldObject(const RenderObject& obj);
 	void renderUIObject(const RenderObject& obj);

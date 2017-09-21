@@ -16,6 +16,8 @@ public:
 
     Level() : width(-1), height(-1), matrix(nullptr), obstacles(nullptr) {}
 
+    Level (const Level &obj) = delete;
+    Level & operator= (const Level & other) = delete;
     ~Level() {
         delete matrix;
         delete obstacles;

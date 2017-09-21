@@ -1,6 +1,7 @@
 build/
 data/ImageLog/
 .settings/
+haiscores.txt
 
 .project
 .cproject

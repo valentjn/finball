@@ -18,7 +18,7 @@ private:
         fstream file;
         file.open("build/haiscores.txt", fstream::out);
         if (file.is_open()) {
-            for (auto const &highscore) {
+            for (auto const &highscore : highscores) {
                 file << highscore << "\n";
             }
         } else {

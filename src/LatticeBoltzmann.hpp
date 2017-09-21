@@ -27,7 +27,7 @@ private:
     Array2D<FICell> fi_Eq;
 
     // quadrature weights for approximating equilibrium distribution
-    int w [9] = {4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36};
+    float w [9] = {4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36};
     int cx [9] = {0, 1, 0, -1, 0 , 1, -1, -1, 1};
     int cy [9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
     int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6}; 
@@ -129,7 +129,7 @@ float omega = 1.0;
 //#################################### End of Collision ##################################################
 
 //#################################### Bounce Back Boundary #################################
-	for (int y = 0; y < level.height; ++y) {
+/*	for (int y = 0; y < level.height; ++y) {
         	for (int x = 0; x < level.width; ++x) {
 	   	 //check for boundary 
             	if (input.matrix->value(x,y)[2]==1) 
@@ -187,8 +187,10 @@ float omega = 1.0;
                 }
         	}
    	}
-
+*/ 
 //#################################### End of Bounce Back ##############################################
+
+//TODO set f_i in obstacles to 0
 
 //#################################### Streaming ############################################
         for (int y = 1; y < level.height-1; ++y) {
@@ -210,8 +212,7 @@ float omega = 1.0;
 // now fi_New contains the streamed and collided values
 //#################################### End of Streaming ##########################################
 
-        // TODO Consider Boundary in Col & STream (0 = fluid, 1 = boundary, 2 =
-        // inflow, 3 = outflow)
+        // TODO Stream back the velocities streamed into obstacles.
 
 //#################################### Output #######################################
         // Calculate macroscopic quantities for the output

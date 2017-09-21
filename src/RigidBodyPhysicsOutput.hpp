@@ -12,7 +12,7 @@ const int GRID_X = 42;
 
 class RigidBodyPhysicsOutput {
 public:
-    enum class type { INFLOW, OUTFLOW, DYNAMIC, STATIC };
+    enum class type { INFLOW, OUTFLOW, BODY, FLUID };
 
     const std::unique_ptr<Array2D<type>> grid_objects;
     const std::unique_ptr<Array2D<glm::vec2>> grid_velocities;

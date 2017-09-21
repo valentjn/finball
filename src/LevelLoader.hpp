@@ -8,7 +8,7 @@
 #include "Array2D.hpp"
 #include "Level.hpp"
 #include "Parameters.hpp"
-#include "glm/vec2.hpp"
+#include "RigidBody.hpp"
 
 using namespace std;
 
@@ -35,7 +35,7 @@ public:
         file >> height;
 
         Array2D<Level::CellType> *level_matrix = new Array2D<Level::CellType>(width, height);
-        vector<glm::vec2> *obstacles = new vector<glm::vec2>();
+        vector<RigidBody> *obstacles = new vector<RigidBody>();
         for (int y = 0; y < height; y++) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
@@ -43,7 +43,7 @@ public:
                     static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                 level_matrix->value(x, y) = cell;
                 if (cell == Level::OBSTACLE) {
-                    obstacles->push_back(glm::vec2(x, y));
+                    obstacles->push_back(RigidBody(x, y));
                 }
             }
         }
@@ -65,8 +65,8 @@ public:
             cout << endl;
             if (parameters.verbosity_level >= 2) {
                 cout << "With obstacles at:" << endl;
-                for (glm::vec2 const &point : *obstacles) {
-                    cout << "(" << point.x << "|" << point.y << ")" << endl;
+                for (auto const &obstacle : *obstacles) {
+                    cout << "(" << obstacle.pos.x << "|" << obstacle.pos.y << ")" << endl;
                 }
             }
             cout << endl;

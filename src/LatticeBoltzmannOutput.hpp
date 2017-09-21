@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "FICell.hpp"
 #include "Array2D.hpp"
 #include <glm/vec3.hpp>
 

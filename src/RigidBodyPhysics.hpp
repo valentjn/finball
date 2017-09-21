@@ -39,7 +39,7 @@ public:
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
             auto &obj = dynamics_world->getCollisionObjectArray()[j];
             // TODO: determine which cells are occupied by obj
-            grid_obj->value(1, 3) = RigidBodyPhysicsOutput::type::DYNAMIC;
+            grid_obj->value(1, 3) = RigidBodyPhysicsOutput::type::FLUID;
             grid_vel->value(1, 3) = glm::vec2{1.0, 0.5};
         }
     }

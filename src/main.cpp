@@ -10,12 +10,8 @@ int main(int argc, char *argv[]) {
     menu.show();
 
     /*
-    Level level;
-    LevelLoader levelLoader();
-    levelLoader.loadLevel(level);
-
-    GameController gameController();
-    gameController.startGame(level);
+    GameController gameController;
+    gameController.startGame(Level("data/testLevel.txt"));
     */
 
     return 0;

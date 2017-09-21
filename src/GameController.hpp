@@ -9,7 +9,6 @@
 #include "LatticeBoltzmann.hpp"
 #include "LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmannOutput.hpp"
-#include "LevelLoader.hpp"
 #include "RigidBodyPhysics.hpp"
 #include "RigidBodyPhysicsInput.hpp"
 #include "RigidBodyPhysicsOutput.hpp"

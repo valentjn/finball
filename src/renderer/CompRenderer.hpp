@@ -21,6 +21,7 @@ private:
 	GLuint m_shader_program_ui;
 	GLuint m_shader_program_fluid;
 	GLuint m_tex_fluid;
+    GLuint m_tex_noise;
 
 	glm::ivec2 m_resolution;
 	SDL_Window* m_window;

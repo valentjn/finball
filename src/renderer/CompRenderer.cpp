@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
+#include <random>
 
 #include <renderer/CompRenderer.hpp>
 #include <Level.hpp>
@@ -58,6 +59,18 @@ GLuint createProgram(const char* vert_path, const char* frag_path)
 	return shader_program;
 }
 
+void APIENTRY debugCallback(
+	GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	std::cout << message;
+}
+
 CompRenderer::CompRenderer(const Level& level)
 	: m_resolution(960, 540)
 	, m_camera_pos(0.f, 0.f, 5.f)
@@ -86,6 +99,9 @@ CompRenderer::CompRenderer(const Level& level)
 	std::cout << "OpenGL " << glGetString(GL_VERSION) << '\n';
 	std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
 
+	glDebugMessageCallback(&debugCallback, nullptr);
+	std::cout << glGetError() << '\n';
+
     // create shader programs
 	m_shader_program_world = createProgram(
 		"src/renderer/world_vert.glsl",
@@ -105,6 +121,26 @@ CompRenderer::CompRenderer(const Level& level)
 
 	// create the texture for the velocities of the fluid
 	glGenTextures(1, &m_tex_fluid);
+	glGenTextures(1, &m_tex_noise);
+	std::vector<float> noise(m_resolution.x * m_resolution.y * 4);
+	std::default_random_engine engine;
+	std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
+	for (float& val : noise) {
+		val = dist(engine);
+	}
+	glBindTexture(GL_TEXTURE_2D, m_tex_noise);
+	glTexImage2D(GL_TEXTURE_2D,
+		0,
+		GL_RGBA,
+		m_resolution.x,
+		m_resolution.y,
+		0,
+		GL_RGBA,
+		GL_FLOAT,
+		noise.data());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 CompRenderer::~CompRenderer()
@@ -128,14 +164,6 @@ void CompRenderer::setFluidVecs(const Array2D<glm::vec3>& fluid_vecs)
 		GL_FLOAT,	// data format
 		fluid_vecs.getData()); // data pointer
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	
-	
-	// upload width and height of the texture
-	/*glUseShaderProgram(shader_program_fluid);
-	glUniform1i(glGetUniformLocation(m_shader_program_fluid, "vecs_width"), fluid_vecs.width());
-	glUniform1i(glGetUniformLocation(m_shader_program_fluid, "vecs_height"), fluid_vecs.height());
-	glUseShaderProgram(0);*/
 }
 
 // enqueues a world object for rendering (at the next update)
@@ -158,8 +186,15 @@ bool CompRenderer::update(typename CompRenderer::OutputData&)
 
 	// render fluid
 	glUseProgram(m_shader_program_fluid);
+	auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
+	glUniform1i(loc, 0);
+	loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
+	glUniform1i(loc, 1);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_tex_noise);
+	
 	m_rectangle->render();
 
     // setup for rendering the world objects

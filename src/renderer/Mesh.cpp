@@ -61,6 +61,7 @@ Mesh& Mesh::operator=(Mesh&& other)
 	other.m_vao = 0;
 	other.m_vbo = 0;
 	other.m_vertex_count = 0;
+	return *this;
 }
 
 void Mesh::render() const

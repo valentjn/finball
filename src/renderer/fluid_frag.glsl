@@ -3,8 +3,10 @@
 
 uniform sampler2D tex_vecs; // texture
 
-//uniform float t; // time component
-//uniform int STEPS; // The number of adjacent locations in one direction to use for smearing
+
+/*
+uniform float t; // time component
+uniform int STEPS; // The number of adjacent locations in one direction to use for smearing
 
 // function that does not perform any transform
 
@@ -70,10 +72,12 @@ vec4 lic() {
 
 	return return_value;
 }
+*/
 
-layout(location = 0) vec4 out_color;
+layout(location = 0) out vec4 out_color;
 
 void main() {
-	gl_FragColor = lic();   // run lic; note the return value is of type vec4/RGBA
-	out_color = vec4(1, 1, 1, 1);
+	//gl_FragColor = lic();   // run lic; note the return value is of type vec4/RGBA
+	out_color = texture(tex_vecs, gl_FragCoord.xy / textureSize(tex_vecs, 0)) * 0.5 + 0.5;
 }
+

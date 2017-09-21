@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <renderer/CompRenderer.hpp>
+#include <Level.hpp>
 
 // Compiles a shader
 GLuint createShader(const char* file_path, GLuint shader_type)
@@ -57,7 +58,7 @@ GLuint createProgram(const char* vert_path, const char* frag_path)
 	return shader_program;
 }
 
-CompRenderer::CompRenderer()
+CompRenderer::CompRenderer(const Level& level)
 	: m_resolution(960, 540)
 	, m_camera_pos(0.f, 0.f, 5.f)
 
@@ -92,6 +93,9 @@ CompRenderer::CompRenderer()
     m_shader_program_ui = createProgram( // TODO: use different shaders
         "src/renderer/world_vert.glsl",
         "src/renderer/world_frag.glsl");
+	m_shader_program_fluid = createProgram(
+		"src/renderer/fluid_vert.glsl",
+		"src/renderer/fluid_frag.glsl");
 
 	// full window viewport
 	glViewport(0, 0, m_resolution.x, m_resolution.y);
@@ -100,7 +104,7 @@ CompRenderer::CompRenderer()
 	m_rectangle = std::unique_ptr<Mesh>(new Mesh());
 
 	// create the texture for the velocities of the fluid
-	glGenTextures(1, &m_fluid_tex);
+	glGenTextures(1, &m_tex_fluid);
 }
 
 CompRenderer::~CompRenderer()
@@ -113,8 +117,8 @@ CompRenderer::~CompRenderer()
 void CompRenderer::setFluidVecs(const Array2D<glm::vec3>& fluid_vecs)
 {
 	// upload texture
-	glBindTexture(GL_TEXTURE2D, m_tex_fluid);
-	glTexImage2D(GL_TEXTURE2D,
+	glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
+	glTexImage2D(GL_TEXTURE_2D,
 		0,			// mipmap level
 		GL_RGB,		// internal format
 		100,		// width
@@ -123,7 +127,7 @@ void CompRenderer::setFluidVecs(const Array2D<glm::vec3>& fluid_vecs)
 		GL_RGB,		// data format
 		GL_FLOAT,	// data format
 		fluid_vecs.getData()); // data pointer
-	glBindTexture(GL_TEXTURE2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	
 	
@@ -148,16 +152,14 @@ void CompRenderer::renderUIObject(const RenderObject& obj)
 
 bool CompRenderer::update(typename CompRenderer::OutputData&)
 {
-	updateFluidTex();
-
-    // clear the framebuffer to dark red
+	// clear the framebuffer to dark red
 	glClearColor(0.4f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// render fluid
 	glUseProgram(m_shader_program_fluid);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE2D, m_tex_fluid;
+	glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
 	m_rectangle->render();
 
     // setup for rendering the world objects

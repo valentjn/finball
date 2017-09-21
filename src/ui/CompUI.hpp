@@ -1,6 +1,8 @@
 #ifndef COMPUI_HPP_
 #define COMPUI_HPP_
 
+#include <Level.hpp>
+
 class CompUI
 {
 public:
@@ -9,6 +11,8 @@ public:
 	{
 		// TODO: add output fields
 	};
+
+	CompUI(const Level& level) {}
 
 	// writes the output of this component to output
     bool update(OutputData& output)

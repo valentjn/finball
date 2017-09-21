@@ -2,7 +2,7 @@
 #define COMPGAMELOGIC_HPP_
 
 #include <renderer/RenderObject.hpp>
-
+#include <Level.hpp>
 #include <SDL2/SDL.h>
 
 class CompGameLogic
@@ -16,7 +16,7 @@ public:
         std::vector<RenderObject> objects_to_render;
     };
 
-    CompGameLogic()
+    CompGameLogic(const Level& level)
     {
         m_object.position = { 0.f, 0.f, 0.f };
         m_object.scale = 1.f;

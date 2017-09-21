@@ -1,8 +1,14 @@
 #ifndef COMPLATTICEBOLTZMANN_HPP_
 #define COMPLATTICEBOLTZMANN_HPP_
 
+#include <Level.hpp>
+#include <lbm/FICell.hpp>
+#include <glm/glm.hpp>
+
 class CompLatticeBoltzmann
 {
+    Level level;
+
     // previous f_i field
     Array2D<FICell> fi_Old;
 
@@ -21,8 +27,9 @@ public:
         std::unique_ptr<Array2D<glm::vec3>> matrix;
 	};
 
-    CompLatticeBoltzmann()
-        : fi_Old(level.width, level.height),
+    CompLatticeBoltzmann(const Level& level)
+        : level(level),
+          fi_Old(level.width, level.height),
           fi_New(level.width, level.height),
           fi_Eq(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
@@ -38,7 +45,7 @@ public:
     bool update(OutputData& output)
 	{   
         if (output.matrix.get() == nullptr) {
-            output.matrix = std::make_unique<Array2D<vec3>>(level.width, level.height);
+            output.matrix = std::make_unique<Array2D<glm::vec3>>(level.width, level.height);
         }
 
         // TODO Calculate fi collision
@@ -91,6 +98,8 @@ public:
 
         // Set fi_old = fi_new
 	    fi_Old = fi_New;
+
+        return true;
 	}
 };
 

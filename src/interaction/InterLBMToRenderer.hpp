@@ -1,7 +1,7 @@
 #ifndef INTERLBMTORENDERER_HPP_
 #define INTERLBMTORENDERER_HPP_
 
-#include <lbm/LaticeBoltzmann.hpp>
+#include <lbm/CompLatticeBoltzmann.hpp>
 #include <renderer/CompRenderer.hpp>
 
 class InterLBMToRenderer {

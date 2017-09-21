@@ -1,27 +1,10 @@
 #ifndef GAME_CONTROLLER_HPP_
 #define GAME_CONTROLLER_HPP_
 
-<<<<<<< HEAD
-#include "Level.hpp"
-#include "Parameters.hpp"
-
-#include "GameLogic.hpp"
-#include "GameLogicInput.hpp"
-#include "GameLogicOutput.hpp"
-#include "LatticeBoltzmann.hpp"
-#include "LatticeBoltzmannInput.hpp"
-#include "LatticeBoltzmannOutput.hpp"
-#include "LevelLoader.hpp"
-#include "RigidBodyPhysics.hpp"
-#include "RigidBodyPhysicsInput.hpp"
-#include "RigidBodyPhysicsOutput.hpp"
-#include "UserInput.hpp"
-#include "UserInputOutput.hpp"
-#include "renderer/Renderer.hpp"
-#include "renderer/RendererInput.hpp"
-=======
 #include <memory>
 #include <vector>
+
+#include <Level.hpp>
 
 class GameComponentBase
 {
@@ -58,6 +41,9 @@ class GameComponent : public GameComponentBase
         current_output.swap(next_output);
         return res;
     }
+
+public:
+    GameComponent<T>(const Level& level) : wrapped(level) {}
 };
 
 class GameInteractionBase {
@@ -80,7 +66,6 @@ class GameInteraction : public GameInteractionBase {
             static_cast<GameComponent<typename T::to_comp_t>&>(comp_to).wrapped);
     }
 };
->>>>>>> cleanCodeBase-experimental
 
 class GameController {
     struct IngoingInteraction {
@@ -88,27 +73,22 @@ class GameController {
         std::unique_ptr<const GameInteractionBase> interaction;
     };
 
-<<<<<<< HEAD
-public:
-    GameController(Parameters &parameters) : parameters(parameters) {}
-
-    void startGame(Level &level) {
-=======
     struct ComponentMapping {
         std::unique_ptr<GameComponentBase> component;
         std::vector<IngoingInteraction> ingoings;
     };
 
     std::vector<ComponentMapping> mappings;
+    Level m_level;
 
 public:
-    GameController();
+    GameController(Level level);
     void run() const;
 
     template<class ComponentT>
     int addComponent() {
         mappings.push_back(ComponentMapping{});
-        mappings.back().component = std::make_unique<GameComponent<ComponentT>>();
+        mappings.back().component = std::make_unique<GameComponent<ComponentT>>(m_level);
         return mappings.size() - 1;
     }
 
@@ -122,7 +102,6 @@ public:
 
     /*void startGame(Array2D<LevelLoader::CellType> *level)
     {
->>>>>>> cleanCodeBase-experimental
         GameLogic gameLogic(parameters);
         UserInput userInput(parameters);
         LatticeBoltzmann latticeBoltzmann(parameters, level);

@@ -43,7 +43,7 @@ public:
     int width() const { return m_width; }
     int height() const { return m_height; }
 
-    const T* getData() { return m_data.data(); }
+    const T* getData() const { return m_data.data(); }
 };
 
 #endif /* ARRAY2D_HPP_ */

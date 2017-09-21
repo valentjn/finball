@@ -8,6 +8,8 @@
 
 #include <renderer/Mesh.hpp>
 #include <renderer/RenderObject.hpp>
+#include <Array2D.hpp>
+#include <Level.hpp>
 
 class CompRenderer
 {
@@ -31,7 +33,6 @@ private:
 	// WIP
 	std::unique_ptr<Mesh> m_rectangle;
 
-    void updateFluidTex();
     void render(const RenderObject& object, GLint model_location) const;
 
 public:
@@ -40,12 +41,12 @@ public:
 
     bool update(OutputData& output);
 
-	CompRenderer();
+	CompRenderer(const Level& level);
 	~CompRenderer();
 
 	void renderWorldObject(const RenderObject& obj);
 	void renderUIObject(const RenderObject& obj);
-    void setFluidVecs(glm::ivec2 resolution, std::vector<glm::vec3>& fluid_vecs);
+    void setFluidVecs(const Array2D<glm::vec3>& fluid_vecs);
 };
 
 #endif

@@ -10,7 +10,7 @@ class UserInputOutput {
     double rightAngle[2];
     double leftVelocity[2];
     double rightVelocity[2];
-    
+
 public:
     bool quit, start;
 

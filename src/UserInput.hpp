@@ -23,10 +23,10 @@ public:
         long steps = 1000;
 
         // generate fake data
-        userInputOutput.leftAngle[0] = (t%steps)*3.141/steps-6.282;
-        userInputOutput.rightAngle[0] = -(t%steps)*3.141/steps+6.282;
-        userInputOutput.leftAngle[1] = (t%steps)*3.141/steps-6.282;
-        userInputOutput.rightAngle[1] = -(t%steps)*3.141/steps+6.282;
+        userInputOutput.leftAngle[0] = (t%steps)*6.282/steps-3.141;
+        userInputOutput.rightAngle[0] = -(t%steps)*6.282/steps+3.141;
+        userInputOutput.leftAngle[1] = (t%steps)*6.282/steps-3.141;
+        userInputOutput.rightAngle[1] = -(t%steps)*6.282/steps+3.141;
         userInputOutput.leftVelocity[0] = 6.282/(steps/1000.0);
         userInputOutput.rightVelocity[0] = -6.282/(steps/1000.0);
         userInputOutput.leftVelocity[1] = 6.282/(steps/1000.0);

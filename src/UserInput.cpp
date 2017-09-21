@@ -15,13 +15,7 @@ using namespace std;
 
 UserInput *UserInput::theUserInput = nullptr;
 
-UserInput::UserInput(Parameters &parameters)
-    : parameters(parameters) {
-#ifndef WITHOUT_KINECT_LIBRARIES
-    context = make_unique<Context>();
-    userGenerator = make_unique<UserGenerator>();
-    depthGenerator = make_unique<DepthGenerator>();
-#endif
+UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
 
     if(theUserInput!=nullptr) {
         throw std::logic_error(
@@ -30,6 +24,11 @@ UserInput::UserInput(Parameters &parameters)
     theUserInput = this;
 
 #ifndef WITHOUT_KINECT_LIBRARIES
+    // init kinect context etc
+    context = make_unique<Context>();
+    userGenerator = make_unique<UserGenerator>();
+    depthGenerator = make_unique<DepthGenerator>();
+
     // TODO: handle error codes
     XnStatus errorCode = XN_STATUS_OK;
 
@@ -44,6 +43,7 @@ UserInput::UserInput(Parameters &parameters)
 UserInput::~UserInput() {
     // TODO
 #ifndef WITHOUT_KINECT_LIBRARIES
+    // cleanup kinect context etc
     depthGenerator->Release();
     userGenerator->Release();
     context->Release();

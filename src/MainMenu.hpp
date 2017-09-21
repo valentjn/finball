@@ -15,15 +15,9 @@
 #include "Highscores.hpp"
 #include "Level.hpp"
 #include "LevelLoader.hpp"
-#include "Parameters.hpp"
 
 class MainMenu {
-private:
-    Parameters parameters;
-
 public:
-    MainMenu(Parameters &parameters) : parameters(parameters) {}
-
     void show() {
         std::vector<float> highscores;
         Highscores::loadHighscores(highscores);
@@ -106,12 +100,12 @@ public:
         TTF_Quit();
         SDL_Quit();
 
-        /*Level level;
-        LevelLoader levelLoader(parameters);
+        Level level;
+        LevelLoader levelLoader;
         levelLoader.loadLevel(level);
 
-        GameController gameController(parameters);
-        gameController.startGame(level);*/
+        GameController gameController;
+        gameController.startGame(level);
     }
 
 private:

@@ -4,16 +4,10 @@
 #include <SDL2/SDL.h>
 #include <chrono>
 
-#include "Parameters.hpp"
 #include "UserInputOutput.hpp"
 
 class UserInput {
-private:
-    Parameters &parameters;
-
 public:
-    UserInput(Parameters &parameters) : parameters(parameters) {}
-
     void getInput(UserInputOutput &userInputOutput) {
         // TODO
         SDL_Event event;

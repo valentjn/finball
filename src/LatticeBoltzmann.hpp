@@ -128,6 +128,68 @@ float omega = 1.0;
         }
 //#################################### End of Collision ##################################################
 
+//#################################### Bounce Back Boundary #################################
+	for (int y = 0; y < level.height; ++y) {
+        	for (int x = 0; x < level.width; ++x) {
+	   	 //check for boundary 
+            	if (input.matrix->value(x,y)[2]==1) 
+		{
+			fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0];
+			if (x+1 >= level.width || input.matrix->value(x+1,y)[2] == 2){ //E
+				fi_New.value(x,y)[1] = fi_Old.value(x,y)[opp[1]];
+			} else 
+			{
+                		fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
+			}
+			if (x+1 >= level.width || y+1 >= level.height || input.matrix->value(x+1,y+1)[2] == 2){ //NE
+				fi_New.value(x,y)[5] = fi_Old.value(x,y)[opp[5]];
+			} else
+			{
+                		fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
+			}
+			if (y+1 >= level.height || input.matrix->value(x,y+1)[2] == 2){ //N
+				fi_New.value(x,y)[2] = fi_Old.value(x,y)[opp[2]];
+			} else
+			{
+                		fi_New.value(x,y)[2]  = fi_Old.value(x,y-1)[2] ;
+			}
+			if (x-1 < 0 || y+1 >= level.height || input.matrix->value(x-1,y+1)[2] == 2){ //NW
+				fi_New.value(x,y)[6] = fi_Old.value(x,y)[opp[6]];
+			} else
+			{
+                		fi_New.value(x,y)[6] = fi_Old.value(x+1,y-1)[6] ;
+			}
+			if (x-1 < 0 || input.matrix->value(x-1,y)[2] == 2){ //W
+				fi_New.value(x,y)[3] = fi_Old.value(x,y)[opp[3]];
+			} else
+			{
+                		fi_New.value(x,y)[3]  = fi_Old.value(x+1,y)[3] ;
+			}
+			if (x-1 < 0 || y-1 < 0 || input.matrix->value(x-1,y-1)[2] == 2){ //SW
+				fi_New.value(x,y)[7] = fi_Old.value(x,y)[opp[7]];
+			} else
+			{
+                		fi_New.value(x,y)[7] = fi_Old.value(x+1,y+1)[7] ;
+			}
+			if ( y-1 < 0 || input.matrix->value(x,y-1)[2] == 2){ //S
+				fi_New.value(x,y)[4] = fi_Old.value(x,y)[opp[4]];
+			} else
+			{
+                		fi_New.value(x,y)[4]  = fi_Old.value(x,y+1)[4];
+			}
+             		if (x+1 >= level.width || y-1 < 0 || input.matrix->value(x+1,y-1)[2] == 2){ //SE
+				fi_New.value(x,y)[8] = fi_Old.value(x,y)[opp[8]];
+			} else
+			{
+                		fi_New.value(x,y)[8] = fi_Old.value(x-1,y+1)[8] ;
+			}
+                	
+                }
+        	}
+   	}
+
+//#################################### End of Bounce Back ##############################################
+
 //#################################### Streaming ############################################
         for (int y = 1; y < level.height-1; ++y) {
         	for (int x = 1; x < level.width-1; ++x) {

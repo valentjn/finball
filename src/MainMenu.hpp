@@ -41,6 +41,9 @@ public:
         SDL_Color color_light = {255, 255, 255, 0};
         SDL_Color color_dark = {50, 50, 50, 0};
 
+        SDL_Surface *icon_surface = IMG_LOAD("assets/haicon.ico");
+        SDL_SetWindowIcon(window, icon_surface);
+
         SDL_Surface *background_surface = IMG_Load("assets/background.jpg");
         SDL_Texture *background_texture =
             SDL_CreateTextureFromSurface(renderer, background_surface);
@@ -59,6 +62,7 @@ public:
         SDL_Texture *start_game_texture =
             SDL_CreateTextureFromSurface(renderer, start_game_surface);
 
+        SDL_FreeSurface(icon_surface);
         SDL_FreeSurface(background_surface);
         SDL_FreeSurface(header_surface);
         SDL_FreeSurface(highscore_surface);

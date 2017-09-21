@@ -43,7 +43,7 @@ class GameComponent : public GameComponentBase
     }
 
 public:
-    GameComponent<T>(const Level& level) : wrapped(level) {}
+    GameComponent<T>(Level& level) : wrapped(level) {}
 };
 
 class GameInteractionBase {
@@ -79,10 +79,10 @@ class GameController {
     };
 
     std::vector<ComponentMapping> mappings;
-    Level m_level;
+    Level& m_level;
 
 public:
-    GameController(Level level);
+    GameController(Level& level);
     void run() const;
 
     template<class ComponentT>

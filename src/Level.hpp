@@ -17,12 +17,8 @@ public:
     Level() : width(-1), height(-1), matrix(nullptr), obstacles(nullptr) {}
 
     ~Level() {
-        if (matrix != nullptr) {
-            delete matrix;
-        }
-        if (obstacles != nullptr) {
-            delete obstacles;
-        }
+        delete matrix;
+        delete obstacles;
     }
 };
 

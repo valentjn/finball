@@ -7,7 +7,7 @@
 
 class CompLatticeBoltzmann
 {
-    Level level;
+    Level& level;
 
     // previous f_i field
     Array2D<FICell> fi_Old;
@@ -35,7 +35,7 @@ public:
         std::unique_ptr<Array2D<glm::vec3>> matrix;
 	};
 
-    CompLatticeBoltzmann(const Level& level)
+    CompLatticeBoltzmann(Level& level)
         : level(level),
           fi_Old(level.width, level.height),
           fi_New(level.width, level.height),

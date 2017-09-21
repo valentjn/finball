@@ -1,7 +1,7 @@
 #include <GameController.hpp>
 #include <iostream>
 
-GameController::GameController(Level level) : m_level(std::move(level)) {}
+GameController::GameController(Level& level) : m_level(level) {}
 
 void GameController::run() const
 {

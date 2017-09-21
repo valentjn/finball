@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
     MainMenu menu(parameters);
     menu.show();
 
-    GameController game{ level };
+    GameController game( level );
 
     auto lbm = game.addComponent<CompLatticeBoltzmann>();
     auto ui = game.addComponent<CompUI>();

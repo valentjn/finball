@@ -37,6 +37,12 @@ debug:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
+run:
+	build/fa_2017_release
+
+run-verbose:
+	build/fa_2017_release -v 10
+
 tidy:
 	clang-tidy src/main.cpp -- $(COMMON_CFLAGS)
 	scan-build -analyze-headers -v make debug

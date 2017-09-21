@@ -17,6 +17,8 @@ class Context;
 class UserGenerator;
 class DepthGenerator;
 }
+
+using user_id_t = unsigned long;
 #endif
 
 class UserInput {

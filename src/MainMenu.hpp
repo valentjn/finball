@@ -41,7 +41,7 @@ public:
         SDL_Color color_light = {255, 255, 255, 0};
         SDL_Color color_dark = {50, 50, 50, 0};
 
-        SDL_Surface *icon_surface = IMG_LOAD("assets/haicon.ico");
+        SDL_Surface *icon_surface = IMG_Load("assets/haicon.png");
         SDL_SetWindowIcon(window, icon_surface);
 
         SDL_Surface *background_surface = IMG_Load("assets/background.jpg");

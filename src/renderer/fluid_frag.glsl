@@ -21,7 +21,7 @@ vec4 lic() {
 	step_coords = normalized_coords;
 	
 	if(texture(tex_vecs, normalized_coords).y == 0.)
-		return vec4(0.,0.,255.,1.0);
+		return vec4(0.,0.,1.0,1.0);
 
 	// step FORWARD along the vector field
 	for(int i=0; i<STEPS; i++) {
@@ -69,9 +69,9 @@ layout(location = 0) out vec4 out_color;
 void main() {
 	
 
-    vec2 normalized_coords = gl_FragCoord.xy / textureSize(tex_noise, 0);
-    vec4 velocity = texture(tex_noise, normalized_coords).xxxx;
+    vec2 normalized_coords = gl_FragCoord.xy / textureSize(tex_vecs, 0);
+    vec4 velocity = texture(tex_vecs, normalized_coords);
     out_color = lic();   // run lic; note the return value is of type vec4/RGBA
-    // out_color = velocity * 0.5 + 0.5;
+    out_color = velocity * 0.5 + 0.5;
 }
 

@@ -8,24 +8,10 @@
 
 #include <renderer/Mesh.hpp>
 #include <renderer/RenderObject.hpp>
+#include <renderer/RendererInput.hpp>
+#include <renderer/RendererOutput.hpp>
 #include <Array2D.hpp>
 #include <Level.hpp>
-
-class RendererInput
-{
-    RendererInput(
-        const GameLogicOutput& game_logic_output,
-        const RigidBodyPhysicsOutput& rigid_body_physics_output,
-        const LatticeBoltzmannOutput& lattice_boltzmann_output)
-    {
-        
-    }
-};
-
-class RendererOutput
-{
-
-};
 
 class Renderer
 {
@@ -53,15 +39,12 @@ private:
     void render(const RenderObject& object, GLint model_location) const;
 
 public:
-    // Currently, the renderer doesn't have output that can be accessed by other components
-    struct OutputData {};
+    void update(const RendererInput& input, RendererOutput& output);
 
-    bool update(OutputData& output);
-
-	CompRenderer(const Level& level);
-	~CompRenderer();
-	CompRenderer (const CompRenderer &obj) = delete;
-	CompRenderer & operator= (const CompRenderer & other) = delete;
+	Renderer();
+	~Renderer();
+	Renderer (const Renderer &obj) = delete;
+	Renderer & operator= (const Renderer & other) = delete;
 
 	void renderWorldObject(const RenderObject& obj);
 	void renderUIObject(const RenderObject& obj);

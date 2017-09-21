@@ -9,8 +9,8 @@ Mesh::Mesh() {
         glm::vec3 position;
     };
 
-    std::vector<Vertex> vertices{{{-0.5f, -0.5f, 0.f}}, {{-0.5f, 0.5f, 0.f}}, {{0.5f, 0.5f, 0.f}},
-                                 {{-0.5f, -0.5f, 0.f}}, {{0.5f, 0.5f, 0.f}},  {{0.5f, -0.5f, 0.f}}};
+    std::vector<Vertex> vertices{{{-1.0f, -1.0f, 0.f}}, {{-1.0f, 1.0f, 0.f}}, {{1.0f, 1.0f, 0.f}},
+                                 {{-1.0f, -1.0f, 0.f}}, {{1.0f, 1.0f, 0.f}},  {{1.0f, -1.0f, 0.f}}};
 
     m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
 

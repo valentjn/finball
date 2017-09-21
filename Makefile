@@ -51,12 +51,10 @@ tidy:
 	scan-build -analyze-headers -v make debug
 
 format-diff:
-	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
-		-exec scripts/clang-format-diff {} \;
+	find src -type f -regex ".*\.\(hpp\|cpp\)" -exec scripts/clang-format-diff {} \;
 
 format:
-	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
-		-exec clang-format -i {} \;
+	find src -type f -regex ".*\.\(hpp\|cpp\)" -exec clang-format -i {} \;
 
 clean:
 	rm -rf build

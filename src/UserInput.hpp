@@ -32,7 +32,7 @@ public:
 		userInputOutput.leftVelocity[1] = 6.282/(steps/1000.0);
 		userInputOutput.rightVelocity[1] = -6.282/(steps/1000.0);
 
-		start = true;
+		userInputOutput.start = true;
     }
 };
 

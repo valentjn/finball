@@ -48,11 +48,11 @@ public:
             userInput.getInput(userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
-            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
-            latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
-
             rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
             rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
+
+            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
+            latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
             gameLogicInput =
                 GameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);

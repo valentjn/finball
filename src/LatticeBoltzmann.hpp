@@ -26,6 +26,12 @@ private:
     // internal f_i equilibrium field
     Array2D<FICell> fi_Eq;
 
+    // quadrature weights for approximating equilibrium distribution
+    int w [9] = {4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36};
+    int cx [9] = {0, 1, 0, -1, 0 , 1, -1, -1, 1};
+    int cy [9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
+    int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6}; 
+
 public:
     LatticeBoltzmann(Parameters &parameters, Level &level)
         : parameters(parameters), level(level), fi_Old(level.width, level.height),
@@ -48,16 +54,16 @@ public:
         /*for (int y = 0; y < level.height; y++)
         {
                 for (int x = 0; x < level.width; x++)
-                {
+                {	//TODO check that the cell is not an obstacle
                         float rho = 0;
                         for (int i = 0; i < 9; i ++)
                         {
                                 rho += fi_Old.getRef(x,y)[i];
                         }
 
-                        //TODO calculate cu , w(i)
+                        //TODO calculate cu
 
-                        //TODO fi_Eq.getRef(x,y)[i] = rho * w(i) * (1+cu + 0.5 *
+                        fi_Eq.getRef(x,y)[i] = rho * w(i) * (1+cu + 0.5 *
         (cu)*(cu) + 3/2 *(ux*ux+uy*uy);
 
                         for (int i = 0; i < 9; i++)
@@ -74,7 +80,7 @@ public:
         // TODO Consider Boundary in Col & STream (0 = fluid, 1 = boundary, 2 =
         // inflow, 3 = outflow)
 
-        // Calculate macroscopic quantities
+        // Calculate macroscopic quantities for the output
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
                 output.matrix->getRef(x, y).z = 0;

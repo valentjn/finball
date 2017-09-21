@@ -17,6 +17,7 @@ public:
         std::copy(t_data, t_data + m_data.size(), m_data.begin());
     }
 
+
     T &value(int x, int y) {
         assert(x >= 0);
         assert(y >= 0);

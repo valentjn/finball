@@ -39,12 +39,10 @@ public:
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
 		//set initial values
-                fi_New.setValue(x, y, FICell());
-                fi_Old.setValue(x, y, FICell());
                 for (int z = 0; z < 9; z++)
                 {
-                     fi_New.value(x,y)[z] = w(z)*1;
-		     fi_Old.value(x,y)[z] = w(z)*1;
+                     fi_New.value(x,y)[z] = w[z]*1;
+		     fi_Old.value(x,y)[z] = w[z]*1;
                 }
             }
         }
@@ -59,10 +57,10 @@ public:
 
 
 //######################################## Collision ####################################################
-for (u_int y = 1; y < level.height; ++y) {
-        for (u_int x = 1; x < level.width; ++x) {
+for (int y = 1; y < level.height-1; ++y) {
+        for (int x = 1; x < level.width-1; ++x) {
 	    //check for boundary 
-            if (input.value(x,y)[2]==0) {
+            if (input.matrix->value(x,y)[2]==0) {
                 
                 float rho = 0.0 ;
                 float velx = 0.0 ;
@@ -86,6 +84,7 @@ for (u_int y = 1; y < level.height; ++y) {
                 const float velyy = vely * vely ;
                 
 //TODO need to set omega
+float omega = 1.0;
                 // For the center
                 float feqC = w[0] * rho * (1.0 - 3.0 * (velxx + velyy) * 0.5 ) ;
                 fi_Old.value(x,y)[0] +=  omega * (feqC - fi_Old.value(x,y)[0]) ;
@@ -124,16 +123,16 @@ for (u_int y = 1; y < level.height; ++y) {
                 // for the south east direction
                 float feqSE = w[8] * rho * (1.0 + 3.0 * (velx - vely) + 4.5 * (velx-vely) * (velx-vely) - 1.5 * (velxx+ velyy) ) ;
                 fi_Old.value(x,y)[8] += omega * (feqSE - fi_Old.value(x,y)[8]) + 3.0 * w[1] * rho * (ax-ay)  ;
-
+		}
             }
         }
 //#################################### End of Collision ##################################################
 
 //#################################### Streaming ############################################
-        for (u_int y = 1; y < level.height; ++y) {
-        	for (u_int x = 1; x < level.width; ++x) {
+        for (int y = 1; y < level.height-1; ++y) {
+        	for (int x = 1; x < level.width-1; ++x) {
 	   	 //check for boundary 
-            	if (input.value(x,y)[2]==0) {
+            	if (input.matrix->value(x,y)[2]==0) {
                		fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
                 	fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
                 	fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
@@ -156,23 +155,29 @@ for (u_int y = 1; y < level.height; ++y) {
         // Calculate macroscopic quantities for the output
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-                output.matrix->getRef(x, y).z = 0;
+                output.matrix->value(x, y)[2] = 0;
                 for (int i = 0; i < 9; i++) {
-                    output.matrix->getRef(x, y).z += fi_New.getRef(x, y)[i]; // density
+                    output.matrix->value(x, y)[2] += fi_New.value(x, y)[i]; // density
                 }
-                output.matrix->getRef(x, y).x = fi_New.getRef(x, y)[1] - fi_New.getRef(x, y)[3] +
-                                                fi_New.getRef(x, y)[5] - fi_New.getRef(x, y)[6] -
-                                                fi_New.getRef(x, y)[7] +
-                                                fi_New.getRef(x, y)[8]; // x Velocity
-                output.matrix->getRef(x, y).y = fi_New.getRef(x, y)[2] - fi_New.getRef(x, y)[4] +
-                                                fi_New.getRef(x, y)[5] + fi_New.getRef(x, y)[6] -
-                                                fi_New.getRef(x, y)[7] -
-                                                fi_New.getRef(x, y)[8]; // y Velocity
+                output.matrix->value(x, y)[0] = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
+                                                fi_New.value(x, y)[5] - fi_New.value(x, y)[6] -
+                                                fi_New.value(x, y)[7] +
+                                                fi_New.value(x, y)[8]; // x Velocity
+                output.matrix->value(x, y)[1] = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
+                                                fi_New.value(x, y)[5] + fi_New.value(x, y)[6] -
+                                                fi_New.value(x, y)[7] -
+                                                fi_New.value(x, y)[8]; // y Velocity
             }
         }
 
         // Set fi_old = fi_new
-        fi_Old.loadData(fi_New.getRawData());
+	for (int y = 0; y < level.height; y++) {
+            for (int x = 0; x < level.width; x++) {
+	        for (int z = 0; z < 9; ++z) {
+			fi_Old.value(x,y)[z]=fi_New.value(x,y)[z];
+		}	
+	    }
+	}
     }
 };
 

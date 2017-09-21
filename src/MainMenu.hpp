@@ -29,15 +29,15 @@ public:
                              SDL_WINDOW_SHOWN /* | SDL_WINDOW_FULLSCREEN */);
 
         SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        TTF_Font *header_font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 70);
-        TTF_Font *highscore_font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 30);
+        TTF_Font *header_font = TTF_OpenFont("data/OpenSans-Regular.ttf", 70);
+        TTF_Font *highscore_font = TTF_OpenFont("data/OpenSans-Regular.ttf", 30);
         SDL_Color color_light = {255, 255, 255, 0};
         SDL_Color color_dark = {50, 50, 50, 0};
 
-        SDL_Surface *icon_surface = IMG_Load("assets/haicon.png");
+        SDL_Surface *icon_surface = IMG_Load("data/haicon.png");
         SDL_SetWindowIcon(window, icon_surface);
 
-        SDL_Surface *background_surface = IMG_Load("assets/background.jpg");
+        SDL_Surface *background_surface = IMG_Load("data/background.jpg");
         SDL_Texture *background_texture =
             SDL_CreateTextureFromSurface(renderer, background_surface);
 

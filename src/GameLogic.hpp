@@ -7,6 +7,7 @@
 #include "GameLogicInput.hpp"
 #include "GameLogicOutput.hpp"
 #include "renderer/RenderObject.hpp"
+#include "Highscores.hpp"
 #include "Log.hpp"
 
 using namespace std;
@@ -33,7 +34,7 @@ public:
 
         if (input.quit) {
             output.running = false;
-            saveHighscore(output.highscore);
+            Highscores::saveHighscore(output.highscore);
             return;
         }
 

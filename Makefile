@@ -31,10 +31,10 @@ install-formatter:
 
 install_icon:
 	mkdir -p ~/.local/share/icons
-	cp assets/haicon.png ~/.local/share/icons
+	cp data/haicon.png ~/.local/share/icons
 	gtk-update-icon-cache
 	mkdir -p ~/.local/share/applications
-	cp assets/finball.desktop ~/.local/share/applications
+	cp data/finball.desktop ~/.local/share/applications
 	sed -i 's?PWD?'`pwd`'?' ~/.local/share/applications/finball.desktop 
 
 release:

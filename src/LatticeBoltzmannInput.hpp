@@ -21,7 +21,8 @@ public:
 
     LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
                           const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput)
-        : matrix(std::make_unique<Array2D<glm::vec3>>(42, 42)) {}
+        : velocities(std::make_unique<Array2D<glm::vec2>>(42, 42)),
+          flagfield(std::make_unique<Array2D<Level::CellType>>(42, 42)) {}
 };
 
 #endif

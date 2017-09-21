@@ -2,6 +2,7 @@
 #define MAIN_MENU_HPP_
 
 #include <vector>
+#include <string>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -32,23 +33,33 @@ public:
 
 
         SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        TTF_Font *font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 70);
-        SDL_Color color = { 255, 255, 255, 150 };
+        TTF_Font *header_font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 70);
+        TTF_Font *highscore_font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 30);
+        SDL_Color color = { 255, 255, 255, 0 };
         
         SDL_Surface *background_surface = IMG_Load("assets/background.jpg");
         SDL_Texture *background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
-        SDL_Surface *highscore_surface = TTF_RenderText_Solid(font, "FinBall", color);
+        SDL_Surface *header_surface = TTF_RenderText_Solid(header_font, "FinBall", color);
+        SDL_Texture *header_texture = SDL_CreateTextureFromSurface(renderer, header_surface);
+
+        std::string highscore_text = get_highscore_text(highscores);
+
+        SDL_Surface *highscore_surface = TTF_RenderText_Blended_Wrapped(highscore_font, highscore_text.c_str(), color, 1000);
         SDL_Texture *highscore_texture = SDL_CreateTextureFromSurface(renderer, highscore_surface);
 
         SDL_FreeSurface(background_surface);
+        SDL_FreeSurface(header_surface);
         SDL_FreeSurface(highscore_surface);
 
         int textWidth, textHeight;
+        SDL_QueryTexture(header_texture, NULL, NULL, &textWidth, &textHeight);
+        SDL_Rect header_rect = { 400 - textWidth / 2 , 50, textWidth, textHeight };
         SDL_QueryTexture(highscore_texture, NULL, NULL, &textWidth, &textHeight);
-        SDL_Rect highscore_rect = { 400 - textWidth / 2 , 50, textWidth, textHeight };
+        SDL_Rect highscore_rect = { 600, 150, textWidth, textHeight };
 
         SDL_RenderCopy(renderer, background_texture, NULL, NULL);
+        SDL_RenderCopy(renderer, header_texture, NULL, &header_rect);
         SDL_RenderCopy(renderer, highscore_texture, NULL, &highscore_rect);
         SDL_RenderPresent(renderer);
             
@@ -69,9 +80,9 @@ public:
         }
             
         // Free resources
-        TTF_CloseFont(font);
+        TTF_CloseFont(header_font);
         SDL_DestroyTexture(background_texture);
-        SDL_DestroyTexture(highscore_texture);
+        SDL_DestroyTexture(header_texture);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
             
@@ -92,6 +103,10 @@ private:
         // read file
         // write to vector
         // sort
+    }
+
+    std::string get_highscore_text(std::vector<float> &highscores) {
+         return "123\n456\n789\nHallo";
     }
 
 };

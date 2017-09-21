@@ -2,6 +2,7 @@
 #define MAIN_MENU_HPP_
 
 #include <vector>
+#include <fstream>
 #include <string>
 
 #include <SDL2/SDL.h>
@@ -12,6 +13,7 @@
 #include "Level.hpp"
 #include "LevelLoader.hpp"
 #include "GameController.hpp"
+#include "Highscores.hpp"
 
 class MainMenu {
 private:
@@ -22,12 +24,11 @@ public:
 
     void show() {
         std::vector<float> highscores;
-        load_highscores(highscores);
+        Highscores::loadHighscores(highscores);
 
-        
         SDL_Init(SDL_INIT_VIDEO);
         TTF_Init();
-        SDL_Window *window = SDL_CreateWindow("FinBall", SDL_WINDOWPOS_UNDEFINED, 
+        SDL_Window *window = SDL_CreateWindow("FinBall", SDL_WINDOWPOS_UNDEFINED,
                                               SDL_WINDOWPOS_UNDEFINED, 800, 600,
                                               SDL_WINDOW_SHOWN /* | SDL_WINDOW_FULLSCREEN */);
 
@@ -36,7 +37,7 @@ public:
         TTF_Font *header_font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 70);
         TTF_Font *highscore_font = TTF_OpenFont("assets/OpenSans-Regular.ttf", 30);
         SDL_Color color = { 255, 255, 255, 0 };
-        
+
         SDL_Surface *background_surface = IMG_Load("assets/background.jpg");
         SDL_Texture *background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
@@ -62,30 +63,30 @@ public:
         SDL_RenderCopy(renderer, header_texture, NULL, &header_rect);
         SDL_RenderCopy(renderer, highscore_texture, NULL, &highscore_rect);
         SDL_RenderPresent(renderer);
-            
-        
+
+
         // Flag for quitting the program
         bool quit = false;
-            
+
         SDL_Event event;
 
         while (!quit) {
             SDL_PollEvent(&event);
-                
+
             switch (event.type) {
                 case SDL_QUIT: // User hits the "x" in the corner of the window
                     quit = true;
                     break;
             }
         }
-            
+
         // Free resources
         TTF_CloseFont(header_font);
         SDL_DestroyTexture(background_texture);
         SDL_DestroyTexture(header_texture);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
-            
+
         // Quit SDL
         TTF_Quit();
         SDL_Quit();
@@ -98,14 +99,7 @@ public:
         gameController.startGame(level);
     }
 
-private:
-    void load_highscores(std::vector<float> &highscores) {
-        // read file
-        // write to vector
-        // sort
-    }
-
-    std::string get_highscore_text(std::vector<float> &highscores) {
+private:std::string get_highscore_text(std::vector<float> &highscores) {
          return "123\n456\n789\nHallo";
     }
 

@@ -6,28 +6,25 @@
 
 #include "GameLogicInput.hpp"
 #include "GameLogicOutput.hpp"
-#include "Parameters.hpp"
 #include "renderer/RenderObject.hpp"
+#include "Log.hpp"
 
 using namespace std;
 using namespace std::chrono;
 
 class GameLogic {
 private:
-    Parameters &parameters;
     RenderObject testRenderObject;
 
     steady_clock::time_point startTime;
 
 public:
-    GameLogic(Parameters &parameters) : parameters(parameters) {
+    GameLogic() {
         testRenderObject.position = {0.f, 0.f, 0.f};
         testRenderObject.scale = 1.f;
 
         startTime = steady_clock::now();
-        if (parameters.verbosity_level >= 1) {
-            cout << "Haiscore clock started\n" << endl;
-        }
+        Log::debug("Haiscore clock started");
     }
 
     void update(const GameLogicInput &input, GameLogicOutput &output) {
@@ -51,8 +48,8 @@ private:
         file.open("build/haiscores.txt", fstream::out | fstream::app);
         if (file.is_open()) {
             file << highscore << "\n";
-        } else if (parameters.verbosity_level >= 1) {
-            cerr << "Failed to save Haiscore" << endl;
+        } else {
+            Log::error("Failed to save Haiscore");
         }
     }
 };

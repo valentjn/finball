@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "Log.hpp"
+
 using namespace std;
 
 class Highscores {
@@ -22,7 +24,7 @@ private:
                 file << highscore << "\n";
             }
         } else {
-            cerr << "Failed to save Haiscores" << endl;
+            Log::error("Failed to save Haiscores");
         }
     }
 
@@ -40,7 +42,7 @@ public:
         fstream file;
         file.open("build/haiscores.txt", fstream::in);
         if (!file.is_open()) {
-            cerr << "Failed to load haiscores" << endl;
+            Log::error("Failed to load haiscores");
             return;
         }
 

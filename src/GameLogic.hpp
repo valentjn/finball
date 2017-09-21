@@ -26,7 +26,7 @@ public:
 
         startTime = steady_clock::now();
         if (parameters.verbosity_level >= 1) {
-            cout << "Highscore clock started\n" << endl;
+            cout << "Haiscore clock started\n" << endl;
         }
     }
 
@@ -48,11 +48,11 @@ public:
 private:
     void saveHighscore(float highscore) {
         fstream file;
-        file.open("build/highscores.txt", fstream::out | fstream::app);
+        file.open("build/haiscores.txt", fstream::out | fstream::app);
         if (file.is_open()) {
             file << highscore << "\n";
         } else if (parameters.verbosity_level >= 1) {
-            cerr << "Failed to save highscore" << endl;
+            cerr << "Failed to save Haiscore" << endl;
         }
     }
 };

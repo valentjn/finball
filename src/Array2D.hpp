@@ -10,13 +10,28 @@ private:
     std::vector<T> m_data;
 
 public:
+    Array2D() : m_width(0), m_height(0) {}
+
     Array2D(int width, int height) : m_width(width), m_height(height), m_data(width * height) {}
+
+    Array2D(Array2D &&other)
+        : m_width(other.m_width), m_height(other.m_height), m_data(std::move(other.m_data)) {
+        other.m_width = 0;
+        other.m_height = 0;
+    }
+
+    Array2D &operator=(Array2D &&other) {
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_data = std::move(other.m_data);
+        other.m_width = 0;
+        other.m_height = 0;
+    }
 
     void loadData(void *data) {
         T *t_data = static_cast<T *>(data);
         std::copy(t_data, t_data + m_data.size(), m_data.begin());
     }
-
 
     T &value(int x, int y) {
         assert(x >= 0);

@@ -14,6 +14,7 @@ DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
 LDFLAGS:= -lSDL2_image \
+		  -lSDL2_ttf \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs`
@@ -23,7 +24,7 @@ LDFLAGS:= -lSDL2_image \
 all: release
 
 install_deb_packages:
-	sudo apt-get install libsdl2-image-dev libsdl2-dev libbullet-dev
+	sudo apt-get install libsdl2-ttf-dev libsdl2-image-dev libsdl2-dev libbullet-dev
 
 install-formatter:
 	sudo apt-get install clang clang-tidy clang-format colordiff
@@ -51,12 +52,10 @@ tidy:
 	scan-build -analyze-headers -v make debug
 
 format-diff:
-	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
-		-exec scripts/clang-format-diff {} \;
+	find src -type f -regex ".*\.\(hpp\|cpp\)" -exec scripts/clang-format-diff {} \;
 
 format:
-	find src -type f -regex ".*\.\(hpp\|cpp\)" -not -path "src/glm/*" \
-		-exec clang-format -i {} \;
+	find src -type f -regex ".*\.\(hpp\|cpp\)" -exec clang-format -i {} \;
 
 clean:
 	rm -rf build

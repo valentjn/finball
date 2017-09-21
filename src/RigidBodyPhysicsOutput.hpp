@@ -10,12 +10,21 @@
 const int GRID_Y = 42;
 const int GRID_X = 42;
 
+class Transformation {
+public:
+    int id;
+    glm::vec2 position;
+    float angle;
+};
+
 class RigidBodyPhysicsOutput {
 public:
     enum class type { INFLOW, OUTFLOW, BODY, FLUID };
 
     const std::unique_ptr<Array2D<type>> grid_objects;
     const std::unique_ptr<Array2D<glm::vec2>> grid_velocities;
+
+    const std::unique_ptr<std::vector<Transformation>> transformations;
 
     RigidBodyPhysicsOutput()
         : grid_objects(std::make_unique<Array2D<type>>(GRID_X, GRID_Y)),

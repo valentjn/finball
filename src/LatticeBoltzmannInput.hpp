@@ -20,9 +20,8 @@ public:
     LatticeBoltzmannInput() {}
 
     LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {
-        // TODO set matrix to some value
-    }
+                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput)
+        : matrix(std::make_unique<Array2D<glm::vec3>>(42, 42)) {}
 };
 
 #endif

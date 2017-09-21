@@ -2,10 +2,10 @@
 #define LATTICE_BOLTZMANN_OUTPUT_HPP_
 
 #include <memory>
-#include "FICell.hpp"
+#include <glm/vec3.hpp>
 
 #include "Array2D.hpp"
-#include <glm/vec3.hpp>
+#include "FICell.hpp"
 
 class LatticeBoltzmannOutput {
 public:

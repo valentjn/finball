@@ -41,7 +41,7 @@ public:
             for (int x = 0; x < width; x++) {
                 Level::CellType cell =
                     static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
-                level_matrix->setValue(x, y, cell);
+                level_matrix->value(x, y) = cell;
                 if (cell == Level::OBSTACLE) {
                     obstacles->push_back(glm::vec2(x, y));
                 }
@@ -58,7 +58,7 @@ public:
             for (int y = 0; y < height; y++) {
                 string line = "";
                 for (int x = 0; x < width; x++) {
-                    line += to_string(level_matrix->getValue(x, y));
+                    line += to_string(level_matrix->value(x, y));
                 }
                 cout << line << endl;
             }

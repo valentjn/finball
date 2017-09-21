@@ -7,8 +7,8 @@
 
 #include "Array2D.hpp"
 #include "Level.hpp"
-#include "RigidBody.hpp"
 #include "Log.hpp"
+#include "RigidBody.hpp"
 
 using namespace std;
 
@@ -60,7 +60,7 @@ public:
         Log::debug("With obstacles at:");
         if (Log::logLevel >= Log::LogLevel::DEBUG) {
             for (auto const &obstacle : *obstacles) {
-                Log::debug("(%d|%d)", (int) obstacle.pos.x, (int) obstacle.pos.y);
+                Log::debug("(%d|%d)", (int)obstacle.pos.x, (int)obstacle.pos.y);
             }
         }
     }

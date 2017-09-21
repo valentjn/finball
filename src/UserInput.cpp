@@ -4,18 +4,18 @@
 #include <XnCppWrapper.h>
 
 UserInput::UserInput(Parameters &parameters)
-	: parameters(parameters), context(std::make_unique<xn::Context>())
+    : parameters(parameters), context(std::make_unique<xn::Context>())
 {
-	//TODO
+    //TODO
 }
 
 UserInput::~UserInput()
 {
-	//TODO
-	context->Release();
+    //TODO
+    context->Release();
 }
 
 void UserInput::getInput(UserInputOutput &userInputOutput)
 {
-	//TODO
+    //TODO
 }

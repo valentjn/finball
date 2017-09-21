@@ -10,17 +10,17 @@
 // forward declarations for kinect
 namespace xn
 {
-  class Context;
+class Context;
 }
 
 class UserInput {
 private:
     Parameters &parameters;
-	std::unique_ptr<xn::Context> context;
+    std::unique_ptr<xn::Context> context;
 
 public:
     UserInput(Parameters &parameters);
-	~UserInput();
+    ~UserInput();
 
     void getInput(UserInputOutput &userInputOutput);
 };

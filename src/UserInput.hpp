@@ -28,8 +28,6 @@ private:
     std::unique_ptr<xn::DepthGenerator> depthGenerator;
 #endif
 
-    static UserInput *theUserInput;
-
 public:
     UserInput(Parameters &parameters);
     ~UserInput();

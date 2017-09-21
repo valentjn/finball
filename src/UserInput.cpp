@@ -13,15 +13,7 @@ using namespace xn;
 
 using namespace std;
 
-UserInput *UserInput::theUserInput = nullptr;
-
 UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
-
-    if(theUserInput!=nullptr) {
-        throw std::logic_error(
-            "Singleton UserInput instantiated multiple times");
-    }
-    theUserInput = this;
 
 #ifndef WITHOUT_KINECT_LIBRARIES
     // init kinect context etc

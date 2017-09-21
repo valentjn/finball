@@ -15,6 +15,9 @@ public:
 
 //TODO return fi_new pointer here
     std::unique_ptr<Array2D<FICell>> fi_current = nullptr;
+
+//TODO return fi_old pointer here
+    std::unique_ptr<Array2D<FICell>> fi_before = nullptr;
 };
 
 #endif

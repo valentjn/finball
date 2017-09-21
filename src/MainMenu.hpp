@@ -55,6 +55,7 @@ public:
         SDL_Texture *start_game_texture =
             SDL_CreateTextureFromSurface(renderer, start_game_surface);
 
+        SDL_FreeSurface(icon_surface);
         SDL_FreeSurface(background_surface);
         SDL_FreeSurface(header_surface);
         SDL_FreeSurface(highscore_surface);

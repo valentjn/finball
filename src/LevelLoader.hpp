@@ -26,31 +26,25 @@ public:
         int width, height;
         file >> width >> height;
 
-        Array2D<Level::CellType> *level_matrix = new Array2D<Level::CellType>(width, height);
-        vector<RigidBody> *obstacles = new vector<RigidBody>();
+        level.matrix = Array2D<Level::CellType>(width, height);
         for (int y = 0; y < height; y++) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
                 Level::CellType cell =
                     static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
-                level_matrix->value(x, y) = cell;
+                level.matrix.value(x, y) = cell;
                 if (cell == Level::OBSTACLE) {
-                    obstacles->push_back(RigidBody(x, y));
+                    level.obstacles.push_back(RigidBody(x, y));
                 }
             }
         }
-
-        level.width = width;
-        level.height = height;
-        level.matrix = level_matrix;
-        level.obstacles = obstacles;
 
         Log::info("Loaded level:");
         if (Log::logLevel >= Log::INFO) {
             for (int y = 0; y < height; y++) {
                 string line = "";
                 for (int x = 0; x < width; x++) {
-                    line += to_string(level_matrix->value(x, y));
+                    line += to_string(level.matrix.value(x, y));
                 }
                 Log::info(line);
             }
@@ -58,7 +52,7 @@ public:
 
         Log::debug("With obstacles at:");
         if (Log::logLevel >= Log::LogLevel::DEBUG) {
-            for (auto const &obstacle : *obstacles) {
+            for (auto const &obstacle : level.obstacles) {
                 Log::debug("(%d|%d)", (int)obstacle.pos.x, (int)obstacle.pos.y);
             }
         }

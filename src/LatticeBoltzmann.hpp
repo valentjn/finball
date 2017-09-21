@@ -21,57 +21,32 @@ private:
     // processed f_i field
     Array2D<FICell> fi_New;
 
-    // internal f_i equilibrium field
-    Array2D<FICell> fi_Eq;
-
     // quadrature weights for approximating equilibrium distribution
-    int w [9] = {4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36};
+    float w [9] = {4./9., 1./9., 1./9., 1./9., 1./9., 1./36., 1./36., 1./36., 1./36.};
     int cx [9] = {0, 1, 0, -1, 0 , 1, -1, -1, 1};
     int cy [9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
-    int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6}; 
+    int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
 
 public:
     LatticeBoltzmann(Level &level)
         : level(level), fi_Old(level.width, level.height),
-          fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
+          fi_New(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-
-                fi_New.value(x, y) = FICell();
-                fi_Old.value(x, y) = FICell();
-
-		//set initial values
-                for (int z = 0; z < 9; z++)
-                {
-                     fi_New.value(x,y)[z] = w[z]*1;
-		     fi_Old.value(x,y)[z] = w[z]*1;
+                for (int z = 0; z < 9; z++) {
+                     fi_New.value(x,y)[z] = w[z]*0.1;
+                     fi_Old.value(x,y)[z] = w[z]*0.1;
                 }
-
-            }
-        }
-    }
-
-    LatticeBoltzmann(Level &level, bool equilibrium)
-        : level(level), fi_Old(level.width, level.height),
-          fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
-        for (int y = 0; y < level.height; y++) {
-            for (int x = 0; x < level.width; x++) {
-                fi_New.value(x, y) = FICell();
-                fi_Old.value(x, y) = FICell();
-		if(!equilibrium){
-			fi_Eq.value(x, y) = FICell();
-			for(int i = 0; i < 9; i++){
-				fi_Eq.value(x,y)[i] = 0;
-			}
-		}
-
             }
         }
     }
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output) {
-        if (output.matrix.get() == nullptr) {
-            output.matrix = std::make_unique<Array2D<vec3>>(level.width, level.height);
+        if (output.velocity.get() == nullptr) {
+            output.velocity = std::make_unique<Array2D<vec2>>(level.width, level.height);
+        }
+        if (output.density.get() == nullptr) {
+            output.density = std::make_unique<Array2D<float>>(level.width, level.height);
         }
 
 
@@ -81,7 +56,7 @@ public:
 for (int y = 1; y < level.height-1; ++y) {
         for (int x = 1; x < level.width-1; ++x) {
 	    //check for boundary 
-            if (input.matrix->value(x,y)[2]==0) {
+            if (input.flagfield->value(x,y)==Level::CellType::FLUID) {
                 
                 float rho = 0.0 ;
                 float velx = 0.0 ;
@@ -150,7 +125,7 @@ float omega = 1.0;
 //#################################### End of Collision ##################################################
 
 //#################################### Bounce Back Boundary #################################
-	for (int y = 0; y < level.height; ++y) {
+/*	for (int y = 0; y < level.height; ++y) {
         	for (int x = 0; x < level.width; ++x) {
 	   	 //check for boundary 
             	if (input.matrix->value(x,y)[2]==1) 
@@ -208,14 +183,16 @@ float omega = 1.0;
                 }
         	}
    	}
-
+*/ 
 //#################################### End of Bounce Back ##############################################
+
+//TODO set f_i in obstacles to 0
 
 //#################################### Streaming ############################################
         for (int y = 1; y < level.height-1; ++y) {
         	for (int x = 1; x < level.width-1; ++x) {
-	   	 //check for boundary 
-            	if (input.matrix->value(x,y)[2]==0) {
+	   	 //check for boundary
+            	if (input.flagfield->value(x,y)==Level::CellType::FLUID) {
                		fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
                 	fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
                 	fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
@@ -231,22 +208,21 @@ float omega = 1.0;
 // now fi_New contains the streamed and collided values
 //#################################### End of Streaming ##########################################
 
-        // TODO Consider Boundary in Col & STream (0 = fluid, 1 = boundary, 2 =
-        // inflow, 3 = outflow)
+        // TODO Stream back the velocities streamed into obstacles.
 
 //#################################### Output #######################################
         // Calculate macroscopic quantities for the output
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-                output.matrix->value(x, y)[2] = 0;
+                output.density->value(x, y) = 0;
                 for (int i = 0; i < 9; i++) {
-                    output.matrix->value(x, y)[2] += fi_New.value(x, y)[i]; // density
+                    output.density->value(x, y) += fi_New.value(x, y)[i]; // density
                 }
-                output.matrix->value(x, y)[0] = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
+                output.velocity->value(x, y)[0] = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
                                                 fi_New.value(x, y)[5] - fi_New.value(x, y)[6] -
                                                 fi_New.value(x, y)[7] +
                                                 fi_New.value(x, y)[8]; // x Velocity
-                output.matrix->value(x, y)[1] = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
+                output.velocity->value(x, y)[1] = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
                                                 fi_New.value(x, y)[5] + fi_New.value(x, y)[6] -
                                                 fi_New.value(x, y)[7] -
                                                 fi_New.value(x, y)[8]; // y Velocity

@@ -58,7 +58,7 @@ public:
         Log::debug("With obstacles at:");
         if (Log::logLevel >= Log::DEBUG) {
             for (auto const &obstacle : obstacles) {
-                Log::debug("(%d|%d)", (int)obstacle.pos.x, (int)obstacle.pos.y);
+                Log::debug("(%d|%d)", (int)obstacle.position.x, (int)obstacle.position.y);
             }
         }
     }

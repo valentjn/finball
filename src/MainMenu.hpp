@@ -1,12 +1,26 @@
 #ifndef MAIN_MENU_HPP_
 #define MAIN_MENU_HPP_
 
+#include <vector>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+
+#include "Parameters.hpp"
+#include "Level.hpp"
+#include "LevelLoader.hpp"
+#include "GameController.hpp"
+
 class MainMenu {
+private:
+    Parameters parameters;
 
 public:
+    MainMenu(Parameters &parameters) : parameters(parameters) {}
+
     void show() {
         std::vector<float> highscores;
-        load_hoghscores(highscores);
+        load_highscores(highscores);
 
         
         // Initialize SDL with the video subsystem
@@ -71,6 +85,13 @@ public:
             
         // Quit SDL
         SDL_Quit();
+
+        Level level;
+        LevelLoader levelLoader(parameters);
+        levelLoader.loadLevel(level);
+
+        GameController gameController(parameters);
+        gameController.startGame(level);
     }
 
 private:
@@ -80,6 +101,6 @@ private:
         // sort
     }
 
-}
+};
 
 #endif

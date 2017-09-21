@@ -81,8 +81,9 @@ Renderer::Renderer(Parameters &parameters)
         throw std::runtime_error(SDL_GetError());
 
     if (parameters.verbosity_level >= 1) {
-        std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
-        std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+        std::cout << "Renderer startet with OpenGL version:\n";
+        std::cout << "OpenGL " << glGetString(GL_VERSION) << "\n";
+        std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n" << std::endl;
     }
 
     // create shader programs

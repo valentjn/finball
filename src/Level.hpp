@@ -16,8 +16,9 @@ public:
 
     Level() : width(-1), height(-1) {}
 
-    ~Level() {
-    }
+    // delete copy constructor and copy-assignent operator
+    Level(const Level&) = delete;
+    Level& operator=(const Level&) = delete;
 };
 
 #endif

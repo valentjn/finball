@@ -9,6 +9,7 @@
 
 #include <renderer/Renderer.hpp>
 #include <Level.hpp>
+#include "Log.hpp"
 
 // Compiles a shader
 GLuint createShader(const char* file_path, GLuint shader_type)
@@ -68,7 +69,7 @@ void APIENTRY debugCallback(
 	const GLchar* message,
 	const void* userParam)
 {
-	std::cout << message;
+	Log::debug(message);
 }
 
 Renderer::Renderer()
@@ -95,11 +96,15 @@ Renderer::Renderer()
 	SDL_GLContext m_glcontext = SDL_GL_CreateContext(m_window);
 	if (!m_glcontext)
 		throw std::runtime_error(SDL_GetError());
-	std::cout << "OpenGL " << glGetString(GL_VERSION) << '\n';
-	std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
+	Log::debug("Loaded Renderer with OpenGL version:");
+	Log::debug("OpenGL %s", glGetString(GL_VERSION));
+	Log::debug("GLSL %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glDebugMessageCallback(&debugCallback, nullptr);
-	std::cout << glGetError() << '\n';
+	int glError = glGetError();
+	if (glError != 0) {
+		Log::error("OpenGL Error: %d", glError);
+	}
 
     // create shader programs
 	m_shader_program_world = createProgram(
@@ -178,7 +183,7 @@ void Renderer::update(const RendererInput& input, RendererOutput&)
     // bind noise texture
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, m_tex_noise);
-	
+
     // render fluid
 	m_rectangle->render();
 
@@ -237,4 +242,3 @@ void Renderer::render(const RenderObject& object, GLint model_location) const
 		glm::value_ptr(model)); // data pointer
 	m_rectangle->render();
 }
-

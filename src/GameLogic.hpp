@@ -51,8 +51,7 @@ private:
         file.open("build/highscores.txt", fstream::out | fstream::app);
         if (file.is_open()) {
             file << highscore << "\n";
-        }
-        else if (parameters.verbosity_level >= 1) {
+        } else if (parameters.verbosity_level >= 1) {
             cerr << "Failed to save highscore" << endl;
         }
     }

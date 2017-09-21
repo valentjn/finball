@@ -149,51 +149,37 @@ Renderer::~Renderer()
 	SDL_Quit();
 }
 
-void Renderer::setFluidVecs(const Array2D<glm::vec3>& fluid_vecs)
-{
-	// upload texture
-	glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
-	glTexImage2D(GL_TEXTURE_2D,
-		0,			// mipmap level
-		GL_RGB,		// internal format
-		100,		// width
-		100,		// height
-		0,			// must be 0, according to khronos.org
-		GL_RGB,		// data format
-		GL_FLOAT,	// data format
-		fluid_vecs.getData()); // data pointer
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-// enqueues a world object for rendering (at the next update)
-void Renderer::renderWorldObject(const RenderObject& obj)
-{
-	m_world_objects.push_back(obj);
-}
-
-// enqueues a ui object for rendering (at the next update)
-void Renderer::renderUIObject(const RenderObject& obj)
-{
-	m_ui_objects.push_back(obj);
-}
-
 void Renderer::update(const RendererInput& input, RendererOutput&)
 {
 	// clear the framebuffer to dark red
 	glClearColor(0.4f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// render fluid
+	// setup for the rendering of the fluid
 	glUseProgram(m_shader_program_fluid);
 	auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
 	glUniform1i(loc, 0);
 	loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
 	glUniform1i(loc, 1);
+
+    // bind & fill velocities texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
+	glTexImage2D(GL_TEXTURE_2D,
+		0,			// mipmap level
+		GL_RG,		// internal format
+		100,		// width
+		100,		// height
+		0,			// must be 0, according to khronos.org
+		GL_RG,		// data format
+		GL_FLOAT,	// data format
+        input.fluid_velocity->getData()); // data pointer
+
+    // bind noise texture
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, m_tex_noise);
 	
+    // render fluid
 	m_rectangle->render();
 
     // setup for rendering the world objects
@@ -223,14 +209,14 @@ void Renderer::update(const RendererInput& input, RendererOutput&)
 
 	// render the world objects
 	GLint model_location = glGetUniformLocation(m_shader_program_world, "model");
-	for (const RenderObject& object : m_world_objects)
+	for (const RenderObject& object : input.world_objects)
         render(object, model_location);
 	m_world_objects.clear();
 
     // render the ui object
 	glUseProgram(m_shader_program_ui);
 	model_location = glGetUniformLocation(m_shader_program_ui, "model");
-	for (const RenderObject& object : m_ui_objects)
+	for (const RenderObject& object : input.ui_objects)
         render(object, model_location);
 	m_ui_objects.clear();
 

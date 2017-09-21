@@ -45,10 +45,6 @@ public:
 	~Renderer();
 	Renderer (const Renderer &obj) = delete;
 	Renderer & operator= (const Renderer & other) = delete;
-
-	void renderWorldObject(const RenderObject& obj);
-	void renderUIObject(const RenderObject& obj);
-    void setFluidVecs(const Array2D<glm::vec3>& fluid_vecs);
 };
 
 #endif

@@ -43,11 +43,11 @@ public:
     }
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output) {
-        if (output.velocity.get() == nullptr) {
-            output.velocity = std::make_unique<Array2D<vec2>>(level.width, level.height);
+        if (output.velocity.width() == 0) {
+            output.velocity = Array2D<vec2>(level.width, level.height);
 	}
-	if (output.density.get() == nullptr) {
-            output.density = std::make_unique<Array2D<float>>(level.width, level.height);
+	if (output.density.width() == 0) {
+            output.density = Array2D<float>(level.width, level.height);
         }
 
 
@@ -215,15 +215,15 @@ float omega = 1.0;
         // Calculate macroscopic quantities for the output
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-                output.density->value(x, y) = 0;
+                output.density.value(x, y) = 0;
                 for (int i = 0; i < 9; i++) {
-                    output.density->value(x, y) += fi_New.value(x, y)[i]; // density
+                    output.density.value(x, y) += fi_New.value(x, y)[i]; // density
                 }
-                output.velocity->value(x, y)[0] = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
+                output.velocity.value(x, y)[0] = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
                                                 fi_New.value(x, y)[5] - fi_New.value(x, y)[6] -
                                                 fi_New.value(x, y)[7] +
                                                 fi_New.value(x, y)[8]; // x Velocity
-                output.velocity->value(x, y)[1] = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
+                output.velocity.value(x, y)[1] = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
                                                 fi_New.value(x, y)[5] + fi_New.value(x, y)[6] -
                                                 fi_New.value(x, y)[7] -
                                                 fi_New.value(x, y)[8]; // y Velocity

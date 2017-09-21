@@ -27,8 +27,10 @@ public:
 		auto time_p = std::chrono::high_resolution_clock::now();
 		long t = std::chrono::duration_cast<std::chrono::milliseconds>(time_p.time_since_epoch()).count();
 		long steps = 1000;
-		userInputOutput.anglePlayer1 = (t%steps)*3.141/steps-6.282;
-		userInputOutput.anglePlayer2 = (t%steps)*3.141/steps-6.282;
+		userInputOutput.leftAngle[0] = (t%steps)*3.141/steps-6.282;
+		userInputOutput.rightAngle[0] = -(t%steps)*3.141/steps+6.282;
+		userInputOutput.leftAngle[1] = (t%steps)*3.141/steps-6.282;
+		userInputOutput.rightAngle[1] = -(t%steps)*3.141/steps+6.282;
     }
 };
 

@@ -38,10 +38,10 @@ debug:
 	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
 run:
-	build/fa_2017_release
+	build/fa_2017_release ${args}
 
 run-verbose:
-	build/fa_2017_release -v 10
+	build/fa_2017_release -v 10 ${args}
 
 tidy:
 	clang-tidy src/main.cpp -- $(COMMON_CFLAGS)

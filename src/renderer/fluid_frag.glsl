@@ -4,12 +4,10 @@
 uniform sampler2D tex_vecs; // velocities texture
 uniform sampler2D tex_noise; // noise texture
 
-
-
-uniform int STEPS; // The number of adjacent locations in one direction to use for smearing
+uniform int STEPS=10; // The number of adjacent locations in one direction to use for smearing
 
 // perfrom line integral convolution
-vec4 lic() {
+vec4 lic() {  
 	const float STEPSIZE = 0.01; // Stepsize to access adjacent texture sample
 
 	//vec2 init_coords = (2.0*coords)-vec2(1.0,1.0); // inital x,y coordinate, shift domain from (0,1) domain to (-1,1)
@@ -21,6 +19,9 @@ vec4 lic() {
 
 	// Start at this fragment's location
 	step_coords = normalized_coords;
+	
+	if(texture(tex_vecs, normalized_coords).y == 0.)
+		return vec4(0.,0.,255.,1.0);
 
 	// step FORWARD along the vector field
 	for(int i=0; i<STEPS; i++) {
@@ -55,9 +56,9 @@ vec4 lic() {
 
 	// use average value for RGB and 1 for A
 
-	vec4 return_value = vec4(average_value,average_value,average_value,1.0);
+	//vec4 return_value = vec4(average_value,average_value,average_value,1.0);
 	
-	//vec4 return_value = vec4(5.,5.,5.,1.0);
+	vec4 return_value = vec4(155.,0.,0.,1.0);
 
 	return return_value;
 }
@@ -71,6 +72,6 @@ void main() {
     vec2 normalized_coords = gl_FragCoord.xy / textureSize(tex_noise, 0);
     vec4 velocity = texture(tex_noise, normalized_coords).xxxx;
     out_color = lic();   // run lic; note the return value is of type vec4/RGBA
-    //out_color = velocity * 0.5 + 0.5;
+    // out_color = velocity * 0.5 + 0.5;
 }
 

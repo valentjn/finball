@@ -100,13 +100,23 @@ public:
 
 private:
     void load_highscores(std::vector<float> &highscores) {
-        // read file
-        // write to vector
-        // sort
+        highscores.push_back(1.23);
+        highscores.push_back(7.65);
+        highscores.push_back(1.23456789);
+        highscores.push_back(5.1243);
     }
 
     std::string get_highscore_text(std::vector<float> &highscores) {
-         return "123\n456\n789\nHallo";
+         std::stringstream stream;
+         int counter = 1;
+
+         stream << std::fixed << std::setprecision(2);
+
+         for (auto it = highscores.begin(); it != highscores.end(); it++) {
+              stream << counter++ << ". " << *it << "\n";
+         }
+
+         return stream.str();
     }
 
 };

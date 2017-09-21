@@ -33,10 +33,10 @@ public:
           fi_New(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-		//set initial values
+                //set initial values
                 for (int z = 0; z < 9; z++) {
-                     fi_New.value(x,y)[z] = w[z]*0.1;
-		     fi_Old.value(x,y)[z] = w[z]*0.1;
+                    fi_New.value(x,y)[z] = w[z]*0.1;
+                    fi_Old.value(x,y)[z] = w[z]*0.1;
                 }
             }
         }

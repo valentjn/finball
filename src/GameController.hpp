@@ -30,6 +30,7 @@ public:
         LatticeBoltzmannOutput latticeBoltzmannOutput;
         RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
         GameLogicOutput gameLogicOutput;
+	RendererOutput rendererOutput;
 
         LatticeBoltzmannInput latticeBoltzmannInput;
         RigidBodyPhysicsInput rigidBodyPhysicsInput;
@@ -54,7 +55,7 @@ public:
             // 3. draw visualization
             rendererInput =
                 RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
-            renderer.update(rendererInput);
+            renderer.update(rendererInput, rendererOutput);
         }
     }
 };

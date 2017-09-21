@@ -29,6 +29,14 @@ install_deb_packages:
 install-formatter:
 	sudo apt-get install clang clang-tidy clang-format colordiff
 
+install_icon:
+	mkdir -p ~/.local/share/icons
+	cp data/haicon.png ~/.local/share/icons
+	gtk-update-icon-cache
+	mkdir -p ~/.local/share/applications
+	cp data/finball.desktop ~/.local/share/applications
+	sed -i 's?PWD?'`pwd`'?' ~/.local/share/applications/finball.desktop 
+
 release:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
@@ -67,7 +75,6 @@ test_all: test_deps
 test_test: test_deps
 	$(CXX) test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
 	build/test_test
-
 
 
 GTEST_DIR = ext/googletest/googletest/

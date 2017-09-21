@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=FinBall
+Exec=PWD/build/fa_2017_release
+Icon=haicon
+Path=PWD/
+StartupWMClass=fa_2017_release

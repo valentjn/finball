@@ -1,13 +1,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/constants.hpp>
 #include <iostream>
 #include <vector>
 
 #include <renderer/Mesh.hpp>
-#include "../../ext/glm/glm/vec3.hpp"
-#include "../../ext/glm/vec3.hpp"
-#include "../../ext/glm/ext.hpp"
-#include "../../ext/glm/glm/gtc/matrix_transform.hpp"
 
 struct Vertex {
     glm::vec3 position;
@@ -20,8 +17,6 @@ std::vector<Vertex> createCircleVertices() {
     glm::vec3 radius{1, 0, 0};
     glm::vec3 normal{0, 0, 1};
 
-    // TODO take pi from a library
-    constexpr float pi = 3.14;
     constexpr int ticks = 64;
 
     float angle;
@@ -29,7 +24,7 @@ std::vector<Vertex> createCircleVertices() {
 
     for (int i = 0; i < ticks; i++) {
         angle = next_angle;
-        next_angle = 2 * pi * (i + 1) / ticks;
+        next_angle = 2 * glm::pi<float>() * (i + 1) / ticks;
         glm::vec3 p2 = glm::rotate(radius, angle, normal);
         glm::vec3 p3 = glm::rotate(radius, next_angle, normal);
         vertices.push_back({center});

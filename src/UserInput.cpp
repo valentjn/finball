@@ -3,19 +3,38 @@
 // headers for kinect
 #include <XnCppWrapper.h>
 
+using namespace std;
+using namespace xn;
+
 UserInput::UserInput(Parameters &parameters)
-    : parameters(parameters), context(std::make_unique<xn::Context>())
+    : parameters(parameters),
+      context(make_unique<Context>()),
+      userGenerator(make_unique<UserGenerator>()),
+      depthGenerator(make_unique<DepthGenerator>())
 {
-    //TODO
+    //TODO: handle error codes
+    XnStatus errorCode = XN_STATUS_OK;
+
+    errorCode = context->Init();
+    errorCode = depthGenerator->Create(*context);
+
+    // start generating data
+    errorCode = context->StartGeneratingAll();
 }
 
 UserInput::~UserInput()
 {
     //TODO
+    depthGenerator->Release();
+    userGenerator->Release();
     context->Release();
 }
 
 void UserInput::getInput(UserInputOutput &userInputOutput)
 {
+    //TODO: handle error codes
+    XnStatus errorCode = XN_STATUS_OK;
+
+    context->WaitNoneUpdateAll();
     //TODO
 }

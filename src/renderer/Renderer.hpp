@@ -7,14 +7,11 @@
 #include <vector>
 
 #include "Mesh.hpp"
-#include "Parameters.hpp"
 #include "RenderObject.hpp"
 #include "RendererInput.hpp"
 
 class Renderer {
 private:
-    Parameters &parameters;
-
     GLuint m_shader_program_world;
     GLuint m_shader_program_ui;
 
@@ -32,7 +29,7 @@ private:
 public:
     void update(const RendererInput &input);
 
-    Renderer(Parameters &parameters);
+    Renderer();
     ~Renderer();
 
     void renderWorldObject(const RenderObject &obj);

@@ -1,18 +1,22 @@
-#include "GameController.hpp"
-#include "Level.hpp"
-#include "LevelLoader.hpp"
-
-Parameters parameters;
+#include "Log.hpp"
+#include "MainMenu.hpp"
+#include "Parameters.hpp"
 
 int main(int argc, char *argv[]) {
-    parameters.setup(argc, argv);
+    Parameters parameters(argc, argv);
+    Log::setLogLevel(parameters.verbosityLevel);
 
+    MainMenu menu;
+    menu.show();
+
+    /*
     Level level;
-    LevelLoader levelLoader(parameters);
+    LevelLoader levelLoader();
     levelLoader.loadLevel(level);
 
-    GameController gameController(parameters);
+    GameController gameController();
     gameController.startGame(level);
+    */
 
     return 0;
 }

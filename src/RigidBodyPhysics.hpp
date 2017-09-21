@@ -7,13 +7,11 @@
 #include "glm/vec2.hpp"
 
 #include "Level.hpp"
-#include "Parameters.hpp"
 #include "RigidBodyPhysicsInput.hpp"
 #include "RigidBodyPhysicsOutput.hpp"
 
 class RigidBodyPhysics {
 private:
-    Parameters &parameters;
     Level &level;
 
     std::unique_ptr<btAlignedObjectArray<btCollisionShape *>> collision_shapes;
@@ -25,8 +23,8 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
 public:
-    RigidBodyPhysics(Parameters &parameters, Level &level)
-        : parameters(parameters), level(level),
+    RigidBodyPhysics(Level &level)
+        : level(level),
           collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
           collision_configuration(std::make_unique<btDefaultCollisionConfiguration>()),
           dispatcher(std::make_unique<btCollisionDispatcher>(collision_configuration.get())),
@@ -41,7 +39,7 @@ public:
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
             auto &obj = dynamics_world->getCollisionObjectArray()[j];
             // TODO: determine which cells are occupied by obj
-            grid_obj->value(1, 3) = RigidBodyPhysicsOutput::type::DYNAMIC;
+            grid_obj->value(1, 3) = RigidBodyPhysicsOutput::type::FLUID;
             grid_vel->value(1, 3) = glm::vec2{1.0, 0.5};
         }
     }

@@ -33,8 +33,8 @@ public:
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
                 // TODO set some equilibrium distribution for fixed rho here
-                fi_New.setValue(x, y, FICell());
-                fi_Old.setValue(x, y, FICell());
+                fi_New.value(x, y) = FICell();
+                fi_Old.value(x, y) = FICell();
             }
         }
     }
@@ -77,23 +77,23 @@ public:
         // Calculate macroscopic quantities
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-                output.matrix->getRef(x, y).z = 0;
+                output.matrix->value(x, y).z = 0;
                 for (int i = 0; i < 9; i++) {
-                    output.matrix->getRef(x, y).z += fi_New.getRef(x, y)[i]; // density
+                    output.matrix->value(x, y).z += fi_New.value(x, y)[i]; // density
                 }
-                output.matrix->getRef(x, y).x = fi_New.getRef(x, y)[1] - fi_New.getRef(x, y)[3] +
-                                                fi_New.getRef(x, y)[5] - fi_New.getRef(x, y)[6] -
-                                                fi_New.getRef(x, y)[7] +
-                                                fi_New.getRef(x, y)[8]; // x Velocity
-                output.matrix->getRef(x, y).y = fi_New.getRef(x, y)[2] - fi_New.getRef(x, y)[4] +
-                                                fi_New.getRef(x, y)[5] + fi_New.getRef(x, y)[6] -
-                                                fi_New.getRef(x, y)[7] -
-                                                fi_New.getRef(x, y)[8]; // y Velocity
+                output.matrix->value(x, y).x = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
+                                                fi_New.value(x, y)[5] - fi_New.value(x, y)[6] -
+                                                fi_New.value(x, y)[7] +
+                                                fi_New.value(x, y)[8]; // x Velocity
+                output.matrix->value(x, y).y = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
+                                                fi_New.value(x, y)[5] + fi_New.value(x, y)[6] -
+                                                fi_New.value(x, y)[7] -
+                                                fi_New.value(x, y)[8]; // y Velocity
             }
         }
 
         // Set fi_old = fi_new
-        fi_Old.loadData(fi_New.getRawData());
+	fi_Old = fi_New;
     }
 };
 

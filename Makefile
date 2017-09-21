@@ -13,6 +13,7 @@ COMMON_CFLAGS= -pedantic \
 		       -I/usr/include/ni -I/usr/include/nite
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
+OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
 LDFLAGS:= -lSDL2_image \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
@@ -29,6 +30,10 @@ install_deb_packages:
 release:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+
+optimal:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
 
 debug:
 	mkdir -p ./build

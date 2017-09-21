@@ -30,6 +30,7 @@ public:
 
         SDL_Init(SDL_INIT_VIDEO);
         TTF_Init();
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         SDL_Window *window =
             SDL_CreateWindow("FinBall", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600,
                              SDL_WINDOW_SHOWN /* | SDL_WINDOW_FULLSCREEN */);
@@ -44,7 +45,7 @@ public:
         SDL_Texture *background_texture =
             SDL_CreateTextureFromSurface(renderer, background_surface);
 
-        SDL_Surface *header_surface = TTF_RenderText_Solid(header_font, "FinBall", color_light);
+        SDL_Surface *header_surface = TTF_RenderText_Blended_Wrapped(header_font, "FinBall", color_light, 1000);
         SDL_Texture *header_texture = SDL_CreateTextureFromSurface(renderer, header_surface);
 
         std::string highscore_text = get_highscore_text(highscores);
@@ -53,8 +54,8 @@ public:
             highscore_font, highscore_text.c_str(), color_light, 1000);
         SDL_Texture *highscore_texture = SDL_CreateTextureFromSurface(renderer, highscore_surface);
 
-        SDL_Surface *start_game_surface = TTF_RenderText_Solid(
-            highscore_font, "To start the game please do a HAI-five!", color_dark);
+        SDL_Surface *start_game_surface = TTF_RenderText_Blended_Wrapped(
+            highscore_font, "To start the game please do a HAI-five!", color_dark, 1000);
         SDL_Texture *start_game_texture =
             SDL_CreateTextureFromSurface(renderer, start_game_surface);
 

@@ -26,6 +26,7 @@ public:
         m_data = std::move(other.m_data);
         other.m_width = 0;
         other.m_height = 0;
+        return *this;
     }
 
     void loadData(void *data) {

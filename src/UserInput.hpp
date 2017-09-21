@@ -12,8 +12,7 @@
 
 #ifndef WITHOUT_KINECT_LIBRARIES
 // forward declarations for kinect
-namespace xn
-{
+namespace xn {
 class Context;
 class UserGenerator;
 class DepthGenerator;
@@ -28,8 +27,8 @@ private:
     std::unique_ptr<xn::UserGenerator> userGenerator;
     std::unique_ptr<xn::DepthGenerator> depthGenerator;
 #endif
-	
-	static UserInput* theUserInput;
+
+    static UserInput *theUserInput;
 
 public:
     UserInput(Parameters &parameters);

@@ -73,7 +73,7 @@ void APIENTRY debugCallback(
 
 Renderer::Renderer()
 	: m_resolution(960, 540)
-	, m_camera_pos(0.f, 0.f, 5.f)
+	, m_camera_pos(8.f, 8.f, 20.f)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		throw std::runtime_error(SDL_GetError());
@@ -200,7 +200,7 @@ void Renderer::update(const RendererInput& input, RendererOutput&)
 	glm::mat4 projection = glm::perspective(
 		glm::pi<float>() * 0.25f,								// vertical field of view
 		static_cast<float>(m_resolution.x) / m_resolution.y,	// aspect ratio
-		0.1f, 10.f);											// distance near & far plane
+		1.0f, 32.f);											// distance near & far plane
 	glUniformMatrix4fv(
 		glGetUniformLocation(m_shader_program_world, "projection"),
 		1,										// matrix count

@@ -1,16 +1,49 @@
 #include <glm/glm.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/constants.hpp>
 #include <iostream>
 #include <vector>
 
 #include <renderer/Mesh.hpp>
 
-Mesh::Mesh() {
-    struct Vertex {
-        glm::vec3 position;
-    };
+struct Vertex {
+    glm::vec3 position;
+};
 
-    std::vector<Vertex> vertices{{{-1.0f, -1.0f, 0.f}}, {{-1.0f, 1.0f, 0.f}}, {{1.0f, 1.0f, 0.f}},
-                                 {{-1.0f, -1.0f, 0.f}}, {{1.0f, 1.0f, 0.f}},  {{1.0f, -1.0f, 0.f}}};
+
+std::vector<Vertex> createCircleVertices() {
+    std::vector<Vertex> vertices;
+    glm::vec3 center{0, 0, 0};
+    glm::vec3 radius{1, 0, 0};
+    glm::vec3 normal{0, 0, 1};
+
+    constexpr int ticks = 64;
+
+    float angle;
+    float next_angle = 0;
+
+    for (int i = 0; i < ticks; i++) {
+        angle = next_angle;
+        next_angle = 2 * glm::pi<float>() * (i + 1) / ticks;
+        glm::vec3 p2 = glm::rotate(radius, angle, normal);
+        glm::vec3 p3 = glm::rotate(radius, next_angle, normal);
+        vertices.push_back({center});
+        vertices.push_back({p2});
+        vertices.push_back({p3});
+    }
+    return vertices;
+}
+
+std::vector<Vertex> createSquareVertices() {
+    return std::vector<Vertex> {
+        {{-1.f, -1.f, 0.f}}, {{-1.f, 1.f, 0.f}}, {{1.f,  1.f, 0.f}},
+        {{-1.f, -1.f, 0.f}}, {{ 1.f, 1.f, 0.f}}, {{1.f, -1.f, 0.f}}
+    };
+}
+
+
+Mesh::Mesh() {
+    auto vertices = createCircleVertices();
 
     m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
 

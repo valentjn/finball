@@ -31,13 +31,43 @@ public:
           broadphase(std::make_unique<btDbvtBroadphase>()),
           solver(std::make_unique<btSequentialImpulseConstraintSolver>()),
           dynamics_world(std::make_unique<btDiscreteDynamicsWorld>(
-              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())) {}
+              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get()))
+    {
+        btCollisionShape* sphere_shape = new btSphereShape(1); // TODO: set correct radius once it's available
+        for (auto obstacle : level.obstacles) {
+            btTransform transform;
+            transform.setIdentity();
+            transform.setOrigin(btVector3(obstacle.position.x, obstacle.position.y, 0));
+            btDefaultMotionState* motion_state =
+                  new btDefaultMotionState(transform);
+            btScalar mass = 1;
+            if (obstacle.isFixed) {
+                mass = 0;
+            }
+            btVector3 inertia;
+            sphere_shape->calculateLocalInertia(mass, inertia);
+            btRigidBody* rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
+            dynamics_world->addRigidBody(rigid_body);
+        }
+    }
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
+        output.rigid_bodies.clear();
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
             auto &obj = dynamics_world->getCollisionObjectArray()[j];
+            btRigidBody *rigid_body = btRigidBody::upcast(obj);
+            btTransform trans;
+            if (rigid_body && rigid_body->getMotionState()) {
+                rigid_body->getMotionState()->getWorldTransform(trans);
+            } else {
+                trans = obj->getWorldTransform();
+            }
+            btVector3 &origin = trans.getOrigin();
+            RigidBody output_body(origin.getX(), origin.getY());
+            output.rigid_bodies.push_back(output_body);
+
             // TODO: determine which cells are occupied by obj
             grid_obj.value(1, 3) = Level::CellType::FLUID;
             grid_vel.value(1, 3) = glm::vec2{1.0, 0.5};

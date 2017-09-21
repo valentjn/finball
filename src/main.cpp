@@ -1,18 +1,19 @@
-#include "GameController.hpp"
-#include "Level.hpp"
-#include "LevelLoader.hpp"
-
-Parameters parameters;
+#include "Parameters.hpp"
+#include "MainMenu.hpp"
 
 int main(int argc, char *argv[]) {
+    Parameters parameters;
     parameters.setup(argc, argv);
 
-    Level level;
-    LevelLoader levelLoader(parameters);
-    levelLoader.loadLevel(level);
+    MainMenu menu(parameters);
+    menu.show();
 
-    GameController gameController(parameters);
-    gameController.startGame(level);
+//    Level level;
+//    LevelLoader levelLoader(parameters);
+//    levelLoader.loadLevel(level);
+
+//    GameController gameController(parameters);
+//    gameController.startGame(level);
 
     return 0;
 }

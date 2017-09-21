@@ -29,8 +29,8 @@ public:
 
         // Create a window on the screen
         SDL_Window *window = SDL_CreateWindow("FinBall", SDL_WINDOWPOS_UNDEFINED, 
-                                              SDL_WINDOWPOS_UNDEFINED, 0, 0,
-                                              SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN);
+                                              SDL_WINDOWPOS_UNDEFINED, 600, 400,
+                                              SDL_WINDOW_SHOWN /* | SDL_WINDOW_FULLSCREEN */);
 
 
         // Create the renderer

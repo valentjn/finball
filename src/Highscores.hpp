@@ -36,6 +36,7 @@ public:
         sortHighscores(highscores);
         highscores.resize(HIGHSCORE_CUTOFF);
         saveHighscores(highscores);
+        Log::info("Saved haiscore: %f", highscore);
     }
 
     static void loadHighscores(std::vector<float> &highscores) {

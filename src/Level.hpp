@@ -1,10 +1,10 @@
 #ifndef LEVEL_HPP_
 #define LEVEL_HPP_
 
-#include <vector>
-#include <stdexcept>
 #include <fstream>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "Array2D.hpp"
 #include "Level.hpp"
@@ -19,7 +19,7 @@ public:
 
     int width, height;
     Array2D<CellType> matrix;
-    vector<RigidBody> obstacles;
+    vector<RigidBody> rigidBodies;
 
     Level(string levelFilePath) {
         fstream file;
@@ -33,20 +33,24 @@ public:
         file >> width >> height;
 
         matrix = Array2D<CellType>(width, height);
-        for (int y = 0; y < height; y++) {
+        for (int y = height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
-                CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
-                matrix.value(x, y) = cell;
-                if (cell == OBSTACLE) {
-                    obstacles.push_back(RigidBody(x, y));
+                if (file_line[x] == 'B') {
+                    rigidBodies.push_back(RigidBody(x, y, false));
+                } else {
+                    CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
+                    matrix.value(x, y) = cell;
+                    if (cell == OBSTACLE) {
+                        rigidBodies.push_back(RigidBody(x, y));
+                    }
                 }
             }
         }
 
         Log::info("Loaded level:");
         if (Log::logLevel >= Log::INFO) {
-            for (int y = 0; y < height; y++) {
+            for (int y = height - 1; y >= 0; y--) {
                 string line = "";
                 for (int x = 0; x < width; x++) {
                     line += to_string(matrix.value(x, y));
@@ -55,17 +59,17 @@ public:
             }
         }
 
-        Log::debug("With obstacles at:");
+        Log::debug("With rigidBodies at:");
         if (Log::logLevel >= Log::DEBUG) {
-            for (auto const &obstacle : obstacles) {
-                Log::debug("(%d|%d)", (int)obstacle.position.x, (int)obstacle.position.y);
+            for (auto const &rigidBody : rigidBodies) {
+                Log::debug("(%d|%d)", (int)rigidBody.position.x, (int)rigidBody.position.y);
             }
         }
     }
 
     // delete copy constructor and copy-assignment operator
-    Level(const Level&) = delete;
-    Level& operator=(const Level&) = delete;
+    Level(const Level &) = delete;
+    Level &operator=(const Level &) = delete;
 };
 
 #endif

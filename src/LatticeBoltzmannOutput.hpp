@@ -2,16 +2,17 @@
 #define LATTICE_BOLTZMANN_OUTPUT_HPP_
 
 #include <memory>
-#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 #include "Array2D.hpp"
 #include "FICell.hpp"
+#include "Level.hpp"
 
 class LatticeBoltzmannOutput {
 public:
     // velocity field
     Array2D<glm::vec2> velocity;
-    // density field 
+    // density field
     Array2D<float> density;
     // constants
     constexpr static float c = 1./1.414213; // 1 / sqrt 2
@@ -22,6 +23,11 @@ public:
     // f_i outputs
     Array2D<FICell> prestream;
     Array2D<FICell> afterstream;
+
+    LatticeBoltzmannOutput(Level &level) {
+        velocity = Array2D<glm::vec2>(level.width, level.height);
+        density = Array2D<float>(level.width, level.height);
+    }
 };
 
 #endif

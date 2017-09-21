@@ -26,7 +26,7 @@ all: release
 install_deb_packages:
 	sudo apt-get install libsdl2-ttf-dev libsdl2-image-dev libsdl2-dev libbullet-dev
 
-install-formatter:
+install_formatter:
 	sudo apt-get install clang clang-tidy clang-format colordiff
 
 install_icon:
@@ -35,7 +35,7 @@ install_icon:
 	gtk-update-icon-cache
 	mkdir -p ~/.local/share/applications
 	cp data/finball.desktop ~/.local/share/applications
-	sed -i 's?PWD?'`pwd`'?' ~/.local/share/applications/finball.desktop 
+	sed -i 's?PWD?'`pwd`'?' ~/.local/share/applications/finball.desktop
 
 release:
 	mkdir -p ./build
@@ -52,14 +52,14 @@ debug:
 run:
 	build/fa_2017_release ${args}
 
-run-verbose:
+run_verbose:
 	build/fa_2017_release -v 10 ${args}
 
 tidy:
 	clang-tidy src/main.cpp -- $(COMMON_CFLAGS)
 	scan-build -analyze-headers -v make debug
 
-format-diff:
+format_diff:
 	find src -type f -regex ".*\.\(hpp\|cpp\)" -exec scripts/clang-format-diff {} \;
 
 format:

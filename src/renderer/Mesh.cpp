@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <iostream>
 #include <vector>
 
@@ -8,8 +8,8 @@
 
 Mesh::Mesh() : m_vao(0), m_vbo(0), m_vertex_count(0) {}
 
-Mesh::Mesh(const std::vector<Vertex>& vertices) {
-
+Mesh::Mesh(const std::vector<Vertex>& vertices)
+{
     m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
 
     // create vertex array object

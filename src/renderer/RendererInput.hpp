@@ -13,15 +13,14 @@ class RendererInput {
 public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
-    const Array2D<glm::vec2>* fluid_velocity;
-    const Array2D<float>* fluid_density;
+    const Array2D<glm::vec2> *fluid_velocity;
+    const Array2D<float> *fluid_density;
 
     RendererInput() : fluid_velocity(nullptr), fluid_density(nullptr) {}
 
     RendererInput(const GameLogicOutput &gameLogicOutput,
                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
-                  const LatticeBoltzmannOutput &latticeBoltzmannOutput)
-    {
+                  const LatticeBoltzmannOutput &latticeBoltzmannOutput) {
         // handle game logic output
         world_objects.insert(world_objects.end(), gameLogicOutput.objectsToRender.begin(),
                              gameLogicOutput.objectsToRender.end());

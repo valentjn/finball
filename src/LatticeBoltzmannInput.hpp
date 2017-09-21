@@ -20,9 +20,12 @@ public:
     LatticeBoltzmannInput() {}
 
     LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput)
-        : velocities(std::make_unique<Array2D<glm::vec2>>(42, 42)),
-          flagfield(std::make_unique<Array2D<Level::CellType>>(42, 42)) {}
+                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {
+        int width = rigidBodyPhysicsOutput.grid_objects.width();
+        int height = rigidBodyPhysicsOutput.grid_objects.height();
+        velocities = std::make_unique<Array2D<glm::vec2>>(width, height);
+        flagfield = std::make_unique<Array2D<Level::CellType>>(width, height);
+    }
 };
 
 #endif

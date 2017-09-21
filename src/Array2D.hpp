@@ -10,6 +10,7 @@ private:
     std::vector<T> m_data;
 
 public:
+    Array2D() : m_width(width), m_height(height) {}
     Array2D(int width, int height) : m_width(width), m_height(height), m_data(width * height) {}
 
     void loadData(void *data) {

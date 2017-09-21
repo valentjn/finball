@@ -20,6 +20,15 @@ public:
                   const LatticeBoltzmannOutput &latticeBoltzmannOutput) {
         world_objects.insert(world_objects.end(), gameLogicOutput.objectsToRender.begin(),
                              gameLogicOutput.objectsToRender.end());
+
+        if (rigidBodyPhysicsOutput.transformations != nullptr) {
+            for (Transformation transformation : *rigidBodyPhysicsOutput.transformations) {
+                RenderObject renderObject = {};
+                renderObject.position = glm::vec3(transformation.position, 0);
+                renderObject.scale = 1;
+                world_objects.push_back(renderObject);
+            }
+        }
     }
 };
 

@@ -1,13 +1,21 @@
-#ifndef COMPLATTICEBOLTZMANN_HPP_
-#define COMPLATTICEBOLTZMANN_HPP_
+#ifndef LATTICE_BOLTZMANN_HPP_
+#define LATTICE_BOLTZMANN_HPP_
 
-#include <Level.hpp>
-#include <lbm/FICell.hpp>
-#include <glm/glm.hpp>
+#include <memory>
 
-class CompLatticeBoltzmann
-{
-    Level& level;
+#include "FICell.hpp"
+#include "LatticeBoltzmannInput.hpp"
+#include "LatticeBoltzmannOutput.hpp"
+#include "Level.hpp"
+#include "Parameters.hpp"
+#include "glm/vec3.hpp"
+
+using namespace glm;
+
+class LatticeBoltzmann {
+private:
+    Parameters &parameters;
+    Level &level;
 
     // previous f_i field
     Array2D<FICell> fi_Old;
@@ -18,28 +26,16 @@ class CompLatticeBoltzmann
     // internal f_i equilibrium field
     Array2D<FICell> fi_Eq;
 
-    Array2D<glm::vec3> input_matrix{ 42, 42 };
-
     // quadrature weights for approximating equilibrium distribution
-    float w [9] = {4./9., 1./9., 1./9., 1./9., 1./9., 1./36., 1./36., 1./36., 1./36.};
+    int w [9] = {4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36};
     int cx [9] = {0, 1, 0, -1, 0 , 1, -1, -1, 1};
     int cy [9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
     int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6}; 
 
 public:
-	// output type of this component
-    struct OutputData
-	{
-        // processed output field (the first two components give the velocity the
-        // third one the density)
-        std::unique_ptr<Array2D<glm::vec3>> matrix;
-	};
-
-    CompLatticeBoltzmann(Level& level)
-        : level(level),
-          fi_Old(level.width, level.height),
-          fi_New(level.width, level.height),
-          fi_Eq(level.width, level.height) {
+    LatticeBoltzmann(Parameters &parameters, Level &level)
+        : parameters(parameters), level(level), fi_Old(level.width, level.height),
+          fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
 		//set initial values
@@ -52,13 +48,9 @@ public:
         }
     }
 
-    CompLatticeBoltzmann (const CompLatticeBoltzmann &obj) = delete;
-	CompLatticeBoltzmann & operator= (const CompLatticeBoltzmann & other) = delete;
-	// writes the output of this component to output
-    bool update(OutputData& output)
-	{   
+    void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output) {
         if (output.matrix.get() == nullptr) {
-            output.matrix = std::make_unique<Array2D<glm::vec3>>(level.width, level.height);
+            output.matrix = std::make_unique<Array2D<vec3>>(level.width, level.height);
         }
 
 
@@ -68,7 +60,7 @@ public:
 for (int y = 1; y < level.height-1; ++y) {
         for (int x = 1; x < level.width-1; ++x) {
 	    //check for boundary 
-            if (input_matrix.value(x,y)[2]==0) {
+            if (input.matrix->value(x,y)[2]==0) {
                 
                 float rho = 0.0 ;
                 float velx = 0.0 ;
@@ -140,52 +132,52 @@ float omega = 1.0;
 	for (int y = 0; y < level.height; ++y) {
         	for (int x = 0; x < level.width; ++x) {
 	   	 //check for boundary 
-            	if (input_matrix.value(x,y)[2]==1) 
+            	if (input.matrix->value(x,y)[2]==1) 
 		{
 			fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0];
-			if (x+1 >= level.width || input_matrix.value(x+1,y)[2] == 2){ //E
+			if (x+1 >= level.width || input.matrix->value(x+1,y)[2] == 2){ //E
 				fi_New.value(x,y)[1] = fi_Old.value(x,y)[opp[1]];
 			} else 
 			{
                 		fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
 			}
-			if (x+1 >= level.width || y+1 >= level.height || input_matrix.value(x+1,y+1)[2] == 2){ //NE
+			if (x+1 >= level.width || y+1 >= level.height || input.matrix->value(x+1,y+1)[2] == 2){ //NE
 				fi_New.value(x,y)[5] = fi_Old.value(x,y)[opp[5]];
 			} else
 			{
                 		fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
 			}
-			if (y+1 >= level.height || input_matrix.value(x,y+1)[2] == 2){ //N
+			if (y+1 >= level.height || input.matrix->value(x,y+1)[2] == 2){ //N
 				fi_New.value(x,y)[2] = fi_Old.value(x,y)[opp[2]];
 			} else
 			{
                 		fi_New.value(x,y)[2]  = fi_Old.value(x,y-1)[2] ;
 			}
-			if (x-1 < 0 || y+1 >= level.height || input_matrix.value(x-1,y+1)[2] == 2){ //NW
+			if (x-1 < 0 || y+1 >= level.height || input.matrix->value(x-1,y+1)[2] == 2){ //NW
 				fi_New.value(x,y)[6] = fi_Old.value(x,y)[opp[6]];
 			} else
 			{
                 		fi_New.value(x,y)[6] = fi_Old.value(x+1,y-1)[6] ;
 			}
-			if (x-1 < 0 || input_matrix.value(x-1,y)[2] == 2){ //W
+			if (x-1 < 0 || input.matrix->value(x-1,y)[2] == 2){ //W
 				fi_New.value(x,y)[3] = fi_Old.value(x,y)[opp[3]];
 			} else
 			{
                 		fi_New.value(x,y)[3]  = fi_Old.value(x+1,y)[3] ;
 			}
-			if (x-1 < 0 || y-1 < 0 || input_matrix.value(x-1,y-1)[2] == 2){ //SW
+			if (x-1 < 0 || y-1 < 0 || input.matrix->value(x-1,y-1)[2] == 2){ //SW
 				fi_New.value(x,y)[7] = fi_Old.value(x,y)[opp[7]];
 			} else
 			{
                 		fi_New.value(x,y)[7] = fi_Old.value(x+1,y+1)[7] ;
 			}
-			if ( y-1 < 0 || input_matrix.value(x,y-1)[2] == 2){ //S
+			if ( y-1 < 0 || input.matrix->value(x,y-1)[2] == 2){ //S
 				fi_New.value(x,y)[4] = fi_Old.value(x,y)[opp[4]];
 			} else
 			{
                 		fi_New.value(x,y)[4]  = fi_Old.value(x,y+1)[4];
 			}
-             		if (x+1 >= level.width || y-1 < 0 || input_matrix.value(x+1,y-1)[2] == 2){ //SE
+             		if (x+1 >= level.width || y-1 < 0 || input.matrix->value(x+1,y-1)[2] == 2){ //SE
 				fi_New.value(x,y)[8] = fi_Old.value(x,y)[opp[8]];
 			} else
 			{
@@ -202,7 +194,7 @@ float omega = 1.0;
         for (int y = 1; y < level.height-1; ++y) {
         	for (int x = 1; x < level.width-1; ++x) {
 	   	 //check for boundary 
-            	if (input_matrix.value(x,y)[2]==0) {
+            	if (input.matrix->value(x,y)[2]==0) {
                		fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
                 	fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
                 	fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
@@ -241,10 +233,14 @@ float omega = 1.0;
         }
 
         // Set fi_old = fi_new
-	fi_Old = fi_New;
-
-        return true;
+	for (int y = 0; y < level.height; y++) {
+            for (int x = 0; x < level.width; x++) {
+	        for (int z = 0; z < 9; ++z) {
+			fi_Old.value(x,y)[z]=fi_New.value(x,y)[z];
+		}	
+	    }
 	}
+    }
 };
 
 #endif

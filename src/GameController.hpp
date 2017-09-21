@@ -1,109 +1,32 @@
 #ifndef GAME_CONTROLLER_HPP_
 #define GAME_CONTROLLER_HPP_
 
-#include <memory>
-#include <vector>
+#include "Level.hpp"
+#include "Parameters.hpp"
 
-#include <Level.hpp>
-
-class GameComponentBase
-{
-    friend class GameController;
-
-    virtual const void* output() const = 0;
-    virtual bool update() = 0;
-
-public:
-    virtual ~GameComponentBase() = 0;
-};
-
-inline GameComponentBase::~GameComponentBase() {}
-
-template<class T>
-class GameComponent : public GameComponentBase
-{
-    template<class Other>
-    friend class GameInteraction;
-
-    T wrapped;
-    std::unique_ptr<typename T::OutputData> current_output = std::make_unique<typename T::OutputData>();
-    std::unique_ptr<typename T::OutputData> next_output = std::make_unique<typename T::OutputData>();
-
-    const void* output() const override
-    {
-        return current_output.get();
-    }
-
-    bool update() override
-    {
-        *next_output = typename T::OutputData{};
-        bool res = wrapped.update(*next_output);
-        current_output.swap(next_output);
-        return res;
-    }
-
-public:
-    GameComponent<T>(Level& level) : wrapped(level) {}
-    GameComponent (const GameComponent &obj) = delete;
-  	GameComponent & operator= (const GameComponent & other) = delete;
-};
-
-class GameInteractionBase {
-    friend class GameController;
-
-    virtual void process(const void* data_from, GameComponentBase& comp_to) const = 0;
-
-public:
-    virtual ~GameInteractionBase() = 0;
-};
-
-inline GameInteractionBase::~GameInteractionBase() {}
-
-template<class T>
-class GameInteraction : public GameInteractionBase {
-    void process(const void* data_from, GameComponentBase& comp_to) const override
-    {
-        T::process(
-            *static_cast<const typename T::from_comp_t::OutputData*>(data_from),
-            static_cast<GameComponent<typename T::to_comp_t>&>(comp_to).wrapped);
-    }
-};
+#include "GameLogic.hpp"
+#include "GameLogicInput.hpp"
+#include "GameLogicOutput.hpp"
+#include "LatticeBoltzmann.hpp"
+#include "LatticeBoltzmannInput.hpp"
+#include "LatticeBoltzmannOutput.hpp"
+#include "LevelLoader.hpp"
+#include "RigidBodyPhysics.hpp"
+#include "RigidBodyPhysicsInput.hpp"
+#include "RigidBodyPhysicsOutput.hpp"
+#include "UserInput.hpp"
+#include "UserInputOutput.hpp"
+#include "renderer/Renderer.hpp"
+#include "renderer/RendererInput.hpp"
 
 class GameController {
-    struct IngoingInteraction {
-        const GameComponentBase* from;
-        std::unique_ptr<const GameInteractionBase> interaction;
-    };
-
-    struct ComponentMapping {
-        std::unique_ptr<GameComponentBase> component;
-        std::vector<IngoingInteraction> ingoings;
-    };
-
-    std::vector<ComponentMapping> mappings;
-    Level& m_level;
+private:
+    Parameters &parameters;
 
 public:
-    GameController(Level& level);
-    void run() const;
+    GameController(Parameters &parameters) : parameters(parameters) {}
 
-    template<class ComponentT>
-    int addComponent() {
-        mappings.push_back(ComponentMapping{});
-        mappings.back().component = std::make_unique<GameComponent<ComponentT>>(m_level);
-        return mappings.size() - 1;
-    }
-
-    template<class InteractionT>
-    void addInteraction(int from, int to)
-    {
-        const GameComponentBase& comp_from = *mappings[from].component;
-        mappings[to].ingoings.push_back(IngoingInteraction{ &comp_from, std::make_unique<GameInteraction<InteractionT>>() });
-    }
-
-
-    /*void startGame(Array2D<LevelLoader::CellType> *level)
-    {
+    void startGame(Level &level) {
         GameLogic gameLogic(parameters);
         UserInput userInput(parameters);
         LatticeBoltzmann latticeBoltzmann(parameters, level);
@@ -140,7 +63,7 @@ public:
                 RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             renderer.update(rendererInput);
         }
-    }*/
+    }
 };
 
 #endif

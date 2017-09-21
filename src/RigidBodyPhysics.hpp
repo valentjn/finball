@@ -25,9 +25,6 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
 public:
-    RigidBodyPhysics (const RigidBodyPhysics &obj) = delete;
-    RigidBodyPhysics & operator= (const RigidBodyPhysics & other) = delete;
-
     RigidBodyPhysics(Parameters &parameters, Level &level)
         : parameters(parameters), level(level),
           collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
@@ -46,19 +43,8 @@ public:
             // TODO: determine which cells are occupied by obj
             grid_obj->value(1, 3) = RigidBodyPhysicsOutput::type::DYNAMIC;
             grid_vel->value(1, 3) = glm::vec2{1.0, 0.5};
-            computeForces(obj, input);
         }
     }
-
-    //btRigidBody.applyImpulse (const btVector3 &impulse, const btVector3 &rel_pos)
-    // iterate over objects
-    void computeForces( btCollisionObject*& obj , const RigidBodyPhysicsInput &input, const float& realtimestepinseconds = 0.1) {
-        // iterate over rigid body outer cells
-            // iterate over neighboring fluid cells, take connecting f_i in old and new frame.
-                // sum them and multiply factors: d, (delta_x/delta_t)^2, real_delta_t,
-    }
-
-    //void getImpulseDiff( btCollisionObject*& obj )
 };
 
 #endif

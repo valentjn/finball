@@ -28,6 +28,14 @@ private:
     std::unique_ptr<xn::Context> context;
     std::unique_ptr<xn::UserGenerator> userGenerator;
     std::unique_ptr<xn::DepthGenerator> depthGenerator;
+
+	static const int MAX_USERS = 2;
+	user_id_t aUsers[MAX_USERS];
+	int nUsers;
+
+	std::chrono::high_resolution_clock::time_point previous_time_point;
+	float previousLeftAngles[MAX_USERS];
+	float previousRightAngles[MAX_USERS];
 #endif
 
 public:

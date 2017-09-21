@@ -6,21 +6,23 @@
 class UserInput;
 
 class UserInputOutput {
-    double anglePlayer1, anglePlayer2;
+    double leftAngle[2];
+	double rightAngle[2];
 public:
     bool quit;
 
     UserInputOutput() : quit(false) {}
 
-    double getAngle(int player)
+    double getLeftAngle(int player)
     {
-        switch(player){
-        case 1: return anglePlayer1;
-        case 2: return anglePlayer2;
-        }
-        return 0;
+		return leftAngle[player-1];
+    }
+    double getRightAngle(int player)
+    {
+		return rightAngle[player-1];
     }
 
+	
     friend class UserInput;
 };
 

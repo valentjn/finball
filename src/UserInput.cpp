@@ -21,6 +21,7 @@ UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
     context = make_unique<Context>();
     userGenerator = make_unique<UserGenerator>();
     depthGenerator = make_unique<DepthGenerator>();
+    previous_time_point = std::chrono::high_resolution_clock::now();
 
     // TODO: handle error codes
     XnStatus errorCode = XN_STATUS_OK;
@@ -40,9 +41,10 @@ UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
     XnCallbackHandle hUserCallbacks, hCalibrationStart, hCalibrationComplete;
 
     errorCode = userGenerator->RegisterUserCallbacks(
-        [](UserGenerator& userGenerator, XnUserID id, void* cookie){
+        [](UserGenerator& userGenerator, XnUserID nID, void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
             // new user added.
+            userGenerator.GetSkeletonCap().RequestCalibration(nID, TRUE);
         },
         [](UserGenerator& userGenerator, XnUserID id, void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
@@ -62,6 +64,13 @@ UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
             void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
             // calibration complete
+            if(status == XN_CALIBRATION_STATUS_OK) {
+                _this->userGenerator->GetSkeletonCap().StartTracking(nID);
+            } else {
+                // TODO: handle errors
+                _this->userGenerator->GetSkeletonCap()
+                    .RequestCalibration(nID, TRUE);
+            }
         }, this, hCalibrationComplete);
 
     // Get Skeleton
@@ -99,6 +108,30 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
     XnStatus errorCode = XN_STATUS_OK;
 
     context->WaitNoneUpdateAll();
+
+    auto now = std::chrono::high_resolution_clock::now();
+    std::chrono::milliseconds delta;
+
+    for(XnUInt16 i=0; i<nUsers; i++) {
+        if(userGenerator->GetSkeletonCap().IsTracking(aUsers[i])==FALSE) {
+            continue;
+        }
+
+        XnSkeletonJointTransformation leftHandJoint, leftElbowJoint;
+        XnSkeletonJointTransformation rightHandJoint, rightElbowJoint;
+
+        userGenerator->GetSkeletonCap().GetSkeletonJoint(
+            aUsers[i], XN_SKEL_LEFT_HAND, leftHandJoint);
+        userGenerator->GetSkeletonCap().GetSkeletonJoint(
+            aUsers[i], XN_SKEL_LEFT_ELBOW, leftElbowJoint);
+        userGenerator->GetSkeletonCap().GetSkeletonJoint(
+            aUsers[i], XN_SKEL_RIGHT_HAND, rightHandJoint);
+        userGenerator->GetSkeletonCap().GetSkeletonJoint(
+            aUsers[i], XN_SKEL_RIGHT_ELBOW, rightElbowJoint);
+
+        //TODO: calculate angles and pass them on
+    }
+
     // TODO
 #endif
 }

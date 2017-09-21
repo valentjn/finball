@@ -1,40 +1,49 @@
 #ifndef ARRAY_2D_HPP_
 #define ARRAY_2D_HPP_
 
-#include <assert.h>
+#include <cassert>
 
 template <typename T> class Array2D {
 private:
-    int width;
-    int height;
-    T *data;
+    int m_width;
+    int m_height;
+    std::vector<T> m_data;
 
 public:
-    Array2D(int width, int height) : width(width), height(height) { data = new T[width * height]; }
+    Array2D(int width, int height)
+        : m_width(width)
+        , m_height(height)
+        , m_data(width * height)      
+    {}
 
-    ~Array2D() { delete[] data; }
-
-    void loadData(void *data) { memcpy(this->data, data, sizeof(T) * width * height); }
-
-    inline void setValue(int x, int y, const T& value) {
-        assert(x >= 0 && y >= 0 && y < height && x < width);
-
-        data[y * width + x] = value;
+    void loadData(void* data)
+    {
+        T* t_data = static_cast<T*>(data);
+        std::copy(t_data, t_data + m_data.size(), m_data.begin());
     }
 
-    inline T getValue(int x, int y) const{
-        assert(x >= 0 && y >= 0 && y < height && x < width);
-
-        return data[y * width + x];
+    T& value(int x, int y)
+    {
+        assert(x >= 0);
+        assert(y >= 0);
+        assert(x < m_width);
+        assert(y < m_height);
+        return m_data[y * m_width + x];
     }
 
-    inline T &getRef(int x, int y) {
-        assert(x >= 0 && y >= 0 && y < height && x < width);
-
-        return data[y * width + x];
+    const T& value(int x, int y) const
+    {
+        assert(x >= 0);
+        assert(y >= 0);
+        assert(x < m_width);
+        assert(y < m_height);
+        return m_data[y * m_width + x];
     }
 
-    T *getRawData() { return data; }
+    int width() const { return m_width; }
+    int height() const { return m_height; }
+
+    const T* getData() { return m_data.data(); }
 };
 
 #endif /* ARRAY2D_HPP_ */

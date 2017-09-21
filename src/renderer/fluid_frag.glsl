@@ -1,7 +1,8 @@
 #version 330
 #extension GL_ARB_explicit_uniform_location : require
 
-uniform sampler2D tex_vecs; // texture
+uniform sampler2D tex_vecs; // velocities texture
+uniform sampler2D tex_noise; // noise texture
 
 
 /*
@@ -77,7 +78,10 @@ vec4 lic() {
 layout(location = 0) out vec4 out_color;
 
 void main() {
-	//gl_FragColor = lic();   // run lic; note the return value is of type vec4/RGBA
-	out_color = texture(tex_vecs, gl_FragCoord.xy / textureSize(tex_vecs, 0)) * 0.5 + 0.5;
+	//out_color = lic();   // run lic; note the return value is of type vec4/RGBA
+
+    vec2 normalized_coords = gl_FragCoord.xy / textureSize(tex_vecs, 0);
+    vec4 velocity = texture(tex_vecs, normalized_coords);
+    out_color = velocity * 0.5 + 0.5;
 }
 

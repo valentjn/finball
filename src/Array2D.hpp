@@ -16,13 +16,13 @@ public:
 
     void loadData(void *data) { memcpy(this->data, data, sizeof(T) * width * height); }
 
-    inline void setValue(int x, int y, const T& value) {
+    inline void setValue(int x, int y, const T &value) {
         assert(x >= 0 && y >= 0 && y < height && x < width);
 
         data[y * width + x] = value;
     }
 
-    inline T getValue(int x, int y) const{
+    inline T getValue(int x, int y) const {
         assert(x >= 0 && y >= 0 && y < height && x < width);
 
         return data[y * width + x];

@@ -24,8 +24,7 @@ public:
 
         string file_line;
         int width, height;
-        file >> width;
-        file >> height;
+        file >> width >> height;
 
         Array2D<Level::CellType> *level_matrix = new Array2D<Level::CellType>(width, height);
         vector<RigidBody> *obstacles = new vector<RigidBody>();

@@ -1,39 +1,71 @@
-#ifndef RENDERER_HPP_
-#define RENDERER_HPP_
+#ifndef COMPRENDERER_HPP_
+#define COMPRENDERER_HPP_
 
 #include <SDL2/SDL.h>
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
 
-#include "Mesh.hpp"
-#include "RenderObject.hpp"
-#include "RendererInput.hpp"
+#include <renderer/Mesh.hpp>
+#include <renderer/RenderObject.hpp>
+#include <Array2D.hpp>
+#include <Level.hpp>
 
-class Renderer {
+class RendererInput
+{
+    RendererInput(
+        const GameLogicOutput& game_logic_output,
+        const RigidBodyPhysicsOutput& rigid_body_physics_output,
+        const LatticeBoltzmannOutput& lattice_boltzmann_output)
+    {
+        
+    }
+};
+
+class RendererOutput
+{
+
+};
+
+class Renderer
+{
 private:
-    GLuint m_shader_program_world;
-    GLuint m_shader_program_ui;
+	std::vector<RenderObject> m_world_objects;
+	std::vector<RenderObject> m_ui_objects;
 
-    glm::ivec2 m_resolution;
-    SDL_Window *m_window;
-    SDL_GLContext m_glcontext;
+	GLuint m_shader_program_world;
+	GLuint m_shader_program_ui;
+	GLuint m_shader_program_fluid;
+	GLuint m_tex_fluid;
+    GLuint m_tex_noise;
 
-    glm::vec3 m_camera_pos;
+	glm::ivec2 m_resolution;
+	SDL_Window* m_window;
+	SDL_GLContext m_glcontext;
 
-    // WIP
-    std::unique_ptr<Mesh> m_rectangle;
+	glm::vec3 m_camera_pos;
 
-    void render(const RenderObject &object, GLint model_location) const;
+    const Array2D<glm::vec3>* m_fluid_vecs;
+
+	// WIP
+	std::unique_ptr<Mesh> m_rectangle;
+
+    void render(const RenderObject& object, GLint model_location) const;
 
 public:
-    void update(const RendererInput &input);
+    // Currently, the renderer doesn't have output that can be accessed by other components
+    struct OutputData {};
 
-    Renderer();
-    ~Renderer();
+    bool update(OutputData& output);
 
-    void renderWorldObject(const RenderObject &obj);
-    void renderUIObject(const RenderObject &obj);
+	CompRenderer(const Level& level);
+	~CompRenderer();
+	CompRenderer (const CompRenderer &obj) = delete;
+	CompRenderer & operator= (const CompRenderer & other) = delete;
+
+	void renderWorldObject(const RenderObject& obj);
+	void renderUIObject(const RenderObject& obj);
+    void setFluidVecs(const Array2D<glm::vec3>& fluid_vecs);
 };
 
 #endif

@@ -14,7 +14,6 @@
 #include "GameController.hpp"
 #include "Highscores.hpp"
 #include "Level.hpp"
-#include "LevelLoader.hpp"
 
 class MainMenu {
 public:
@@ -100,10 +99,7 @@ public:
         TTF_Quit();
         SDL_Quit();
 
-        Level level;
-        LevelLoader levelLoader;
-        levelLoader.loadLevel(level);
-
+        Level level("data/testLevel.txt");
         GameController gameController;
         gameController.startGame(level);
     }

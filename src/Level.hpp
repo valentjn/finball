@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Array2D.hpp"
-#include "glm/vec2.hpp"
+#include "RigidBody.hpp"
 
 class Level {
 public:
@@ -12,7 +12,7 @@ public:
 
     int width, height;
     Array2D<CellType> *matrix;
-    std::vector<glm::vec2> *obstacles;
+    std::vector<RigidBody> *obstacles;
 
     Level() : width(-1), height(-1), matrix(nullptr), obstacles(nullptr) {}
 

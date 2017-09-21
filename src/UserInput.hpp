@@ -18,21 +18,21 @@ public:
                 break;
             }
         }
-		auto time_p = std::chrono::high_resolution_clock::now();
-		long t = std::chrono::duration_cast<std::chrono::milliseconds>(time_p.time_since_epoch()).count();
-		long steps = 1000;
+        auto time_p = std::chrono::high_resolution_clock::now();
+        long t = std::chrono::duration_cast<std::chrono::milliseconds>(time_p.time_since_epoch()).count();
+        long steps = 1000;
 
-		// generate fake data
-		userInputOutput.leftAngle[0] = (t%steps)*3.141/steps-6.282;
-		userInputOutput.rightAngle[0] = -(t%steps)*3.141/steps+6.282;
-		userInputOutput.leftAngle[1] = (t%steps)*3.141/steps-6.282;
-		userInputOutput.rightAngle[1] = -(t%steps)*3.141/steps+6.282;
-		userInputOutput.leftVelocity[0] = 6.282/(steps/1000.0);
-		userInputOutput.rightVelocity[0] = -6.282/(steps/1000.0);
-		userInputOutput.leftVelocity[1] = 6.282/(steps/1000.0);
-		userInputOutput.rightVelocity[1] = -6.282/(steps/1000.0);
+        // generate fake data
+        userInputOutput.leftAngle[0] = (t%steps)*3.141/steps-6.282;
+        userInputOutput.rightAngle[0] = -(t%steps)*3.141/steps+6.282;
+        userInputOutput.leftAngle[1] = (t%steps)*3.141/steps-6.282;
+        userInputOutput.rightAngle[1] = -(t%steps)*3.141/steps+6.282;
+        userInputOutput.leftVelocity[0] = 6.282/(steps/1000.0);
+        userInputOutput.rightVelocity[0] = -6.282/(steps/1000.0);
+        userInputOutput.leftVelocity[1] = 6.282/(steps/1000.0);
+        userInputOutput.rightVelocity[1] = -6.282/(steps/1000.0);
 
-		userInputOutput.start = true;
+        userInputOutput.start = true;
     }
 };
 

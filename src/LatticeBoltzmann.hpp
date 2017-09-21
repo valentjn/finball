@@ -41,8 +41,8 @@ public:
 		//set initial values
                 for (int z = 0; z < 9; z++)
                 {
-                     fi_New.value(x,y)[z] = w[z]*1;
-		     fi_Old.value(x,y)[z] = w[z]*1;
+                     fi_New.value(x,y)[z] = w[z]*0.1;
+		     fi_Old.value(x,y)[z] = w[z]*0.1;
                 }
             }
         }

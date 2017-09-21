@@ -98,6 +98,9 @@ CompRenderer::CompRenderer()
 
     // create a rectangle mesh so that we have some dummy to render (WIP)
 	m_rectangle = std::unique_ptr<Mesh>(new Mesh());
+
+	// create the texture for the velocities of the fluid
+	glGenTextures(1, &m_fluid_tex);
 }
 
 CompRenderer::~CompRenderer()
@@ -105,6 +108,11 @@ CompRenderer::~CompRenderer()
 	SDL_GL_DeleteContext(m_glcontext);
 	SDL_DestroyWindow(m_window);
 	SDL_Quit();
+}
+
+void CompRenderer::setFluidVecs(glm::ivec2 resolution, std::vector<glm::vec3>& fluid_vecs)
+{
+	m_fluid_vecs
 }
 
 // enqueues a world object for rendering (at the next update)
@@ -121,9 +129,15 @@ void CompRenderer::renderUIObject(const RenderObject& obj)
 
 bool CompRenderer::update(typename CompRenderer::OutputData&)
 {
+	updateFluidTex();
+
     // clear the framebuffer to dark red
 	glClearColor(0.4f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// render fluid
+	glUseProgram(m_shader_program_fluid);
+	m_rectangle->render();
 
     // setup for rendering the world objects
 	glUseProgram(m_shader_program_world);
@@ -167,6 +181,20 @@ bool CompRenderer::update(typename CompRenderer::OutputData&)
 	SDL_GL_SwapWindow(m_window);
 
     return true;
+}
+
+void CompRenderer::updateFluidTex()
+{
+	glBindTexture(GL_TEXTURE2D, m_fluid_tex);
+	glTexImage2D(GL_TEXTURE2D,
+		0,			// mipmap level
+		GL_RGB,		// internal format
+		100,		// width
+		100,		// height
+		0,			// must be 0, according to khronos.org
+		GL_RGB,		// data format
+		GL_FLOAT,	// data format
+		m_fluid_vecs.data();
 }
 
 // renders an object to the screen (private method)

@@ -24,9 +24,12 @@ private:
 
 	glm::vec3 m_camera_pos;
 
+    std::vector<glm::vec3>* m_fluid_vecs;
+
 	// WIP
 	std::unique_ptr<Mesh> m_rectangle;
 
+    void updateFluidTex();
     void render(const RenderObject& object, GLint model_location) const;
 
 public:
@@ -40,6 +43,7 @@ public:
 
 	void renderWorldObject(const RenderObject& obj);
 	void renderUIObject(const RenderObject& obj);
+    void setFluidVecs(glm::ivec2 resolution, std::vector<glm::vec3>& fluid_vecs);
 };
 
 #endif

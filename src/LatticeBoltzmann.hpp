@@ -32,9 +32,26 @@ public:
           fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-                // TODO set some equilibrium distribution for fixed rho here
                 fi_New.value(x, y) = FICell();
                 fi_Old.value(x, y) = FICell();
+            }
+        }
+    }
+
+    LatticeBoltzmann(Parameters &parameters, Level &level, bool equilibrium)
+        : parameters(parameters), level(level), fi_Old(level.width, level.height),
+          fi_New(level.width, level.height), fi_Eq(level.width, level.height) {
+        for (int y = 0; y < level.height; y++) {
+            for (int x = 0; x < level.width; x++) {
+                fi_New.value(x, y) = FICell();
+                fi_Old.value(x, y) = FICell();
+		if(!equilibrium){
+			fi_Eq.value(x, y) = FICell();
+			for(int i = 0; i < 9; i++){
+				fi_Eq.value(x,y)[i] = 0;
+			}
+		}
+
             }
         }
     }

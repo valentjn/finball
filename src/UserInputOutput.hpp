@@ -11,6 +11,9 @@ class UserInputOutput {
     double leftVelocity[2];
     double rightVelocity[2];
 
+    bool playerIsTracked[2];
+    bool playerIsCalibrating[2];
+    bool playerIsCalibrated[2];
 public:
     bool quit, start;
 
@@ -27,6 +30,16 @@ public:
     }
     double getRightVelocity(int player) {
         return rightVelocity[player-1];
+    }
+
+    bool isTracked(int player) {
+        return playerIsTracked[player-1];
+    }
+    bool isCalibrating(int player) {
+        return playerIsCalibrating[player-1];
+    }
+    bool isCalibrated(int player) {
+        return playerIsCalibrated[player-1];
     }
 
     friend class UserInput;

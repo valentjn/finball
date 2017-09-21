@@ -10,8 +10,10 @@ using namespace xn;
 #endif
 
 #include <stdexcept>
+#include <cmath>
 
 using namespace std;
+using namespace std::chrono;
 
 // initialization of user input facilities
 UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
@@ -109,8 +111,8 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 
     context->WaitNoneUpdateAll();
 
-    auto now = std::chrono::high_resolution_clock::now();
-    std::chrono::milliseconds delta;
+    auto now = high_resolution_clock::now();
+    milliseconds delta = duration_cast<milliseconds>(now-previous_time_point);
 
     for(XnUInt16 i=0; i<nUsers; i++) {
         if(userGenerator->GetSkeletonCap().IsTracking(aUsers[i])==FALSE) {
@@ -129,9 +131,33 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
         userGenerator->GetSkeletonCap().GetSkeletonJoint(
             aUsers[i], XN_SKEL_RIGHT_ELBOW, rightElbowJoint);
 
-        //TODO: calculate angles and pass them on
+		// compute angles
+        double left_x_diff_1 = leftHandJoint.position.position.X
+			- leftElbowJoint.position.position.X;
+		double left_y_diff_1 = leftHandJoint.position.position.Y
+			- leftElbowJoint.position.position.Y;
+		userInputOutput.rightAngle[0] = atan2(left_y_diff_1, left_x_diff_1);
+		
+		double right_x_diff_1 = leftHandJoint.position.position.X
+			- leftElbowJoint.position.position.X;
+		double right_y_diff_1 = leftHandJoint.position.position.Y
+			- leftElbowJoint.position.position.Y;
+		userInputOutput.rightAngle[0] = atan2(left_y_diff_1, left_x_diff_1);		
+
+		double left_x_diff_2 = leftHandJoint.position.position.X
+			- leftElbowJoint.position.position.X;
+		double left_y_diff_2 = leftHandJoint.position.position.Y
+			- leftElbowJoint.position.position.Y;
+		userInputOutput.leftAngle[1] = atan2(left_y_diff_1, left_x_diff_1);
+		
+		double right_x_diff_2 = leftHandJoint.position.position.X
+			- leftElbowJoint.position.position.X;
+		double right_y_diff_2 = leftHandJoint.position.position.Y
+			- leftElbowJoint.position.position.Y;
+		userInputOutput.rightAngle[1] = atan2(left_y_diff_1, left_x_diff_1);	
     }
 
+	previous_time_point = now;
     // TODO
 #endif
 }

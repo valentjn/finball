@@ -13,17 +13,14 @@ public:
     Array2D() : m_width(0), m_height(0) {}
 
     Array2D(int width, int height) : m_width(width), m_height(height), m_data(width * height) {}
-    
-    Array2D(Array2D&& other)
-        : m_width(other.m_width)
-        , m_height(other.m_height)
-        , m_data(std::move(other.m_data))
-    {
+
+    Array2D(Array2D &&other)
+        : m_width(other.m_width), m_height(other.m_height), m_data(std::move(other.m_data)) {
         other.m_width = 0;
         other.m_height = 0;
     }
 
-    Array2D& operator=(Array2D&& other) {
+    Array2D &operator=(Array2D &&other) {
         m_width = other.m_width;
         m_height = other.m_height;
         m_data = std::move(other.m_data);

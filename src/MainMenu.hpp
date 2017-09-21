@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "Parameters.hpp"
 #include "Level.hpp"
@@ -23,52 +24,38 @@ public:
         load_highscores(highscores);
 
         
-        // Initialize SDL with the video subsystem
         SDL_Init(SDL_INIT_VIDEO);
-
-
-        // Create a window on the screen
+        TTF_Init();
         SDL_Window *window = SDL_CreateWindow("FinBall", SDL_WINDOWPOS_UNDEFINED, 
-                                              SDL_WINDOWPOS_UNDEFINED, 600, 400,
+                                              SDL_WINDOWPOS_UNDEFINED, 800, 600,
                                               SDL_WINDOW_SHOWN /* | SDL_WINDOW_FULLSCREEN */);
 
 
-        // Create the renderer
         SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        TTF_Font *font = TTF_OpenFont("assets/OpenSans-regular.ttf", 25);
+        SDL_Color color = { 255, 255, 255 };
+        
+        SDL_Surface *background_surface = IMG_Load("assets/background.jpg");
+        SDL_Texture *background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
+        SDL_Surface *highscore_surface = TTF_RenderText_Solid(font, "FinBall - The Game", color);
+        SDL_Texture *highscore_texture = SDL_CreateTextureFromSurface(renderer, highscore_surface);
 
-        // Create a surface for loading an image 
-        SDL_Surface* surface = IMG_Load("images/background.jpg");
+        SDL_FreeSurface(background_surface);
+        SDL_FreeSurface(highscore_surface);
 
-
-        // Create the texture from the surface
-        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-
-        // Free the surface
-        SDL_FreeSurface(surface);
-          
-            
-        // Let the renderer render the texture
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
-            
-            
-        // Move the image from the back buffer to the front buffer
+        SDL_RenderCopy(renderer, background_texture, NULL, NULL);
+        SDL_RenderCopy(renderer, highscore_texture, NULL, NULL);
         SDL_RenderPresent(renderer);
             
         
         // Flag for quitting the program
         bool quit = false;
             
-            
-        // SDL event
         SDL_Event event;
 
 
-        // Game loop: this is the main loop of any SDL program
         while (!quit) {
-            
-            // Check for SDL events
             SDL_PollEvent(&event);
                 
             switch (event.type) {
@@ -79,11 +66,14 @@ public:
         }
             
         // Free resources
-        SDL_DestroyTexture(texture);
+        TTF_CloseFont(font);
+        SDL_DestroyTexture(background_texture);
+        SDL_DestroyTexture(highscore_texture);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
             
         // Quit SDL
+        TTF_Quit();
         SDL_Quit();
 
         Level level;

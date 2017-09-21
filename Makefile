@@ -5,17 +5,19 @@ COMMON_CFLAGS= -pedantic \
 		       -fmessage-length=0 \
 		       -Wno-unused-parameter \
 		       -fmessage-length=0 \
-		       -std=c++14 \
+		       -std=gnu++14 \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src \
-		       -I ext
+		       -I ext \
+		       -I/usr/include/ni -I/usr/include/nite
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
 LDFLAGS:= -lSDL2_image \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs`
+		  `pkg-config bullet --libs` \
+		  -lOpenNI -lXnVNite_1_5_2
 
 .PHONY: test_all
 

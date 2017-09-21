@@ -6,44 +6,9 @@
 
 #include <renderer/Mesh.hpp>
 
-struct Vertex {
-    glm::vec3 position;
-};
+Mesh::Mesh() : m_vao(0), m_vbo(0), m_vertex_count(0) {}
 
-
-std::vector<Vertex> createCircleVertices() {
-    std::vector<Vertex> vertices;
-    glm::vec3 center{0, 0, 0};
-    glm::vec3 radius{1, 0, 0};
-    glm::vec3 normal{0, 0, 1};
-
-    constexpr int ticks = 64;
-
-    float angle;
-    float next_angle = 0;
-
-    for (int i = 0; i < ticks; i++) {
-        angle = next_angle;
-        next_angle = 2 * glm::pi<float>() * (i + 1) / ticks;
-        glm::vec3 p2 = glm::rotate(radius, angle, normal);
-        glm::vec3 p3 = glm::rotate(radius, next_angle, normal);
-        vertices.push_back({center});
-        vertices.push_back({p2});
-        vertices.push_back({p3});
-    }
-    return vertices;
-}
-
-std::vector<Vertex> createSquareVertices() {
-    return std::vector<Vertex> {
-        {{-1.f, -1.f, 0.f}}, {{-1.f, 1.f, 0.f}}, {{1.f,  1.f, 0.f}},
-        {{-1.f, -1.f, 0.f}}, {{ 1.f, 1.f, 0.f}}, {{1.f, -1.f, 0.f}}
-    };
-}
-
-
-Mesh::Mesh() {
-    auto vertices = createCircleVertices();
+Mesh::Mesh(const std::vector<Vertex>& vertices) {
 
     m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
 
@@ -71,13 +36,72 @@ Mesh::Mesh() {
     glBindVertexArray(0);
 }
 
-Mesh::~Mesh() {
+Mesh::~Mesh()
+{
     glDeleteBuffers(1, &m_vbo);
     glDeleteVertexArrays(1, &m_vao);
 }
 
-void Mesh::render() {
+Mesh::Mesh(Mesh&& other)
+	: m_vao(other.m_vao)
+	, m_vbo(other.m_vbo)
+	, m_vertex_count(other.m_vertex_count)
+{
+	other.m_vao = 0;
+	other.m_vbo = 0;
+	other.m_vertex_count = 0;
+}
+
+Mesh& Mesh::operator=(Mesh&& other)
+{
+	Mesh(std::move(*this));
+	m_vao = other.m_vao;
+	m_vbo = other.m_vbo;
+	m_vertex_count = other.m_vertex_count;
+	other.m_vao = 0;
+	other.m_vbo = 0;
+	other.m_vertex_count = 0;
+}
+
+void Mesh::render() const
+{
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);
     glBindVertexArray(0);
 }
+
+Mesh createRectangleMesh(float width, float height)
+{
+	glm::vec3 bl{ -0.5f * width, -0.5f * height, 0.0f };
+	glm::vec3 tl{ -0.5f * width, 0.5f * height, 0.0f };
+	glm::vec3 br{ 0.5f * width, -0.5f * height, 0.0f };
+	glm::vec3 tr{ 0.5f * width, 0.5f * height, 0.0f };
+	std::vector<Vertex> vertices{ {bl}, {br}, {tr}, {bl}, {tr}, {tl} };
+	return Mesh(vertices);
+}
+
+Mesh createCircleMesh(float radius)
+{
+	std::vector<Vertex> vertices;
+    glm::vec3 center{0, 0, 0};
+    glm::vec3 rad{radius, 0, 0};
+    glm::vec3 normal{0, 0, 1};
+
+    constexpr int ticks = 64;
+
+    float angle;
+    float next_angle = 0;
+
+    for (int i = 0; i < ticks; i++) {
+        angle = next_angle;
+        next_angle = 2 * glm::pi<float>() * (i + 1) / ticks;
+        glm::vec3 p2 = glm::rotate(rad, angle, normal);
+        glm::vec3 p3 = glm::rotate(rad, next_angle, normal);
+        vertices.push_back({center});
+        vertices.push_back({p2});
+        vertices.push_back({p3});
+    }
+
+	return Mesh(vertices);
+}
+

@@ -4,15 +4,27 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 
+struct Vertex {
+    glm::vec3 position;
+};
+
 class Mesh {
     GLuint m_vao;
     GLuint m_vbo;
     GLsizei m_vertex_count;
 
 public:
-    Mesh();
+	Mesh();
+    Mesh(const std::vector<Vertex>& vertices);
     ~Mesh();
-    void render();
+	Mesh(Mesh&& other);
+	Mesh& operator=(Mesh&& other);
+	Mesh(const Mesh&) = delete;
+	Mesh& operator=(const Mesh&) = delete;
+    void render() const;
 };
+
+Mesh createRectangleMesh(float width, float height);
+Mesh createCircleMesh(float radius);
 
 #endif // MESH_HPP_

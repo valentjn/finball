@@ -116,7 +116,7 @@ Renderer::Renderer()
 	glViewport(0, 0, m_resolution.x, m_resolution.y);
 
     // create a rectangle mesh so that we have some dummy to render (WIP)
-	m_rectangle = std::unique_ptr<Mesh>(new Mesh());
+	m_full_quad = createRectangleMesh(2.f, 2.f);
 
 	// create the texture for the velocities of the fluid
 	glGenTextures(1, &m_tex_fluid);
@@ -180,7 +180,7 @@ void Renderer::update(const RendererInput& input, RendererOutput&)
 	glBindTexture(GL_TEXTURE_2D, m_tex_noise);
 	
     // render fluid
-	m_rectangle->render();
+	m_full_quad.render();
 
     // setup for rendering the world objects
 	glUseProgram(m_shader_program_world);
@@ -235,6 +235,6 @@ void Renderer::render(const RenderObject& object, GLint model_location) const
 		1,                      // matrix count
 		GL_FALSE,               // is not transposed
 		glm::value_ptr(model)); // data pointer
-	m_rectangle->render();
+	m_full_quad.render();
 }
 

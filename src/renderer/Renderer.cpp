@@ -6,8 +6,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <renderer/Renderer.hpp>
 #include "Log.hpp"
+#include <renderer/Renderer.hpp>
 
 // Compiles a shader
 GLuint createShader(const char *file_path, GLuint shader_type) {
@@ -57,8 +57,7 @@ GLuint createProgram(const char *vert_path, const char *frag_path) {
     return shader_program;
 }
 
-Renderer::Renderer()
-    : m_resolution(960, 540), m_camera_pos(0.f, 0.f, 5.f) {
+Renderer::Renderer() : m_resolution(960, 540), m_camera_pos(0.f, 0.f, 5.f) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         throw std::runtime_error(SDL_GetError());
 

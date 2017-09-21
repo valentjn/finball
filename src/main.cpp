@@ -1,6 +1,6 @@
+#include "Log.hpp"
 #include "MainMenu.hpp"
 #include "Parameters.hpp"
-#include "Log.hpp"
 
 int main(int argc, char *argv[]) {
     Parameters parameters(argc, argv);

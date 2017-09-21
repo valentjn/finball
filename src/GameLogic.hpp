@@ -6,9 +6,9 @@
 
 #include "GameLogicInput.hpp"
 #include "GameLogicOutput.hpp"
-#include "renderer/RenderObject.hpp"
 #include "Highscores.hpp"
 #include "Log.hpp"
+#include "renderer/RenderObject.hpp"
 
 using namespace std;
 using namespace std::chrono;

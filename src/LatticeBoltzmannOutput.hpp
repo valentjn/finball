@@ -14,9 +14,9 @@ public:
     // density field 
     std::unique_ptr<Array2D<float>> density = nullptr;
     // constants
-    float c = 1./3.14;
-    float dt = 0;
-    float dx = 0;
+    float c = 1./1.414213; // 1 / sqrt 2
+    float dt = 1;
+    float dx = 1;
     int cx [9] = {0, 1, 0, -1, 0 , 1, -1, -1, 1};
     int cy [9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
     // f_i outputs

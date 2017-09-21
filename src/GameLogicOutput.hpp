@@ -8,9 +8,10 @@
 class GameLogicOutput {
 public:
     bool running;
+    int highscore;
     std::vector<RenderObject> objectsToRender;
 
-    GameLogicOutput() : running(true) {}
+    GameLogicOutput() : running(true), highscore(0) {}
 };
 
 #endif

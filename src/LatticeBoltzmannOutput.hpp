@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "Array2D.hpp"
-#include "glm/vec3.hpp"
+#include <glm/vec3.hpp>
 
 class LatticeBoltzmannOutput {
 public:

@@ -11,6 +11,7 @@ class RigidBody {
 private:
     glm::vec2 pos;
     glm::vec2 vel;
+    //current orientation
     float theta;
     float angVel;
     float mass;
@@ -73,9 +74,9 @@ private:
 
 public:
     RigidBodyCircle()
-        : RigidBodyCircle(1.f)
+        : RigidBodyCircle(1.f){}
 
-              RigidBodyCircle(const float &r)
+    RigidBodyCircle(const float &r)
         : RigidBody(), radius(r) {
         setType(CIRCLE);
     }

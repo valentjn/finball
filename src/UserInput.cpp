@@ -13,6 +13,7 @@ using namespace xn;
 
 using namespace std;
 
+// initialization of user input facilities
 UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
 
 #ifndef WITHOUT_KINECT_LIBRARIES
@@ -32,6 +33,7 @@ UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
 #endif
 }
 
+// finalization of user input facilities
 UserInput::~UserInput() {
     // TODO
 #ifndef WITHOUT_KINECT_LIBRARIES
@@ -42,6 +44,7 @@ UserInput::~UserInput() {
 #endif
 }
 
+// process input
 void UserInput::getInput(UserInputOutput &userInputOutput) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {

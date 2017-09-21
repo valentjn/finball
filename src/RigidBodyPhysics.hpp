@@ -33,14 +33,48 @@ public:
           broadphase(std::make_unique<btDbvtBroadphase>()),
           solver(std::make_unique<btSequentialImpulseConstraintSolver>()),
           dynamics_world(std::make_unique<btDiscreteDynamicsWorld>(
-              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())) {}
+              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())) {
+        btCollisionShape *colShape = new btSphereShape(btScalar(1));
+
+        collision_shapes->push_back(colShape);
+
+        btTransform startTransform;
+        startTransform.setIdentity();
+        startTransform.setOrigin(btVector3(btScalar(8), btScalar(8), btScalar(0)));
+
+        btScalar mass(1.f);
+
+        btVector3 localInertia;
+        colShape->calculateLocalInertia(mass, localInertia);
+
+        btDefaultMotionState *motionState = new btDefaultMotionState(startTransform);
+        btRigidBody *body = new btRigidBody(mass, motionState, colShape, localInertia);
+        dynamics_world->addRigidBody(body);
+
+        // float grid_step_size = BULLET_WORLD_WIDTH / static_cast<float>(level.width);
+    }
+
+    // TODO: Destructor  colShapes
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
+        dynamics_world->stepSimulation(1. / 60.);
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
-        for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
-            auto &obj = dynamics_world->getCollisionObjectArray()[j];
+        for (int i = 0; i < dynamics_world->getNumCollisionObjects(); i++) {
+            auto &obj = dynamics_world->getCollisionObjectArray()[i];
             // TODO: determine which cells are occupied by obj
+
+            btRigidBody *body = btRigidBody::upcast(obj);
+            btTransform trans;
+            if (body && body->getMotionState()) {
+                body->getMotionState()->getWorldTransform(trans);
+            } else {
+                trans = obj->getWorldTransform();
+            }
+            btVector3 &origin = trans.getOrigin();
+            printf("world pos object %d = %f,%f,%f\n", i, origin.getX(), origin.getY(),
+                   origin.getZ());
+
             grid_obj->value(1, 3) = RigidBodyPhysicsOutput::type::DYNAMIC;
             grid_vel->value(1, 3) = glm::vec2{1.0, 0.5};
         }

@@ -2,21 +2,68 @@
 #define LEVEL_HPP_
 
 #include <vector>
+#include <stdexcept>
+#include <fstream>
+#include <string>
 
 #include "Array2D.hpp"
+#include "Level.hpp"
+#include "Log.hpp"
 #include "RigidBody.hpp"
+
+using namespace std;
 
 class Level {
 public:
-    enum CellType { EMPTY, OBSTACLE, /*BC_BOUNCE_BACK,*/ BC_NO_SLIP, BC_INFLOW, BC_OUTFLOW };
+    enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
 
     int width, height;
     Array2D<CellType> matrix;
-    std::vector<RigidBody> obstacles;
+    vector<RigidBody> obstacles;
 
-    Level() : width(-1), height(-1) {}
+    Level(string levelFilePath) {
+        fstream file;
+        file.open(levelFilePath, fstream::in);
+        if (!file.is_open()) {
+            Log::error("Failed to load level");
+            throw runtime_error("Failed to load level");
+        }
 
-    // delete copy constructor and copy-assignent operator
+        string file_line;
+        file >> width >> height;
+
+        matrix = Array2D<CellType>(width, height);
+        for (int y = 0; y < height; y++) {
+            file >> file_line;
+            for (int x = 0; x < width; x++) {
+                CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
+                matrix.value(x, y) = cell;
+                if (cell == OBSTACLE) {
+                    obstacles.push_back(RigidBody(x, y));
+                }
+            }
+        }
+
+        Log::info("Loaded level:");
+        if (Log::logLevel >= Log::INFO) {
+            for (int y = 0; y < height; y++) {
+                string line = "";
+                for (int x = 0; x < width; x++) {
+                    line += to_string(matrix.value(x, y));
+                }
+                Log::info(line);
+            }
+        }
+
+        Log::debug("With obstacles at:");
+        if (Log::logLevel >= Log::DEBUG) {
+            for (auto const &obstacle : obstacles) {
+                Log::debug("(%d|%d)", (int)obstacle.pos.x, (int)obstacle.pos.y);
+            }
+        }
+    }
+
+    // delete copy constructor and copy-assignment operator
     Level(const Level&) = delete;
     Level& operator=(const Level&) = delete;
 };

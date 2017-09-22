@@ -28,7 +28,8 @@ public:
     }
 
     void startSDL() {
-        if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        Log::debug("Initializing SDL and creating window ...");
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
             auto error = SDL_GetError();
             Log::error("Failed to initialize SDL: %s", error);
             throw std::runtime_error(error);
@@ -45,6 +46,7 @@ public:
             Log::error("Failed to create SDL window: %s", error);
             throw std::runtime_error(error);
         }
+        Log::debug("Initialized SDL and created window.");
 
         // Set icon
         SDL_Surface *icon_surface = IMG_Load("data/haicon.png");

@@ -70,7 +70,7 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test
+	$(CXX) src/Log.cpp test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
 	build/test
 
 test_test: test_deps

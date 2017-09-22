@@ -15,6 +15,7 @@ RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
 LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
+		  -lSDL2_mixer \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs`
@@ -24,7 +25,7 @@ LDFLAGS:= -lSDL2_image \
 all: release
 
 install_deb_packages:
-	sudo apt-get install libsdl2-ttf-dev libsdl2-image-dev libsdl2-dev libbullet-dev
+	sudo apt-get install libsdl2-ttf-dev libsdl2-image-dev libsdl2-dev libbullet-dev libsdl2-mixer-dev
 
 install_formatter:
 	sudo apt-get install clang clang-tidy clang-format colordiff

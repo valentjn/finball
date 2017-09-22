@@ -15,7 +15,7 @@ using namespace std;
 
 class Level {
 public:
-    enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW, BALL };
+    enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
 
     int width, height;
     Array2D<CellType> matrix;
@@ -36,10 +36,10 @@ public:
         for (int y = height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
-                CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
-                if (cell == BALL) {
+                if (file_line[x] == 'B') {
                     rigidBodies.push_back(RigidBody(x, y, false));
                 } else {
+                    CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
                     matrix.value(x, y) = cell;
                     if (cell == OBSTACLE) {
                         rigidBodies.push_back(RigidBody(x, y));

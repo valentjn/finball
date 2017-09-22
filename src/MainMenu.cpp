@@ -45,14 +45,14 @@ void MainMenu::show() {
     while (!quit) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_KEYDOWN: // if key is "SPACE" it falls through and quits the menu
+            case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_SPACE) {
                     quit = true;
                 }
                 break;
             case SDL_QUIT: // User hits the "x" in the corner of the window
-                quit = true;
-                break;
+                hide();
+                return;
             }
         }
     }

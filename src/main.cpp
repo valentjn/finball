@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     Log::setLogLevel(parameters.verbosityLevel);
 
     MusicPlayer musicPlayer;
-    musicPlayer.play("data/Quan_Zhi_Gao_Shou_Intro.mp3");
+    musicPlayer.play("data/music.flac");
 
     MainMenu menu;
     menu.show();

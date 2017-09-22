@@ -24,10 +24,11 @@ public:
         if (SDL_Init(SDL_INIT_AUDIO) < 0) {
             Log::error("Failed to init SDL audio");
         }
-        if (Mix_Init(MIX_INIT_MP3) != MIX_INIT_MP3) {
+        int flags = MIX_INIT_FLAC | MIX_INIT_MP3 | MIX_INIT_OGG;
+        if (Mix_Init(flags) != flags) {
             Log::error("Failed to initialize Mixer: %s", Mix_GetError());
         }
-        Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
+        Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 1024);
         mixInit = true;
     }
 

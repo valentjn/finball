@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <iostream>
 #include <vector>
 
@@ -9,7 +9,6 @@
 struct Vertex {
     glm::vec3 position;
 };
-
 
 std::vector<Vertex> createCircleVertices() {
     std::vector<Vertex> vertices;
@@ -35,12 +34,9 @@ std::vector<Vertex> createCircleVertices() {
 }
 
 std::vector<Vertex> createSquareVertices() {
-    return std::vector<Vertex> {
-        {{-1.f, -1.f, 0.f}}, {{-1.f, 1.f, 0.f}}, {{1.f,  1.f, 0.f}},
-        {{-1.f, -1.f, 0.f}}, {{ 1.f, 1.f, 0.f}}, {{1.f, -1.f, 0.f}}
-    };
+    return std::vector<Vertex>{{{-1.f, -1.f, 0.f}}, {{-1.f, 1.f, 0.f}}, {{1.f, 1.f, 0.f}},
+                               {{-1.f, -1.f, 0.f}}, {{1.f, 1.f, 0.f}},  {{1.f, -1.f, 0.f}}};
 }
-
 
 Mesh::Mesh() {
     auto vertices = createCircleVertices();

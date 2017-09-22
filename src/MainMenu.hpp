@@ -41,7 +41,8 @@ public:
         SDL_Texture *background_texture =
             SDL_CreateTextureFromSurface(renderer, background_surface);
 
-        SDL_Surface *header_surface = TTF_RenderText_Blended_Wrapped(header_font, "FinBall", color_light, 1000);
+        SDL_Surface *header_surface =
+            TTF_RenderText_Blended_Wrapped(header_font, "FinBall", color_light, 1000);
         SDL_Texture *header_texture = SDL_CreateTextureFromSurface(renderer, header_surface);
 
         std::string highscore_text = get_highscore_text(highscores);
@@ -92,6 +93,7 @@ public:
 
         // Free resources
         TTF_CloseFont(header_font);
+        TTF_CloseFont(highscore_font);
         SDL_DestroyTexture(background_texture);
         SDL_DestroyTexture(header_texture);
         SDL_DestroyTexture(highscore_texture);

@@ -39,8 +39,7 @@ public:
                 CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
                 if (cell == BALL) {
                     rigidBodies.push_back(RigidBody(x, y, false));
-                }
-                else {
+                } else {
                     matrix.value(x, y) = cell;
                     if (cell == OBSTACLE) {
                         rigidBodies.push_back(RigidBody(x, y));

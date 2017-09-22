@@ -51,6 +51,8 @@ public:
     }
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
+        dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
+
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
         output.rigid_bodies.clear();

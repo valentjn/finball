@@ -11,8 +11,8 @@ struct RigidBody {
     float radius;
 
     RigidBody(glm::vec2 pos, bool isFixed) : position(pos), isFixed(isFixed) {}
-    RigidBody(int x, int y, bool isFixed) : RigidBody(glm::vec2(x, y), isFixed) {}
-    RigidBody(int x, int y) : RigidBody(x, y, true) {}
+    RigidBody(float x, float y, bool isFixed) : RigidBody(glm::vec2(x, y), isFixed) {}
+    RigidBody(float x, float y) : RigidBody(x, y, true) {}
 };
 
 #endif // RIGID_BODY_HPP_

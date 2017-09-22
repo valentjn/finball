@@ -7,10 +7,6 @@
 #include "Array2D.hpp"
 #include "Level.hpp"
 
-// TODO: coordinate this with other teams
-const int GRID_Y = 42;
-const int GRID_X = 42;
-
 class RigidBodyPhysicsOutput {
 public:
     Array2D<Level::CellType> grid_objects;

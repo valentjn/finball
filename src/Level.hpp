@@ -37,16 +37,16 @@ public:
             file >> file_line;
             for (int x = 0; x < width; x++) {
                 CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
-                matrix.value(x, y) = cell;
+                matrix.value(x, height - y - 1) = cell;
                 if (cell == OBSTACLE) {
-                    obstacles.push_back(RigidBody(x, y));
+                    obstacles.push_back(RigidBody(x, height - y - 1));
                 }
             }
         }
 
         Log::info("Loaded level:");
         if (Log::logLevel >= Log::INFO) {
-            for (int y = 0; y < height; y++) {
+            for (int y = height - 1; y >= 0; y--) {
                 string line = "";
                 for (int x = 0; x < width; x++) {
                     line += to_string(matrix.value(x, y));

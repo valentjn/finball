@@ -1,10 +1,10 @@
 #ifndef LEVEL_HPP_
 #define LEVEL_HPP_
 
-#include <vector>
-#include <stdexcept>
 #include <fstream>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "Array2D.hpp"
 #include "Level.hpp"
@@ -64,8 +64,8 @@ public:
     }
 
     // delete copy constructor and copy-assignment operator
-    Level(const Level&) = delete;
-    Level& operator=(const Level&) = delete;
+    Level(const Level &) = delete;
+    Level &operator=(const Level &) = delete;
 };
 
 #endif

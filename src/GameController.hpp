@@ -30,7 +30,7 @@ public:
         LatticeBoltzmannOutput latticeBoltzmannOutput(level);
         RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
         GameLogicOutput gameLogicOutput;
-	RendererOutput rendererOutput;
+        RendererOutput rendererOutput;
 
         LatticeBoltzmannInput latticeBoltzmannInput;
         RigidBodyPhysicsInput rigidBodyPhysicsInput;

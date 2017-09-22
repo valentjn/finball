@@ -48,8 +48,8 @@ void MainMenu::show() {
             case SDL_KEYDOWN: // if key is "SPACE" it falls through and quits the menu
                 if (event.key.keysym.sym == SDLK_SPACE) {
                     quit = true;
-                    break;
                 }
+                break;
             case SDL_QUIT: // User hits the "x" in the corner of the window
                 quit = true;
                 break;

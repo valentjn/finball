@@ -15,11 +15,11 @@ using namespace std;
 
 class Level {
 public:
-    enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
+    enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW, BALL };
 
     int width, height;
     Array2D<CellType> matrix;
-    vector<RigidBody> obstacles;
+    vector<RigidBody> rigidBodies;
 
     Level(string levelFilePath) {
         fstream file;
@@ -33,13 +33,18 @@ public:
         file >> width >> height;
 
         matrix = Array2D<CellType>(width, height);
-        for (int y = 0; y < height; y++) {
+        for (int y = height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
                 CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
-                matrix.value(x, height - y - 1) = cell;
-                if (cell == OBSTACLE) {
-                    obstacles.push_back(RigidBody(x, height - y - 1));
+                if (cell == BALL) {
+                    rigidBodies.push_back(RigidBody(x, y, false));
+                }
+                else {
+                    matrix.value(x, y) = cell;
+                    if (cell == OBSTACLE) {
+                        rigidBodies.push_back(RigidBody(x, y));
+                    }
                 }
             }
         }
@@ -55,10 +60,10 @@ public:
             }
         }
 
-        Log::debug("With obstacles at:");
+        Log::debug("With rigidBodies at:");
         if (Log::logLevel >= Log::DEBUG) {
-            for (auto const &obstacle : obstacles) {
-                Log::debug("(%d|%d)", (int)obstacle.position.x, (int)obstacle.position.y);
+            for (auto const &rigidBody : rigidBodies) {
+                Log::debug("(%d|%d)", (int)rigidBody.position.x, (int)rigidBody.position.y);
             }
         }
     }

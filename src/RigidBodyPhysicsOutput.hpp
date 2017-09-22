@@ -4,8 +4,8 @@
 #include <glm/vec2.hpp>
 #include <memory>
 
-#include "Level.hpp"
 #include "Array2D.hpp"
+#include "Level.hpp"
 
 // TODO: coordinate this with other teams
 const int GRID_Y = 42;
@@ -18,8 +18,7 @@ public:
     std::vector<RigidBody> rigid_bodies;
 
     RigidBodyPhysicsOutput(Level const &level)
-        : grid_objects(level.width, level.height),
-          grid_velocities(level.width, level.height) {}
+        : grid_objects(level.width, level.height), grid_velocities(level.width, level.height) {}
 };
 
 #endif

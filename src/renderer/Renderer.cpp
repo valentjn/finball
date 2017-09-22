@@ -10,6 +10,7 @@
 #include "Log.hpp"
 #include <Level.hpp>
 #include <renderer/Renderer.hpp>
+#include "SDLController.hpp"
 
 // Compiles a shader
 GLuint createShader(const char *file_path, GLuint shader_type) {
@@ -65,17 +66,9 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // TODO: dynamically set camera positon depending on level size
-Renderer::Renderer() : m_resolution(960, 540), m_camera_pos(32.f, 32.f, 100.f) {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
-        throw std::runtime_error(SDL_GetError());
-
-    // create window
-    m_window = SDL_CreateWindow("Game",                                         // title
-                                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, // position
-                                m_resolution.x, m_resolution.y,                 // size
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-    if (!m_window)
-        throw std::runtime_error(SDL_GetError());
+Renderer::Renderer() : m_camera_pos(32.f, 32.f, 100.f) {
+    m_window = SDLController::getInstance().getWindow();
+    m_resolution = SDLController::getInstance().getResolution();
 
     // initialize OpenGL
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -83,8 +76,12 @@ Renderer::Renderer() : m_resolution(960, 540), m_camera_pos(32.f, 32.f, 100.f) {
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     m_glcontext = SDL_GL_CreateContext(m_window);
-    if (!m_glcontext)
-        throw std::runtime_error(SDL_GetError());
+    if (!m_glcontext) {
+        auto error = SDL_GetError();
+        Log::error("Failed to create SDL window: %s", error);
+        throw std::runtime_error(error);
+    }
+
     Log::debug("Loaded Renderer with OpenGL version:");
     Log::debug("OpenGL %s", glGetString(GL_VERSION));
     Log::debug("GLSL %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -128,8 +125,6 @@ Renderer::Renderer() : m_resolution(960, 540), m_camera_pos(32.f, 32.f, 100.f) {
 
 Renderer::~Renderer() {
     SDL_GL_DeleteContext(m_glcontext);
-    SDL_DestroyWindow(m_window);
-    SDL_Quit();
 }
 
 void Renderer::update(const RendererInput &input, RendererOutput &) {

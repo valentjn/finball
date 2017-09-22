@@ -4,6 +4,7 @@
 #include "GameController.hpp"
 #include "Highscores.hpp"
 #include "Level.hpp"
+#include "SDLController.hpp"
 
 #include "MainMenu.hpp"
 
@@ -64,12 +65,7 @@ void MainMenu::show() {
 }
 
 void MainMenu::setup() {
-    SDL_Init(SDL_INIT_VIDEO);
-    TTF_Init();
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-    window = SDL_CreateWindow("FinBall", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600,
-                              SDL_WINDOW_SHOWN /* | SDL_WINDOW_FULLSCREEN */);
-
+    SDL_Window *window = SDLController::getInstance().getWindow();
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Setup fonts and colors
@@ -78,11 +74,6 @@ void MainMenu::setup() {
     headerFont = TTF_OpenFont("data/OpenSans-Regular.ttf", 70);
     defaultFont = TTF_OpenFont("data/OpenSans-Regular.ttf", 30);
 
-    // Set icon
-    SDL_Surface *icon_surface = IMG_Load("data/haicon.png");
-    SDL_SetWindowIcon(window, icon_surface);
-    SDL_FreeSurface(icon_surface);
-
     // Set background
     SDL_Surface *background_surface = IMG_Load("data/background.jpg");
     SDL_Texture *background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
@@ -90,8 +81,7 @@ void MainMenu::setup() {
     SDL_RenderCopy(renderer, background_texture, NULL, NULL);
     SDL_DestroyTexture(background_texture);
 
-    int windowWidth, windowHeight;
-    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+    int windowWidth = SDLController::getInstance().getResolution().x;
     createText("FinBall", windowWidth / 2, 50, true, colorLight, headerFont);
     createText("To start the game please do a HAI-five or press SPACE!", windowWidth / 2, 500);
 
@@ -106,9 +96,4 @@ void MainMenu::hide() {
     TTF_CloseFont(headerFont);
     TTF_CloseFont(defaultFont);
     SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-
-    // Quit SDL
-    TTF_Quit();
-    SDL_Quit();
 }

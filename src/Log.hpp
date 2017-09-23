@@ -9,7 +9,7 @@ using namespace std;
 
 class Log {
 public:
-    enum LogLevel { NONE, ERROR, INFO, DEBUG };
+    enum LogLevel { NONE, ERROR, WARNING, INFO, DEBUG };
     static LogLevel logLevel;
 
 private:
@@ -40,6 +40,13 @@ public:
         va_list format_args;
         va_start(format_args, message);
         log(message, ERROR, format_args);
+        va_end(format_args);
+    }
+
+    static void warn(string message, ...) {
+        va_list format_args;
+        va_start(format_args, message);
+        log(message, WARNING, format_args);
         va_end(format_args);
     }
 

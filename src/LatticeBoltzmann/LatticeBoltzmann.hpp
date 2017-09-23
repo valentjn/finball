@@ -6,7 +6,7 @@
 #include <glm/vec3.hpp>
 
 #include "Array2D.hpp"
-#include "FICell.hpp"
+#include "LatticeBoltzmann/FICell.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "Level.hpp"

@@ -13,6 +13,7 @@ class SDLWindow {
 
 private:
     SDL_Window *window;
+    int width, height;
 
 public:
     SDLWindow(int width, int height, const char* title, bool fullscreen) {
@@ -22,6 +23,8 @@ public:
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         atexit(SDL_Quit);
         createWindow(width, height, title, fullscreen);
+
+        SDL_GetWindowSize(window, &this->width, &this->height);
     }
 
     ~SDLWindow() {
@@ -31,14 +34,10 @@ public:
     }
 
     int getWidth() const {
-        int width;
-        SDL_GetWindowSize(window, &width, nullptr);
         return width;
     }
 
     int getHeight() const {
-        int height;
-        SDL_GetWindowSize(window, nullptr, &height);
         return height;
     }
 
@@ -65,6 +64,7 @@ private:
 
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+            width = height = 0;
         }
 
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

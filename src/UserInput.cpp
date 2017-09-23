@@ -1,4 +1,5 @@
 #include "UserInput.hpp"
+#include <iostream>
 
 #ifndef WITHOUT_KINECT_LIBRARIES
 
@@ -24,6 +25,7 @@ UserInput::UserInput() {
     userGenerator = make_unique<UserGenerator>();
     depthGenerator = make_unique<DepthGenerator>();
     previous_time_point = std::chrono::high_resolution_clock::now();
+	nUsers = 0;
 
     // TODO: handle error codes
     XnStatus errorCode = XN_STATUS_OK;
@@ -68,6 +70,11 @@ UserInput::UserInput() {
             // calibration complete
             if(status == XN_CALIBRATION_STATUS_OK) {
                 _this->userGenerator->GetSkeletonCap().StartTracking(nID);
+				if(_this->nUsers < MAX_USERS) {
+					// add user
+					_this->aUsers[_this->nUsers] = nID;
+					_this->nUsers++;
+				}
             } else {
                 // TODO: handle errors
                 _this->userGenerator->GetSkeletonCap()
@@ -132,29 +139,17 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
             aUsers[i], XN_SKEL_RIGHT_ELBOW, rightElbowJoint);
 
 		// compute angles
-        double left_x_diff_1 = leftHandJoint.position.position.X
+        double right_x_diff = rightHandJoint.position.position.X
 			- leftElbowJoint.position.position.X;
-		double left_y_diff_1 = leftHandJoint.position.position.Y
+		double right_y_diff = rightHandJoint.position.position.Y
 			- leftElbowJoint.position.position.Y;
-		userInputOutput.rightAngle[0] = atan2(left_y_diff_1, left_x_diff_1);
+		userInputOutput.rightAngle[i] = atan2(right_y_diff, right_x_diff);
 		
-		double right_x_diff_1 = leftHandJoint.position.position.X
+		double left_x_diff = leftHandJoint.position.position.X
 			- leftElbowJoint.position.position.X;
-		double right_y_diff_1 = leftHandJoint.position.position.Y
+		double left_y_diff = leftHandJoint.position.position.Y
 			- leftElbowJoint.position.position.Y;
-		userInputOutput.rightAngle[0] = atan2(left_y_diff_1, left_x_diff_1);		
-
-		double left_x_diff_2 = leftHandJoint.position.position.X
-			- leftElbowJoint.position.position.X;
-		double left_y_diff_2 = leftHandJoint.position.position.Y
-			- leftElbowJoint.position.position.Y;
-		userInputOutput.leftAngle[1] = atan2(left_y_diff_1, left_x_diff_1);
-		
-		double right_x_diff_2 = leftHandJoint.position.position.X
-			- leftElbowJoint.position.position.X;
-		double right_y_diff_2 = leftHandJoint.position.position.Y
-			- leftElbowJoint.position.position.Y;
-		userInputOutput.rightAngle[1] = atan2(left_y_diff_1, left_x_diff_1);	
+		userInputOutput.leftAngle[i] = atan2(left_y_diff, left_x_diff);
     }
 
 	previous_time_point = now;

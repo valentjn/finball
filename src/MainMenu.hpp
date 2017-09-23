@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <Level.hpp>
 
 class MainMenu {
 private:
@@ -31,7 +32,7 @@ private:
     void hide();
 
 public:
-    void show();
+    std::unique_ptr<Level> show();
 };
 
 #endif

@@ -36,7 +36,7 @@ void MainMenu::createText(std::string text, int x, int y, bool center, SDL_Color
     SDL_DestroyTexture(texture);
 }
 
-void MainMenu::show() {
+std::unique_ptr<Level> MainMenu::show() {
     setup();
 
     // Flag for quitting the program
@@ -52,16 +52,15 @@ void MainMenu::show() {
                 }
                 break;
             case SDL_QUIT: // User hits the "x" in the corner of the window
-                hide();
-                return;
+                //hide();
+                //return;
+                break;
             }
         }
     }
 
     hide();
-    Level level("data/testLevel.txt");
-    GameController gameController;
-    gameController.startGame(level);
+    return std::make_unique<Level>("data/testLevel.txt");
 }
 
 void MainMenu::setup() {

@@ -82,7 +82,7 @@ GTEST_BUILD_CFLAGS = -I $(GTEST_DIR)/include/ -I $(GTEST_DIR) -pthread
 GTEST_BUILD_CFLAGS_MAIN = $(GTEST_DIR)/src/gtest_main.cc $(GTEST_BUILD_CFLAGS)
 
 GTEST_CFLAGS = -I $(GTEST_DIR)/include -pthread build/gtest-all.o
-GTEST_MAIN_CFLAGS = $(GTEST_CFLAGS) $(COMMON_CFLAGS) build/gtest_main.o
+GTEST_MAIN_CFLAGS = $(GTEST_CFLAGS) $(DEBUG_CFLAGS) build/gtest_main.o
 
 build/gtest-all.o:
 	mkdir -p build

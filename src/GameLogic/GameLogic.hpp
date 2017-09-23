@@ -4,11 +4,11 @@
 #include <chrono>
 #include <fstream>
 
-#include "GameLogicInput.hpp"
-#include "GameLogicOutput.hpp"
+#include "GameLogic/GameLogicInput.hpp"
+#include "GameLogic/GameLogicOutput.hpp"
 #include "Highscores.hpp"
 #include "Log.hpp"
-#include "renderer/RenderObject.hpp"
+#include "Visualization/RenderObject.hpp"
 
 using namespace std;
 using namespace std::chrono;

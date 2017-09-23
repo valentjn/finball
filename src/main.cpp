@@ -1,9 +1,10 @@
 #include <memory>
+
+#include "GameController.hpp"
 #include "Log.hpp"
 #include "MainMenu.hpp"
 #include "Parameters.hpp"
 #include "SDLController.hpp"
-#include "GameController.hpp"
 
 int main(int argc, char *argv[]) {
 
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]) {
     // show main menu and obtain level from it
     MainMenu menu;
     std::unique_ptr<Level> level = menu.show();
-    
+
     // run the game
     GameController gameController;
     gameController.startGame(*level);

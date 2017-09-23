@@ -1,7 +1,7 @@
 #ifndef RIGID_BODY_HPP_
 #define RIGID_BODY_HPP_
 
-#include "glm/vec2.hpp"
+#include <glm/vec2.hpp>
 
 struct RigidBody {
     int id;
@@ -16,4 +16,4 @@ struct RigidBody {
     virtual ~RigidBody() {}
 };
 
-#endif // RIGID_BODY_HPP_
+#endif

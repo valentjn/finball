@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "Array2D.hpp"
-#include "Level.hpp"
 #include "Log.hpp"
 #include "RigidBody.hpp"
 

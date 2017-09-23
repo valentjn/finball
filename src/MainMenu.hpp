@@ -6,7 +6,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <Level.hpp>
+
+#include "Level.hpp"
 
 class MainMenu {
 private:
@@ -26,7 +27,9 @@ private:
     void createText(std::string text, int x, int y, bool center) {
         createText(text, x, y, center, colorDark);
     }
-    void createText(std::string text, int x, int y) { createText(text, x, y, true); }
+    void createText(std::string text, int x, int y) {
+        createText(text, x, y, true);
+    }
 
     void setup();
     void hide();

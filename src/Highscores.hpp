@@ -56,4 +56,4 @@ public:
     }
 };
 
-#endif /* HIGHSCORES_HPP_ */
+#endif

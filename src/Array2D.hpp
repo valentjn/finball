@@ -2,8 +2,10 @@
 #define ARRAY_2D_HPP_
 
 #include <cassert>
+#include <vector>
 
-template <typename T> class Array2D {
+template <typename T>
+class Array2D {
 private:
     int m_width;
     int m_height;

@@ -1,15 +1,15 @@
 #ifndef RENDERER_INPUT_HPP_
 #define RENDERER_INPUT_HPP_
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
-#include <GameLogicOutput.hpp>
-#include <LatticeBoltzmannOutput.hpp>
-#include <renderer/RenderObject.hpp>
-#include <RigidBodyPhysicsOutput.hpp>
-#include <Array2D.hpp>
-#include <renderer/Mesh.hpp>
+#include "Array2D.hpp"
+#include "GameLogic/GameLogicOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
+#include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "Visualization/RenderObject.hpp"
+#include "Visualization/Mesh.hpp"
 
 class RendererInput {
     std::unordered_map<int, Mesh> m_rigid_body_meshes;

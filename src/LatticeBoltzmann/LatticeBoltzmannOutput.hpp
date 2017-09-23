@@ -2,6 +2,7 @@
 #define LATTICE_BOLTZMANN_OUTPUT_HPP_
 
 #include <memory>
+
 #include <glm/vec2.hpp>
 
 #include "Array2D.hpp"

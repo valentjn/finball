@@ -1,16 +1,17 @@
 #include <fstream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Log.hpp"
-#include <Level.hpp>
-#include <renderer/Renderer.hpp>
+#include "Level.hpp"
 #include "SDLController.hpp"
+#include "Visualization/Renderer.hpp"
 
 // Compiles a shader
 GLuint createShader(const char *file_path, GLuint shader_type) {
@@ -94,11 +95,11 @@ Renderer::Renderer() : m_camera_pos(32.f, 32.f, 100.f) {
 
     // create shader programs
     m_shader_program_world =
-        createProgram("src/renderer/world_vert.glsl", "src/renderer/world_frag.glsl");
+        createProgram("src/Visualization/glsl/world_vert.glsl", "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_ui = createProgram( // TODO: use different shaders
-        "src/renderer/world_vert.glsl", "src/renderer/world_frag.glsl");
+        "src/Visualization/glsl/world_vert.glsl", "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_fluid =
-        createProgram("src/renderer/fluid_vert.glsl", "src/renderer/fluid_frag.glsl");
+        createProgram("src/Visualization/glsl/fluid_vert.glsl", "src/Visualization/glsl/fluid_frag.glsl");
 
     // full window viewport
     glViewport(0, 0, m_resolution.x, m_resolution.y);
@@ -134,7 +135,7 @@ Renderer::~Renderer() {
     SDL_GL_DeleteContext(m_glcontext);
 }
 
-void Renderer::update(const RendererInput &input, RendererOutput &) {
+void Renderer::update(const RendererInput &input) {
     // clear the framebuffer to dark red
     glClearColor(0.4f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

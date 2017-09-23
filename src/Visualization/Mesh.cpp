@@ -1,10 +1,11 @@
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 #include <iostream>
 #include <vector>
 
-#include <renderer/Mesh.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+
+#include "Visualization/Mesh.hpp"
 
 Mesh::Mesh() : m_vao(0), m_vbo(0), m_vertex_count(0) {}
 
@@ -110,4 +111,3 @@ bool Mesh::operator==(const Mesh& other) const
 {
 	return m_vao == other.m_vao;
 }
-

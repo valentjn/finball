@@ -3,12 +3,12 @@
 
 #include <memory>
 
-#include "btBulletDynamicsCommon.h"
-#include "glm/vec2.hpp"
+#include <btBulletDynamicsCommon.h>
+#include <glm/vec2.hpp>
 
 #include "Level.hpp"
-#include "RigidBodyPhysicsInput.hpp"
-#include "RigidBodyPhysicsOutput.hpp"
+#include "RigidBody/RigidBodyPhysicsInput.hpp"
+#include "RigidBody/RigidBodyPhysicsOutput.hpp"
 
 class RigidBodyPhysics {
 private:

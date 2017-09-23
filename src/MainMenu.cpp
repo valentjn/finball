@@ -4,9 +4,8 @@
 #include "GameController.hpp"
 #include "Highscores.hpp"
 #include "Level.hpp"
-#include "SDLController.hpp"
-
 #include "MainMenu.hpp"
+#include "SDLController.hpp"
 
 std::string getHighscoreText() {
     std::vector<float> highscores;

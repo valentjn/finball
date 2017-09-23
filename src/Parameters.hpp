@@ -39,4 +39,4 @@ public:
     }
 };
 
-#endif /* PARAMETERS_HPP_ */
+#endif

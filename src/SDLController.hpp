@@ -2,7 +2,6 @@
 #define SDL_CONTROLLER_HPP_
 
 #include <glm/glm.hpp>
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>

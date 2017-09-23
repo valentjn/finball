@@ -1,17 +1,17 @@
 #ifndef COMPRENDERER_HPP_
 #define COMPRENDERER_HPP_
 
-#include <SDL2/SDL.h>
-#include <glm/glm.hpp>
 #include <memory>
 #include <vector>
 
-#include <Array2D.hpp>
-#include <Level.hpp>
-#include <renderer/Mesh.hpp>
-#include <renderer/RenderObject.hpp>
-#include <renderer/RendererInput.hpp>
-#include <renderer/RendererOutput.hpp>
+#include <glm/glm.hpp>
+#include <SDL2/SDL.h>
+
+#include "Array2D.hpp"
+#include "Level.hpp"
+#include "Visualization/Mesh.hpp"
+#include "Visualization/RenderObject.hpp"
+#include "Visualization/RendererInput.hpp"
 
 class Renderer {
 private:
@@ -38,7 +38,7 @@ private:
     void render(const RenderObject &object, GLint model_location) const;
 
 public:
-    void update(const RendererInput &input, RendererOutput &output);
+    void update(const RendererInput &input);
 
     Renderer();
     ~Renderer();

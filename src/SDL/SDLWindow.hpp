@@ -21,7 +21,7 @@ public:
         handle_error(TTF_Init() != 0, "Failed to initialize TTF", TTF_GetError());
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-
+        atexit(SDL_Quit);
         create_window(title, fullscreen);
     }
 
@@ -61,7 +61,7 @@ private:
         uint32_t flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
         if (fullscreen) {
-            flags |= SDL_WINDOW_FULLSCREEN;
+            flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
         }
 
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

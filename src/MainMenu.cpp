@@ -26,6 +26,7 @@ std::unique_ptr<Level> MainMenu::show() {
             case SDL_QUIT: // User hits the "x" in the corner of the window
                 //hide();
                 //return;
+            	exit(0);
                 break;
             }
         }

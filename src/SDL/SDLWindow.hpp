@@ -23,6 +23,12 @@ public:
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         atexit(SDL_Quit);
 
+        if (fullscreen) {
+            SDL_DisplayMode displayMode;
+            SDL_GetCurrentDisplayMode(0, &displayMode);
+            width = displayMode.w;
+            height = displayMode.h;
+        }
         createWindow(width, height, title, fullscreen);
         SDL_GetWindowSize(window, &this->width, &this->height);
 
@@ -66,7 +72,6 @@ private:
 
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-            width = height = 0;
         }
 
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

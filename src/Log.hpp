@@ -9,11 +9,11 @@ using namespace std;
 
 class Log {
 public:
-    enum LogLevel { NONE, ERROR, INFO, DEBUG };
+    enum LogLevel { NONE, ERROR, WARNING, INFO, DEBUG };
     static LogLevel logLevel;
 
 private:
-    static const string LOG_NAMES[];
+    static const char *LOG_NAMES[];
 
     static FILE *getOutStream(LogLevel logLevel) {
         switch (logLevel) {
@@ -27,7 +27,7 @@ private:
     static void log(string message, LogLevel logLevel, va_list format_args) {
         if (Log::logLevel >= logLevel) {
             FILE *stream = getOutStream(logLevel);
-            fprintf(stream, "%s:\t", LOG_NAMES[logLevel].c_str());
+            fprintf(stream, "%-11s", LOG_NAMES[logLevel]);
             vfprintf(stream, message.c_str(), format_args);
             fprintf(stream, "\n");
         }
@@ -40,6 +40,13 @@ public:
         va_list format_args;
         va_start(format_args, message);
         log(message, ERROR, format_args);
+        va_end(format_args);
+    }
+
+    static void warn(string message, ...) {
+        va_list format_args;
+        va_start(format_args, message);
+        log(message, WARNING, format_args);
         va_end(format_args);
     }
 
@@ -58,4 +65,4 @@ public:
     }
 };
 
-#endif /* LOG_HPP_ */
+#endif

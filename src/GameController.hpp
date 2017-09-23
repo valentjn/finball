@@ -1,35 +1,33 @@
 #ifndef GAME_CONTROLLER_HPP_
 #define GAME_CONTROLLER_HPP_
 
+#include "GameLogic/GameLogic.hpp"
+#include "GameLogic/GameLogicInput.hpp"
+#include "GameLogic/GameLogicOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmann.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "Level.hpp"
-
-#include "GameLogic.hpp"
-#include "GameLogicInput.hpp"
-#include "GameLogicOutput.hpp"
-#include "LatticeBoltzmann.hpp"
-#include "LatticeBoltzmannInput.hpp"
-#include "LatticeBoltzmannOutput.hpp"
-#include "LevelLoader.hpp"
-#include "RigidBodyPhysics.hpp"
-#include "RigidBodyPhysicsInput.hpp"
-#include "RigidBodyPhysicsOutput.hpp"
-#include "UserInput.hpp"
-#include "UserInputOutput.hpp"
-#include "renderer/Renderer.hpp"
-#include "renderer/RendererInput.hpp"
+#include "RigidBody/RigidBodyPhysics.hpp"
+#include "RigidBody/RigidBodyPhysicsInput.hpp"
+#include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "UserInput/UserInput.hpp"
+#include "UserInput/UserInputOutput.hpp"
+#include "Visualization/Renderer.hpp"
+#include "Visualization/RendererInput.hpp"
 
 class GameController {
 public:
-    void startGame(Level &level) {
+    void startGame(SDLWindow &window, Level &level) {
         GameLogic gameLogic;
         UserInput userInput;
         LatticeBoltzmann latticeBoltzmann(level);
         RigidBodyPhysics rigidBodyPhysics(level);
-        Renderer renderer;
+        Renderer renderer(window);
 
         UserInputOutput userInputOutput;
-        LatticeBoltzmannOutput latticeBoltzmannOutput;
-        RigidBodyPhysicsOutput rigidBodyPhysicsOutput;
+        LatticeBoltzmannOutput latticeBoltzmannOutput(level);
+        RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
         GameLogicOutput gameLogicOutput;
 
         LatticeBoltzmannInput latticeBoltzmannInput;

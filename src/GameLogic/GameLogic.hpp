@@ -4,11 +4,11 @@
 #include <chrono>
 #include <fstream>
 
-#include "GameLogicInput.hpp"
-#include "GameLogicOutput.hpp"
+#include "GameLogic/GameLogicInput.hpp"
+#include "GameLogic/GameLogicOutput.hpp"
 #include "Highscores.hpp"
 #include "Log.hpp"
-#include "renderer/RenderObject.hpp"
+#include "Visualization/RenderObject.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -23,7 +23,8 @@ public:
     GameLogic() {
         testRenderObject.position = {0.f, 0.f, 0.f};
         testRenderObject.scale = 1.f;
-
+        // TODO: add proper mesh!
+        testRenderObject.mesh = nullptr;
         startTime = steady_clock::now();
         Log::debug("Haiscore clock started");
     }

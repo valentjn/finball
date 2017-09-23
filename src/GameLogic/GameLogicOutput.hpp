@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "renderer/RenderObject.hpp"
+#include "Visualization/RenderObject.hpp"
 
 class GameLogicOutput {
 public:

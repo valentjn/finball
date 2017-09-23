@@ -3,11 +3,13 @@
 
 #include <glm/glm.hpp>
 
+#include "Visualization/Mesh.hpp"
+
 struct RenderObject {
+	Mesh* mesh;
     glm::vec3 position;
     float scale;
-
-    // Todo: object type
+	float rotation;
 };
 
-#endif // RENDEROBJECT_HPP_
+#endif

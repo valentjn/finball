@@ -2,16 +2,34 @@
 #define ARRAY_2D_HPP_
 
 #include <cassert>
+#include <vector>
 
-template <typename T> class Array2D {
+template <typename T>
+class Array2D {
 private:
     int m_width;
     int m_height;
     std::vector<T> m_data;
 
 public:
-    Array2D() : m_width(width), m_height(height) {}
+    Array2D() : m_width(0), m_height(0) {}
+
     Array2D(int width, int height) : m_width(width), m_height(height), m_data(width * height) {}
+
+    Array2D(Array2D &&other)
+        : m_width(other.m_width), m_height(other.m_height), m_data(std::move(other.m_data)) {
+        other.m_width = 0;
+        other.m_height = 0;
+    }
+
+    Array2D &operator=(Array2D &&other) {
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_data = std::move(other.m_data);
+        other.m_width = 0;
+        other.m_height = 0;
+        return *this;
+    }
 
     void loadData(void *data) {
         T *t_data = static_cast<T *>(data);
@@ -37,7 +55,18 @@ public:
     int width() const { return m_width; }
     int height() const { return m_height; }
 
-    const T *getData() { return m_data.data(); }
+    const T *getData() const { return m_data.data(); }
+
+    bool operator==(const Array2D<T>& other) const
+    {
+        if (m_width != other.m_width || m_height != other.m_height)
+            return false;
+        for (int i = 0; i < m_width; ++i)
+            for (int j = 0; j < m_height; ++j)
+                if (value(i,j) != other.value(i,j))
+                    return false;
+        return true;
+    }
 };
 
 #endif /* ARRAY2D_HPP_ */

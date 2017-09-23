@@ -1,29 +1,74 @@
 #ifndef LEVEL_HPP_
 #define LEVEL_HPP_
 
+#include <fstream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 #include "Array2D.hpp"
-#include "RigidBody.hpp"
+#include "Log.hpp"
+#include "RigidBody/RigidBody.hpp"
+
+using namespace std;
 
 class Level {
 public:
-    enum CellType { EMPTY, OBSTACLE, /*BC_BOUNCE_BACK,*/ BC_NO_SLIP, BC_INFLOW, BC_OUTFLOW };
+    enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
 
     int width, height;
-    Array2D<CellType> *matrix;
-    std::vector<RigidBody> *obstacles;
+    Array2D<CellType> matrix;
+    vector<RigidBody> rigidBodies;
 
-    Level() : width(-1), height(-1), matrix(nullptr), obstacles(nullptr) {}
-
-    ~Level() {
-        if (matrix != nullptr) {
-            delete matrix;
+    Level(string levelFilePath) {
+        fstream file;
+        file.open(levelFilePath, fstream::in);
+        if (!file.is_open()) {
+            Log::error("Failed to load level");
+            throw runtime_error("Failed to load level");
         }
-        if (obstacles != nullptr) {
-            delete obstacles;
+
+        string file_line;
+        file >> width >> height;
+
+        matrix = Array2D<CellType>(width, height);
+        for (int y = height - 1; y >= 0; y--) {
+            file >> file_line;
+            for (int x = 0; x < width; x++) {
+                if (file_line[x] == 'B') {
+                    rigidBodies.push_back(RigidBody(x, y, false));
+                } else {
+                    CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
+                    matrix.value(x, y) = cell;
+                    if (cell == OBSTACLE) {
+                        rigidBodies.push_back(RigidBody(x, y));
+                    }
+                }
+            }
+        }
+
+        Log::info("Loaded level:");
+        if (Log::logLevel >= Log::INFO) {
+            for (int y = height - 1; y >= 0; y--) {
+                string line = "";
+                for (int x = 0; x < width; x++) {
+                    line += to_string(matrix.value(x, y));
+                }
+                Log::info(line);
+            }
+        }
+
+        Log::debug("With rigidBodies at:");
+        if (Log::logLevel >= Log::DEBUG) {
+            for (auto const &rigidBody : rigidBodies) {
+                Log::debug("(%d|%d)", (int)rigidBody.position.x, (int)rigidBody.position.y);
+            }
         }
     }
+
+    // delete copy constructor and copy-assignment operator
+    Level(const Level &) = delete;
+    Level &operator=(const Level &) = delete;
 };
 
 #endif

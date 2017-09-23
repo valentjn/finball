@@ -18,7 +18,7 @@ private:
 
     static void saveHighscores(vector<float> &highscores) {
         fstream file;
-        file.open("build/haiscores.txt", fstream::out);
+        file.open("haiscores.txt", fstream::out);
         if (file.is_open()) {
             for (auto const &highscore : highscores) {
                 file << highscore << "\n";
@@ -36,11 +36,12 @@ public:
         sortHighscores(highscores);
         highscores.resize(HIGHSCORE_CUTOFF);
         saveHighscores(highscores);
+        Log::info("Saved haiscore: %f", highscore);
     }
 
     static void loadHighscores(std::vector<float> &highscores) {
         fstream file;
-        file.open("build/haiscores.txt", fstream::in);
+        file.open("haiscores.txt", fstream::in);
         if (!file.is_open()) {
             Log::error("Failed to load haiscores");
             return;
@@ -55,4 +56,4 @@ public:
     }
 };
 
-#endif /* HIGHSCORES_HPP_ */
+#endif

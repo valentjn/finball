@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/LatticeBoltzmann.hpp"
+#include "../src/LatticeBoltzmann/LatticeBoltzmann.hpp"
 
 TEST(LBMTest, CollideStep1x1) {
 

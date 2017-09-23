@@ -3,11 +3,13 @@
 
 #include <memory>
 
+#include <glm/vec3.hpp>
+
+#include "Array2D.hpp"
 #include "FICell.hpp"
-#include "LatticeBoltzmannInput.hpp"
-#include "LatticeBoltzmannOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "Level.hpp"
-#include "glm/vec3.hpp"
 
 using namespace glm;
 

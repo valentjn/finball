@@ -1,8 +1,9 @@
 #ifndef RIGID_BODY_PHYSICS_OUTPUT_HPP_
 #define RIGID_BODY_PHYSICS_OUTPUT_HPP_
 
-#include <glm/vec2.hpp>
 #include <memory>
+
+#include <glm/vec2.hpp>
 
 #include "Array2D.hpp"
 #include "Level.hpp"

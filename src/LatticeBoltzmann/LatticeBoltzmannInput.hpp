@@ -3,11 +3,12 @@
 
 #include <memory>
 
+#include <glm/vec3.hpp>
+
 #include "Array2D.hpp"
-#include "RigidBodyPhysicsOutput.hpp"
-#include "UserInputOutput.hpp"
-#include "glm/vec3.hpp"
 #include "Level.hpp"
+#include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "UserInput/UserInputOutput.hpp"
 
 class LatticeBoltzmannInput {
 public:

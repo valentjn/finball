@@ -58,4 +58,4 @@ public:
     }
 };
 
-#endif /* LOG_HPP_ */
+#endif

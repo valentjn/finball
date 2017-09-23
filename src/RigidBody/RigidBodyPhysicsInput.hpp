@@ -1,8 +1,8 @@
 #ifndef RIGID_BODY_PHYSICS_INPUT_HPP_
 #define RIGID_BODY_PHYSICS_INPUT_HPP_
 
-#include "LatticeBoltzmannOutput.hpp"
-#include "UserInputOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
+#include "UserInput/UserInputOutput.hpp"
 
 class RigidBodyPhysicsInput {
 public:

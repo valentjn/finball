@@ -2,7 +2,8 @@
 #define RENDER_OBJECT_HPP_
 
 #include <glm/glm.hpp>
-#include <renderer/Mesh.hpp>
+
+#include "Visualization/Mesh.hpp"
 
 struct RenderObject {
 	Mesh* mesh;
@@ -11,4 +12,4 @@ struct RenderObject {
 	float rotation;
 };
 
-#endif // RENDEROBJECT_HPP_
+#endif

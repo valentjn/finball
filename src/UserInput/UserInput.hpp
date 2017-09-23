@@ -1,10 +1,11 @@
 #ifndef USER_INPUT_HPP_
 #define USER_INPUT_HPP_
 
-#include <SDL2/SDL.h>
 #include <chrono>
 
-#include "UserInputOutput.hpp"
+#include <SDL2/SDL.h>
+
+#include "UserInput/UserInputOutput.hpp"
 
 class UserInput {
 public:
@@ -18,7 +19,8 @@ public:
                 break;
             }
         }
-		auto time_p = std::chrono::high_resolution_clock::now();
+
+        auto time_p = std::chrono::high_resolution_clock::now();
         long t = std::chrono::duration_cast<std::chrono::milliseconds>(time_p.time_since_epoch()).count();
         long steps = 1000;
 
@@ -31,13 +33,13 @@ public:
         userInputOutput.rightVelocity[0] = -6.282/(steps/1000.0);
         userInputOutput.leftVelocity[1] = 6.282/(steps/1000.0);
         userInputOutput.rightVelocity[1] = -6.282/(steps/1000.0);
-		
-		userInputOutput.playerIsTracked[0] = true;
-		userInputOutput.playerIsTracked[1] = true;
-		userInputOutput.playerIsCalibrated[0] = true;
-		userInputOutput.playerIsCalibrated[1] = true;
-		userInputOutput.playerIsCalibrating[0] = false;
-		userInputOutput.playerIsCalibrating[1] = false;
+
+        userInputOutput.playerIsTracked[0] = true;
+        userInputOutput.playerIsTracked[1] = true;
+        userInputOutput.playerIsCalibrated[0] = true;
+        userInputOutput.playerIsCalibrated[1] = true;
+        userInputOutput.playerIsCalibrating[0] = false;
+        userInputOutput.playerIsCalibrating[1] = false;
 
         userInputOutput.start = true;
     }

@@ -1,9 +1,9 @@
 #ifndef GAME_LOGIC_INPUT_HPP_
 #define GAME_LOGIC_INPUT_HPP_
 
-#include "LatticeBoltzmannOutput.hpp"
-#include "RigidBodyPhysicsOutput.hpp"
-#include "UserInputOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
+#include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "UserInput/UserInputOutput.hpp"
 
 class GameLogicInput {
 public:

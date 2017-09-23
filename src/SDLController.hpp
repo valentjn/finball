@@ -2,6 +2,7 @@
 #define SDL_CONTROLLER_HPP_
 
 #include <glm/glm.hpp>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -52,16 +53,12 @@ public:
         SDL_FreeSurface(icon_surface);
     }
 
-    SDL_Window *getWindow() {
-        return window;
-    }
+    SDL_Window *getWindow() { return window; }
 
-    glm::ivec2 &getResolution() {
-        return resolution;
-    }
+    glm::ivec2 &getResolution() { return resolution; }
 
     SDLController(SDLController const &) = delete;
-    void operator =(SDLController const &) = delete;
+    void operator=(SDLController const &) = delete;
 };
 
 #endif

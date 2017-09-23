@@ -216,5 +216,6 @@ void Renderer::render(const RenderObject &object, GLint model_location) const {
 		1,                      // matrix count
 		GL_FALSE,               // is not transposed
 		glm::value_ptr(model)); // data pointer
+	assert(object.mesh != nullptr);
 	object.mesh->render();
 }

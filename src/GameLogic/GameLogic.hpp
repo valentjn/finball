@@ -23,7 +23,8 @@ public:
     GameLogic() {
         testRenderObject.position = {0.f, 0.f, 0.f};
         testRenderObject.scale = 1.f;
-
+        // TODO: add proper mesh!
+        testRenderObject.mesh = nullptr;
         startTime = steady_clock::now();
         Log::debug("Haiscore clock started");
     }

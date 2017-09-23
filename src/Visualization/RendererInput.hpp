@@ -77,7 +77,7 @@ public:
         // handle lattice boltzmann output
         fluid_velocity = &latticeBoltzmannOutput.velocity;
         fluid_density = &latticeBoltzmannOutput.density;
-        /* test input */
+        /* test input
         static Array2D<glm::vec2> test_fluid_velocity;
         if (test_fluid_velocity == Array2D<glm::vec2>{}) {
             test_fluid_velocity = Array2D<glm::vec2>{ 42, 42 };
@@ -87,7 +87,7 @@ public:
                         static_cast<float>(i) / test_fluid_velocity.width(),
                         static_cast<float>(j) / test_fluid_velocity.height() };
         }
-        fluid_velocity = &test_fluid_velocity;
+        fluid_velocity = &test_fluid_velocity;*/
 
 
         Log::info("RendererInput: %d objects to render", world_objects.size());

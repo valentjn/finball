@@ -24,10 +24,13 @@ public:
         atexit(SDL_Quit);
 
         if (fullscreen) {
-            width = height = 0;
+            SDL_DisplayMode displayMode;
+            SDL_GetCurrentDisplayMode(0, &displayMode);
+            width = displayMode.w;
+            height = displayMode.h;
         }
         createWindow(width, height, title, fullscreen);
-        SDL_GetWindowSize(window, &width, &height);
+        SDL_GetWindowSize(window, &this->width, &this->height);
     }
 
     ~SDLWindow() {

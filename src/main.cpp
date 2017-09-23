@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<Level> level = menu.show();
 
     // run the game
-    GameController gameController;
-    gameController.startGame(window, *level);
+    GameController gameController(window, *level);
+    gameController.startGame();
 
     return 0;
 }

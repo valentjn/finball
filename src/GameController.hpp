@@ -14,6 +14,7 @@
 #include "RigidBody/RigidBodyPhysics.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "Timer.hpp"
 #include "UserInput/UserInput.hpp"
 #include "UserInput/UserInputOutput.hpp"
 #include "Visualization/Renderer.hpp"
@@ -22,36 +23,58 @@
 using namespace chrono;
 
 class GameController {
+
+private:
+    // Game components
+    GameLogic gameLogic;
+    UserInput userInput;
+    LatticeBoltzmann latticeBoltzmann;
+    RigidBodyPhysics rigidBodyPhysics;
+    Renderer renderer;
+
+    // Input objects
+    LatticeBoltzmannInput latticeBoltzmannInput;
+    RigidBodyPhysicsInput rigidBodyPhysicsInput;
+    GameLogicInput gameLogicInput;
+    RendererInput rendererInput;
+
+    // Output objects
+    UserInputOutput userInputOutput;
+    LatticeBoltzmannOutput latticeBoltzmannOutput;
+    RigidBodyPhysicsOutput rigidBodyPhysicsOutput;
+    GameLogicOutput gameLogicOutput;
+
+    // Mutex
+
 public:
-    void startGame(SDLWindow &window, Level &level) {
-        GameLogic gameLogic;
-        UserInput userInput;
-        LatticeBoltzmann latticeBoltzmann(level);
-        RigidBodyPhysics rigidBodyPhysics(level);
-        Renderer renderer(window);
+    GameController(SDLWindow &window, Level &level) :
+        latticeBoltzmann(level), rigidBodyPhysics(level), renderer(window),
+        latticeBoltzmannOutput(level), rigidBodyPhysicsOutput(level),
+        latticeBoltzmannInput(level) {}
 
-        UserInputOutput userInputOutput;
-        LatticeBoltzmannOutput latticeBoltzmannOutput(level);
-        RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
-        GameLogicOutput gameLogicOutput;
+    void startGame() {
+        Timer simulationTimer([this]() {
+            this->simulationStep();
+        });
+        simulationTimer.start(100);
 
-        LatticeBoltzmannInput latticeBoltzmannInput(level);
-        RigidBodyPhysicsInput rigidBodyPhysicsInput;
-        GameLogicInput gameLogicInput;
-        RendererInput rendererInput;
+        Timer visualizationTimer([this]() {
+            this->visualizationStep();
+        });
+        visualizationTimer.start(100);
 
         steady_clock::time_point lastFrame = steady_clock::now();
 
         while (gameLogicOutput.running) {
             // 1. get user input (kinect)
-            userInput.getInput(userInputOutput);
+            // userInput.getInput(userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
-            rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
-            rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
-
-            latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
-            latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
+            // rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+            // rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
+            //
+            // latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
+            // latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
             gameLogicInput =
                 GameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
@@ -69,6 +92,20 @@ public:
                 lastFrame = thisFrame;
             }
         }
+    }
+private:
+    void simulationStep() {
+        rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+        rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
+
+        latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
+        latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
+    }
+
+    void visualizationStep() {
+        rendererInput =
+            RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
+        renderer.update(rendererInput);
     }
 };
 

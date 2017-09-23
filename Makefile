@@ -2,6 +2,7 @@ CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
 COMMON_CFLAGS= -pedantic \
 		       -Wall \
 		       -Wextra \
+			   -pthread \
 		       -fmessage-length=0 \
 		       -Wno-unused-parameter \
 		       -fmessage-length=0 \

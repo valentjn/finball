@@ -2,6 +2,7 @@ build/
 data/ImageLog/
 .settings/
 haiscores.txt
+benchmark*.txt
 
 .project
 .cproject

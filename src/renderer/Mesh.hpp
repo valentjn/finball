@@ -22,6 +22,7 @@ public:
 	Mesh(const Mesh&) = delete;
 	Mesh& operator=(const Mesh&) = delete;
     void render() const;
+	bool operator==(const Mesh& other) const;
 };
 
 Mesh createRectangleMesh(float width, float height);

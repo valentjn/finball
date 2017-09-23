@@ -106,3 +106,8 @@ Mesh createCircleMesh(float radius)
 	return Mesh(vertices);
 }
 
+bool Mesh::operator==(const Mesh& other) const
+{
+	return m_vao == other.m_vao;
+}
+

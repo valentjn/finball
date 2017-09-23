@@ -2,6 +2,7 @@
 #define RENDERER_INPUT_HPP_
 
 #include <vector>
+#include <unordered_map>
 
 #include <GameLogicOutput.hpp>
 #include <LatticeBoltzmannOutput.hpp>
@@ -11,9 +12,7 @@
 #include <renderer/Mesh.hpp>
 
 class RendererInput {
-    static Mesh m_rectangle;
-    static Mesh m_circle;
-    static bool m_meshes_initialized;
+    std::unordered_map<int, Mesh> m_rigid_body_meshes;
 
 public:
     std::vector<RenderObject> world_objects;
@@ -26,11 +25,6 @@ public:
     RendererInput(const GameLogicOutput &gameLogicOutput,
                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
                   const LatticeBoltzmannOutput &latticeBoltzmannOutput) {
-        if (!m_meshes_initialized) {
-            m_rectangle = createRectangleMesh(2.f, 2.f);
-            m_circle = createCircleMesh(1.f);
-        }
-
         // handle game logic output
         world_objects.insert(world_objects.end(), gameLogicOutput.objectsToRender.begin(),
                              gameLogicOutput.objectsToRender.end());
@@ -40,7 +34,9 @@ public:
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody.position, 0);
             renderObject.scale = rigidBody.radius;
-            renderObject.mesh = &m_circle;
+            renderObject.mesh = &m_rigid_body_meshes[rigidBody.id];
+            if (*renderObject.mesh == Mesh{})
+                *renderObject.mesh = createCircleMesh(1.f);
             /*switch (typeid(rigidBody)) {
             case typeid(RigidRectangle):
                 const RigidRectangle& rect = static_cast<RigidRectangle>(rigidBody);

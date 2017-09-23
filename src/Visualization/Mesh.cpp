@@ -107,6 +107,12 @@ Mesh createCircleMesh(float radius)
 	return Mesh(vertices);
 }
 
+Mesh createFluidMesh(float width, float height)
+{
+    // TODO: render fluid texture on top
+    return createRectangleMesh(width, height);   
+}
+
 bool Mesh::operator==(const Mesh& other) const
 {
 	return m_vao == other.m_vao;

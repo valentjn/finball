@@ -15,18 +15,20 @@ using namespace std::chrono;
 
 class GameLogic {
 private:
-    RenderObject testRenderObject;
+    Mesh fluid_mesh;
+    RenderObject fluid_surface;
 
     steady_clock::time_point startTime;
 
 public:
     GameLogic() {
-        testRenderObject.position = {0.f, 0.f, 0.f};
-        testRenderObject.scale = 1.f;
+        fluid_surface.position = {8.f, 8.f, 0.f};
+        fluid_surface.scale = 1.f;
         // TODO: add proper mesh!
-        testRenderObject.mesh = nullptr;
+        fluid_mesh = createFluidMesh(16.f, 16.f);
+        fluid_surface.mesh = &fluid_mesh;
         startTime = steady_clock::now();
-        Log::debug("Haiscore clock started");
+        Log::debug("Haiscore clock started ;-)");
     }
 
     void update(const GameLogicInput &input, GameLogicOutput &output) {
@@ -40,7 +42,7 @@ public:
         }
 
         if (output.objectsToRender.empty()) {
-            output.objectsToRender.push_back(testRenderObject);
+            output.objectsToRender.push_back(fluid_surface);
         }
     }
 

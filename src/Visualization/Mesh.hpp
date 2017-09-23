@@ -28,5 +28,6 @@ public:
 
 Mesh createRectangleMesh(float width, float height);
 Mesh createCircleMesh(float radius);
+Mesh createFluidMesh(float width, float height);
 
 #endif // MESH_HPP_

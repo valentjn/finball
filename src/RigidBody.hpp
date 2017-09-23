@@ -13,6 +13,7 @@ struct RigidBody {
     RigidBody(glm::vec2 pos, bool isFixed) : position(pos), isFixed(isFixed) {}
     RigidBody(float x, float y, bool isFixed) : RigidBody(glm::vec2(x, y), isFixed) {}
     RigidBody(float x, float y) : RigidBody(x, y, true) {}
+    virtual ~RigidBody() {}
 };
 
 #endif // RIGID_BODY_HPP_

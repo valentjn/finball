@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
 
     // create SDL Controller
     SDLWindow window(800, 600, "Finball", parameters.fullscreen);
+    window.setIcon("data/haicon.png");
 
     // show main menu and obtain level from it
     MainMenu menu(window);

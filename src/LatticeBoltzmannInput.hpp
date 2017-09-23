@@ -17,7 +17,10 @@ public:
     // input flag matrix
     std::unique_ptr<Array2D<Level::CellType>> flagfield = nullptr;
 
-    LatticeBoltzmannInput() {}
+    LatticeBoltzmannInput(Level &level) {
+        velocities = std::make_unique<Array2D<glm::vec2>>(level.width, level.height);
+        flagfield = std::make_unique<Array2D<Level::CellType>>(level.width, level.height);
+    }
 
     LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
                           const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {

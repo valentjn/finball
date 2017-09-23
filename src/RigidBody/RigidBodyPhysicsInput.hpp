@@ -22,11 +22,6 @@ public:
 						  cx(latticeBoltzmannOutput.cx),
 						  cy(latticeBoltzmannOutput.cy) {}
 
-	void computeImpulseAt(const glm::vec2& pos, glm::vec2& impulse) {
-		impulse.x = pos.x/2.0;
-		impulse.y = pos.y/2.0;
-	}
-
 	void computeImpulseAt(const int posX, const int posY, glm::vec2& impulse) {
 		impulse = glm::vec2(0.0,0.0);
 		for (int i = 0; i < 9; ++i)

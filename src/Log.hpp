@@ -13,7 +13,7 @@ public:
     static LogLevel logLevel;
 
 private:
-    static const string LOG_NAMES[];
+    static const char *LOG_NAMES[];
 
     static FILE *getOutStream(LogLevel logLevel) {
         switch (logLevel) {
@@ -27,7 +27,7 @@ private:
     static void log(string message, LogLevel logLevel, va_list format_args) {
         if (Log::logLevel >= logLevel) {
             FILE *stream = getOutStream(logLevel);
-            fprintf(stream, "%s:\t", LOG_NAMES[logLevel].c_str());
+            fprintf(stream, "%-11s", LOG_NAMES[logLevel]);
             vfprintf(stream, message.c_str(), format_args);
             fprintf(stream, "\n");
         }

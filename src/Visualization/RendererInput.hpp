@@ -39,8 +39,7 @@ public:
 
         for (auto& gameLogicObject : world_objects){
         	if(gameLogicObject.mesh == nullptr){
-				Log::error(
-						"Error: a game_logic object does not have a render mesh, rendering as circle");
+				Log::warn("A game_logic object does not have a render mesh, rendering as circle");
 				gameLogicObject.mesh = &dummyUIMesh;
         	}
         }

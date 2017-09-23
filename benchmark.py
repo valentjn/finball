@@ -22,7 +22,8 @@ def analyse(file_path):
     for i in range(9):
         print("{}:\t\t{:.1f}\t\t{:.1%}".format(NAMES[i], time[i], percent[i]/n))
 
-for i in range(1,8):
-    print("=====", i, "=====")
-    analyse("benchmark{}.txt".format(i))
-    print("\n\n")
+analyse("benchmark.txt")
+# for i in range(1,8):
+#     print("=====", i, "=====")
+#     analyse("benchmark{}.txt".format(i))
+#     print("\n\n")

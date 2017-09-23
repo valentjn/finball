@@ -4,7 +4,7 @@
 #include "Log.hpp"
 #include "MainMenu.hpp"
 #include "Parameters.hpp"
-#include "SDLController.hpp"
+#include "SDL/SDLWindow.hpp"
 
 int main(int argc, char *argv[]) {
 
@@ -15,15 +15,15 @@ int main(int argc, char *argv[]) {
     Log::setLogLevel(parameters.verbosityLevel);
 
     // create SDL Controller
-    SDLController::getInstance().startSDL();
+    SDLWindow window(800, 600, "Finball", parameters.fullscreen);
 
     // show main menu and obtain level from it
-    MainMenu menu;
+    MainMenu menu(window);
     std::unique_ptr<Level> level = menu.show();
 
     // run the game
     GameController gameController;
-    gameController.startGame(*level);
+    gameController.startGame(window, *level);
 
     return 0;
 }

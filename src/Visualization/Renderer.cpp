@@ -10,7 +10,7 @@
 
 #include "Log.hpp"
 #include "Level.hpp"
-#include "SDLController.hpp"
+#include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
 
 // Compiles a shader
@@ -67,9 +67,9 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // TODO: dynamically set camera positon depending on level size
-Renderer::Renderer() : m_camera_pos(32.f, 32.f, 100.f) {
-    m_window = SDLController::getInstance().getWindow();
-    m_resolution = SDLController::getInstance().getResolution();
+Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
+    m_window = window.getWindow();
+    m_resolution = glm::ivec2(window.getWidth(), window.getHeight());
 
     // initialize OpenGL
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

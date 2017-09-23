@@ -12,6 +12,7 @@
 #include "Visualization/Mesh.hpp"
 #include "Visualization/RenderObject.hpp"
 #include "Visualization/RendererInput.hpp"
+#include "SDL/SDLWindow.hpp"
 
 class Renderer {
 private:
@@ -40,7 +41,7 @@ private:
 public:
     void update(const RendererInput &input);
 
-    Renderer();
+    Renderer(const SDLWindow &window);
     ~Renderer();
     Renderer(const Renderer &obj) = delete;
     Renderer &operator=(const Renderer &other) = delete;

@@ -16,7 +16,7 @@ using namespace std;
 using namespace std::chrono;
 
 // initialization of user input facilities
-UserInput::UserInput(Parameters &parameters) : parameters(parameters) {
+UserInput::UserInput() {
 
 #ifndef WITHOUT_KINECT_LIBRARIES
     // init kinect context etc

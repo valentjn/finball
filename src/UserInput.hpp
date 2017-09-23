@@ -22,7 +22,6 @@ using user_id_t = unsigned long;
 
 class UserInput {
 private:
-    Parameters &parameters;
 #ifndef WITHOUT_KINECT_LIBRARIES
     std::unique_ptr<xn::Context> context;
     std::unique_ptr<xn::UserGenerator> userGenerator;
@@ -38,7 +37,7 @@ private:
 #endif
 
 public:
-    UserInput(Parameters &parameters);
+    UserInput();
     ~UserInput();
 
     void getInput(UserInputOutput &userInputOutput);

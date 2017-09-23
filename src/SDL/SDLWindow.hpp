@@ -70,6 +70,7 @@ private:
 
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+            width = height = 0;
         }
 
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

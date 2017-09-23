@@ -12,10 +12,12 @@ class Parameters {
 public:
     int verbosityLevel = 0;
     bool fullscreen = false;
+    int windowWidth = 800;
+    int windowHeight = 600;
 
     Parameters(int argc, char *const argv[]) {
         int optchar;
-        const char *options = "v:f";
+        const char *options = "v:f:w:h:";
 
         while ((optchar = getopt(argc, argv, options)) > 0) {
             switch (optchar) {
@@ -25,6 +27,14 @@ public:
 
             case 'f':
                 fullscreen = true;
+                break;
+
+            case 'w':
+                windowWidth = atoi(optarg);
+                break;
+
+            case 'h':
+                windowHeight = atoi(optarg);
                 break;
 
             default:

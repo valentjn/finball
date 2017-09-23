@@ -70,7 +70,7 @@ void main() {
 	
 
     vec2 normalized_coords = gl_FragCoord.xy / textureSize(tex_vecs, 0);
-    vec4 velocity = texture(tex_vecs, normalized_coords);
+    vec4 velocity = texture(tex_vecs, normalized_coords).xxyy;
     out_color = lic();   // run lic; note the return value is of type vec4/RGBA
     out_color = velocity * 0.5 + 0.5;
 }

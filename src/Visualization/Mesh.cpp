@@ -7,8 +7,6 @@
 
 #include "Visualization/Mesh.hpp"
 
-Mesh::Mesh() : m_vao(0), m_vbo(0), m_vertex_count(0) {}
-
 Mesh::Mesh(const std::vector<Vertex>& vertices)
 {
     m_vertex_count = static_cast<decltype(m_vertex_count)>(vertices.size());
@@ -43,28 +41,6 @@ Mesh::~Mesh()
     glDeleteVertexArrays(1, &m_vao);
 }
 
-Mesh::Mesh(Mesh&& other)
-	: m_vao(other.m_vao)
-	, m_vbo(other.m_vbo)
-	, m_vertex_count(other.m_vertex_count)
-{
-	other.m_vao = 0;
-	other.m_vbo = 0;
-	other.m_vertex_count = 0;
-}
-
-Mesh& Mesh::operator=(Mesh&& other)
-{
-	Mesh(std::move(*this));
-	m_vao = other.m_vao;
-	m_vbo = other.m_vbo;
-	m_vertex_count = other.m_vertex_count;
-	other.m_vao = 0;
-	other.m_vbo = 0;
-	other.m_vertex_count = 0;
-	return *this;
-}
-
 void Mesh::render() const
 {
     glBindVertexArray(m_vao);
@@ -72,17 +48,17 @@ void Mesh::render() const
     glBindVertexArray(0);
 }
 
-Mesh createRectangleMesh(float width, float height)
+std::unique_ptr<Mesh> createRectangleMesh(float width, float height)
 {
 	glm::vec3 bl{ -0.5f * width, -0.5f * height, 0.0f };
 	glm::vec3 tl{ -0.5f * width, 0.5f * height, 0.0f };
 	glm::vec3 br{ 0.5f * width, -0.5f * height, 0.0f };
 	glm::vec3 tr{ 0.5f * width, 0.5f * height, 0.0f };
 	std::vector<Vertex> vertices{ {bl}, {br}, {tr}, {bl}, {tr}, {tl} };
-	return Mesh(vertices);
+	return std::make_unique<Mesh>(vertices);
 }
 
-Mesh createCircleMesh(float radius)
+std::unique_ptr<Mesh> createCircleMesh(float radius)
 {
 	std::vector<Vertex> vertices;
     glm::vec3 center{0, 0, 0};
@@ -104,16 +80,16 @@ Mesh createCircleMesh(float radius)
         vertices.push_back({p3});
     }
 
-	return Mesh(vertices);
+	return std::make_unique<Mesh>(vertices);
 }
 
-Mesh createFluidMesh(float width, float height)
+std::unique_ptr<Mesh> createFluidMesh(float width, float height)
 {
     // TODO: render fluid texture on top
     return createRectangleMesh(width, height);  
 } 
 
-Mesh createArrowMesh(float scale) {
+std::unique_ptr<Mesh> createArrowMesh(float scale) {
     std::vector<Vertex> vertices {
             {{  0.25f * scale,  0.25f * scale, 0.0f }},
             {{  0.5f  * scale,  0.0f  * scale, 0.0f }},
@@ -128,7 +104,7 @@ Mesh createArrowMesh(float scale) {
             {{ -0.5f  * scale, -0.15f * scale, 0.0f }}
     };
 
-    return Mesh(vertices);
+    return std::make_unique<Mesh>(vertices);
 }
 
 bool Mesh::operator==(const Mesh& other) const

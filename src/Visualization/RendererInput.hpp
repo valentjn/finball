@@ -12,8 +12,8 @@
 #include "Visualization/Mesh.hpp"
 
 class RendererInput {
-    std::unordered_map<int, Mesh> m_rigid_body_meshes;
-    Mesh dummyUIMesh;
+    std::unordered_map<int, std::unique_ptr<Mesh>> m_rigid_body_meshes;
+    std::unique_ptr<Mesh> dummyUIMesh;
 
 public:
     std::vector<RenderObject> world_objects;
@@ -38,9 +38,9 @@ public:
                              gameLogicOutput.objectsToRender.end());
 
         for (auto& gameLogicObject : world_objects){
-        	if(gameLogicObject.mesh == nullptr){
+        	if(!gameLogicObject.mesh){
 				Log::warn("A game_logic object does not have a render mesh, rendering as circle");
-				gameLogicObject.mesh = &dummyUIMesh;
+				gameLogicObject.mesh = dummyUIMesh.get();
         	}
         }
 
@@ -48,8 +48,8 @@ public:
 
         // handle rigid body physics output
 		for (const RigidBody& rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
-            Mesh& mesh = m_rigid_body_meshes[rigidBody.id];
-            if (mesh == Mesh{}) { // check if the mesh wasn't already in the map
+            auto& mesh = m_rigid_body_meshes[rigidBody.id];
+            if (!mesh) { // check if the mesh wasn't already in the map
 				Log::info(
                     "WARNING: rigid body with id %d does not have a render mesh, rendering as circle",
                     rigidBody.id);
@@ -59,7 +59,7 @@ public:
             renderObject.position = glm::vec3(rigidBody.position, 0);
             renderObject.scale = rigidBody.radius;
 			assert(m_rigid_body_meshes.count(rigidBody.id)!=0);
-			renderObject.mesh = &mesh;
+			renderObject.mesh = mesh.get();
 
             /*switch (typeid(rigidBody)) {
             case typeid(RigidRectangle):

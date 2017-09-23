@@ -38,8 +38,7 @@ private:
 
     const Array2D<glm::vec3> *m_fluid_vecs;
 
-	// WIP
-	Mesh m_full_quad;
+	std::unique_ptr<Mesh> m_full_quad;
 
     void render(const RenderObject &object, GLint model_location) const;
 

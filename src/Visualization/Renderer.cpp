@@ -184,7 +184,7 @@ void Renderer::update(const RendererInput &input) {
     glBindTexture(GL_TEXTURE_2D, m_tex_noise);
 
     // render fluid
-	m_full_quad.render();
+	m_full_quad->render();
 
     // setup for rendering the world objects
     glViewport(0, 0, m_resolution.x, m_resolution.y);

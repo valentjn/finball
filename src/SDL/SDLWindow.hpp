@@ -22,9 +22,11 @@ public:
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         atexit(SDL_Quit);
-        createWindow(width, height, title, fullscreen);
 
+        createWindow(width, height, title, fullscreen);
         SDL_GetWindowSize(window, &this->width, &this->height);
+
+        Log::info("Window size is %d x %d", this->width, this->height);
     }
 
     ~SDLWindow() {

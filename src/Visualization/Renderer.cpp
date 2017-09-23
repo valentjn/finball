@@ -109,8 +109,13 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
 
     // create the texture for the velocities of the fluid
     glGenTextures(1, &m_tex_fluid);
+    glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // create the noise texture
     glGenTextures(1, &m_tex_noise);
-    std::vector<float> noise(m_resolution.x * m_resolution.y * 4);
+    std::vector<float> noise(m_resolution.x * m_resolution.y);
     std::default_random_engine engine;
     std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
     for (float& val : noise) {
@@ -119,11 +124,11 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
     glBindTexture(GL_TEXTURE_2D, m_tex_noise);
     glTexImage2D(GL_TEXTURE_2D,
 	    0,
-	    4,
+	    GL_RGBA,
 	    m_resolution.x,
 	    m_resolution.y,
 	    0,
-	    GL_RGBA,
+	    GL_LUMINANCE,
 	    GL_FLOAT,
 	    noise.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -150,22 +155,15 @@ void Renderer::update(const RendererInput &input) {
     // bind & fill velocities texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
-    std::cout << glGetError() << '\n';
     glTexImage2D(GL_TEXTURE_2D,
                  0,                                // mipmap level
-                 2,                                // internal format
-                 100,                              // width
-                 100,                              // height
+                 GL_RGBA,                                // internal format
+                 42,                              // width
+                 21,                              // height
                  0,                                // must be 0, according to khronos.org
                  GL_RG,                            // data format
                  GL_FLOAT,                         // data format
                  input.fluid_velocity->getData()); // data pointer
-    std::cout << glGetError() << '\n';
-    for (int i = 0; i < input.fluid_velocity->width(); ++i) {
-        for (int j = 0; j < input.fluid_velocity->height(); ++j) {
-    //        std::cout << input.fluid_velocity->value(i,j).x << '\n' << input.fluid_velocity->value(i,j).y << '\n';
-        }
-    }
 
     // bind noise texture
     glActiveTexture(GL_TEXTURE1);

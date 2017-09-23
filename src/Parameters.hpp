@@ -17,7 +17,7 @@ public:
 
     Parameters(int argc, char *const argv[]) {
         int optchar;
-        const char *options = "v:f:w:h:";
+        const char *options = "v:fw:h:";
 
         while ((optchar = getopt(argc, argv, options)) > 0) {
             switch (optchar) {

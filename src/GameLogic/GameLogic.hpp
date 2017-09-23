@@ -43,17 +43,6 @@ public:
             output.objectsToRender.push_back(testRenderObject);
         }
     }
-
-private:
-    void saveHighscore(float highscore) {
-        fstream file;
-        file.open("build/haiscores.txt", fstream::out | fstream::app);
-        if (file.is_open()) {
-            file << highscore << "\n";
-        } else {
-            Log::error("Failed to save Haiscore");
-        }
-    }
 };
 
 #endif

@@ -110,7 +110,25 @@ Mesh createCircleMesh(float radius)
 Mesh createFluidMesh(float width, float height)
 {
     // TODO: render fluid texture on top
-    return createRectangleMesh(width, height);   
+    return createRectangleMesh(width, height);  
+} 
+
+Mesh createArrowMesh(float scale) {
+    std::vector<Vertex> vertices {
+            {{  0.25f * scale,  0.25f * scale, 0.0f }},
+            {{  0.5f  * scale,  0.0f  * scale, 0.0f }},
+            {{  0.25f * scale, -0.25f * scale, 0.0f }},
+
+            {{ -0.5f  * scale,  0.15f * scale, 0.0f }},
+            {{  0.25f * scale,  0.15f * scale, 0.0f }},
+            {{  0.25f * scale, -0.15f * scale, 0.0f }},
+
+            {{ -0.5f  * scale,  0.15f * scale, 0.0f }},
+            {{  0.25f * scale, -0.15f * scale, 0.0f }},
+            {{ -0.5f  * scale, -0.15f * scale, 0.0f }}
+    };
+
+    return Mesh(vertices);
 }
 
 bool Mesh::operator==(const Mesh& other) const

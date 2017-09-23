@@ -56,6 +56,17 @@ public:
     int height() const { return m_height; }
 
     const T *getData() const { return m_data.data(); }
+
+    bool operator==(const Array2D<T>& other) const
+    {
+        if (m_width != other.m_width || m_height != other.m_height)
+            return false;
+        for (int i = 0; i < m_width; ++i)
+            for (int j = 0; j < m_height; ++j)
+                if (value(i,j) != other.value(i,j))
+                    return false;
+        return true;
+    }
 };
 
 #endif /* ARRAY2D_HPP_ */

@@ -107,28 +107,33 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
     // create a rectangle mesh so that we have some dummy to render (WIP)
 	m_full_quad = createRectangleMesh(2.f, 2.f);
 
-	// create the texture for the velocities of the fluid
-	glGenTextures(1, &m_tex_fluid);
-	glGenTextures(1, &m_tex_noise);
-	std::vector<float> noise(m_resolution.x * m_resolution.y * 4);
-	std::default_random_engine engine;
-	std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
-	for (float& val : noise) {
-		val = dist(engine);
-	}
-	glBindTexture(GL_TEXTURE_2D, m_tex_noise);
-	glTexImage2D(GL_TEXTURE_2D,
-		0,
-		GL_RGBA,
-		m_resolution.x,
-		m_resolution.y,
-		0,
-		GL_RGBA,
-		GL_FLOAT,
-		noise.data());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
+    // create the texture for the velocities of the fluid
+    glGenTextures(1, &m_tex_fluid);
+    glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // create the noise texture
+    glGenTextures(1, &m_tex_noise);
+    std::vector<float> noise(m_resolution.x * m_resolution.y);
+    std::default_random_engine engine;
+    std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
+    for (float& val : noise) {
+	    val = dist(engine);
+    }
+    glBindTexture(GL_TEXTURE_2D, m_tex_noise);
+    glTexImage2D(GL_TEXTURE_2D,
+	    0,
+	    GL_RGBA,
+	    m_resolution.x,
+	    m_resolution.y,
+	    0,
+	    GL_LUMINANCE,
+	    GL_FLOAT,
+	    noise.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Renderer::~Renderer() {
@@ -152,9 +157,9 @@ void Renderer::update(const RendererInput &input) {
     glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
     glTexImage2D(GL_TEXTURE_2D,
                  0,                                // mipmap level
-                 GL_RG,                            // internal format
-                 100,                              // width
-                 100,                              // height
+                 GL_RGBA,                                // internal format
+                 42,                              // width
+                 21,                              // height
                  0,                                // must be 0, according to khronos.org
                  GL_RG,                            // data format
                  GL_FLOAT,                         // data format

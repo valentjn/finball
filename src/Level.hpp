@@ -8,7 +8,7 @@
 
 #include "Array2D.hpp"
 #include "Log.hpp"
-#include "RigidBody.hpp"
+#include "RigidBody/RigidBody.hpp"
 
 using namespace std;
 

@@ -21,7 +21,7 @@ public:
         handle_error(TTF_Init() != 0, "Failed to initialize TTF", TTF_GetError());
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-
+        atexit(SDL_Quit);
         create_window(title, fullscreen);
     }
 

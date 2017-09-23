@@ -101,9 +101,6 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
     m_shader_program_fluid =
         createProgram("src/Visualization/glsl/fluid_vert.glsl", "src/Visualization/glsl/fluid_frag.glsl");
 
-    // full window viewport
-    glViewport(0, 0, m_resolution.x, m_resolution.y);
-
     // create a rectangle mesh so that we have some dummy to render (WIP)
 	m_full_quad = createRectangleMesh(2.f, 2.f);
 
@@ -125,14 +122,29 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
     glTexImage2D(GL_TEXTURE_2D,
 	    0,
 	    GL_RGBA,
-	    m_resolution.x,
-	    m_resolution.y,
+	    m_fluid_width,
+	    m_fluid_height,
 	    0,
 	    GL_LUMINANCE,
 	    GL_FLOAT,
 	    noise.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // create lic output texture
+    glGenTextures(1, &m_tex_fluid_output);
+    glBindTexture(GL_TEXTURE_2D, m_tex_fluid_output);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fluid_height, m_fluid_width, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glGenFramebuffers(1, &m_framebuffer_fluid_output);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_tex_fluid_output, 0);
+    GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &draw_buffer);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        Log::error("Failed to create framebuffer for fluid visualization.");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -146,13 +158,15 @@ void Renderer::update(const RendererInput &input) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // setup for the rendering of the fluid
+    glViewport(0, 0, m_fluid_width, m_fluid_height);
     glUseProgram(m_shader_program_fluid);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
+
+    // bind & fill velocities texture
     auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
     glUniform1i(loc, 0);
     loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
     glUniform1i(loc, 1);
-
-    // bind & fill velocities texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
     glTexImage2D(GL_TEXTURE_2D,
@@ -173,6 +187,8 @@ void Renderer::update(const RendererInput &input) {
 	m_full_quad.render();
 
     // setup for rendering the world objects
+    glViewport(0, 0, m_resolution.x, m_resolution.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(m_shader_program_world);
 
     // update view matrix in shader_program_world

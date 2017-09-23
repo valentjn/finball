@@ -16,6 +16,9 @@
 
 class Renderer {
 private:
+    constexpr static int m_fluid_width = 256;
+    constexpr static int m_fluid_height = 256;
+
     std::vector<RenderObject> m_world_objects;
     std::vector<RenderObject> m_ui_objects;
 
@@ -24,6 +27,8 @@ private:
     GLuint m_shader_program_fluid;
     GLuint m_tex_fluid;
     GLuint m_tex_noise;
+    GLuint m_tex_fluid_output;
+    GLuint m_framebuffer_fluid_output;
 
     glm::ivec2 m_resolution;
     SDL_Window *m_window;

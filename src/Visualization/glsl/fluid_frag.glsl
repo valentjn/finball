@@ -7,10 +7,9 @@ uniform sampler2D tex_noise; // noise texture
 const int STEPS=10; // The number of adjacent locations in one direction to use for smearing
 
 // perfrom line integral convolution
-float lic(vec2 normalized_coords) {  
-	const float STEPSIZE = 0.01; // Stepsize to access adjacent texture sample
+float lic(vec2 normalized_coords) {
+	vec2 texel_size = 10.0 / textureSize(tex_noise, 0);
 
-	//vec2 init_coords = (2.0*coords)-vec2(1.0,1.0); // inital x,y coordinate, shift domain from (0,1) domain to (-1,1)
 	vec2 v; // the vector field's x and y components
 	vec2 step_coords; // current step x,y coordinate
 	vec4 texture_value = vec4(0.0,0.0,0.0,0.0); // color value at the particular texture coordinate vec4/RGBA
@@ -20,15 +19,14 @@ float lic(vec2 normalized_coords) {
 	step_coords = normalized_coords;
 	
 	// step FORWARD along the vector field
-	for(int i=0; i<STEPS; i++) {
+	for(int i=0; i < STEPS; i++) {
 		v = texture(tex_vecs, normalized_coords).xy;
 
 		// use Euler's Method. Get the next approximate point along the curve
-		step_coords += STEPSIZE * v;
+		step_coords += v * texel_size;
 
 		// get the texture value at that point
-		texture_value = texture2D(tex_noise, step_coords); // color value at the particular texture coordinate vec4/RGBA
-		running_total += texture_value[2]; // It is a grayscale texture, so just use R in RGBA
+		running_total += texture(tex_noise, step_coords).x;
 	}
 
 	// resart at this fragment's location
@@ -39,11 +37,10 @@ float lic(vec2 normalized_coords) {
 		v = texture(tex_vecs, normalized_coords).xy;
 
 		// use Euler's Method. Get the next approximate point along the curve
-		step_coords -= STEPSIZE * v;
+		step_coords -= v * texel_size;
 
 		// get the texture value at that point
-		texture_value = texture2D(tex_noise, step_coords); // color value at the particular texture coordinate vec4/RGBA
-		running_total += texture_value[0]; // It is a grayscale texture, so just use R in RGBA
+		running_total += texture(tex_noise, step_coords).x;
 	}
 
 	// average grayscale value of all samples along the curve, this is the final value for this pixel

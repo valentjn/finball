@@ -28,6 +28,8 @@ public:
     LatticeBoltzmannOutput(Level &level) {
         velocity = Array2D<glm::vec2>(level.width, level.height);
         density = Array2D<float>(level.width, level.height);
+        prestream = Array2D<FICell>(level.width, level.height);
+        afterstream = Array2D<FICell>(level.width, level.height);
     }
 };
 

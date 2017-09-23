@@ -24,8 +24,12 @@ private:
 
 public:
     MainMenu(const SDLWindow &window) : window(window), renderer(window) {
-        headerFont = renderer.loadFont("data/OpenSans-Regular.ttf", 70);
-        defaultFont = renderer.loadFont("data/OpenSans-Regular.ttf", 30);
+        int windowHeight = window.getHeight();
+        int headerFontSize = windowHeight * 0.12;
+        int defaultFontSize = windowHeight * 0.05;
+
+        headerFont = renderer.loadFont("data/OpenSans-Regular.ttf", headerFontSize);
+        defaultFont = renderer.loadFont("data/OpenSans-Regular.ttf", defaultFontSize);
 
         colorLight = {255, 255, 255, 0};
         colorDark = {50, 50, 50, 0};

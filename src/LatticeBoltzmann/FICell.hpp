@@ -8,6 +8,11 @@ struct FICell {
         assert(index >= 0 && index < 9);
         return components[index];
     }
+
+	const float &operator[](int index) const {
+        assert(index >= 0 && index < 9);
+        return components[index];
+    }
 };
 
 #endif

@@ -15,7 +15,8 @@ int main(int argc, char *argv[]) {
     Log::setLogLevel(parameters.verbosityLevel);
 
     // create SDL Controller
-    SDLWindow window(800, 600, "Finball", parameters.fullscreen);
+    SDLWindow window(parameters.windowWidth, parameters.windowHeight,
+                     "Finball", parameters.fullscreen);
     window.setIcon("data/haicon.png");
 
     // show main menu and obtain level from it

@@ -15,10 +15,12 @@ class SDLRenderer {
 private:
     SDL_Renderer *renderer;
     std::vector<TTF_Font *> fonts;
+    int windowWidth;
 
 public:
     SDLRenderer(const SDLWindow &window) {
         renderer = SDL_CreateRenderer(window.getWindow(), -1, SDL_RENDERER_ACCELERATED);
+        windowWidth = window.getWidth();
     }
 
     ~SDLRenderer() {
@@ -44,7 +46,7 @@ public:
     }
 
     void addText(std::string text, int x, int y, TTF_Font *font, SDL_Color color, bool center) {
-        SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, 1000);
+        SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, windowWidth);
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
 

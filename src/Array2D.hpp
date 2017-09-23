@@ -10,20 +10,15 @@ private:
     std::vector<T> m_data;
 
 public:
-    Array2D(int width, int height)
-        : m_width(width)
-        , m_height(height)
-        , m_data(width * height)      
-    {}
+    Array2D() : m_width(width), m_height(height) {}
+    Array2D(int width, int height) : m_width(width), m_height(height), m_data(width * height) {}
 
-    void loadData(void* data)
-    {
-        T* t_data = static_cast<T*>(data);
+    void loadData(void *data) {
+        T *t_data = static_cast<T *>(data);
         std::copy(t_data, t_data + m_data.size(), m_data.begin());
     }
 
-    T& value(int x, int y)
-    {
+    T &value(int x, int y) {
         assert(x >= 0);
         assert(y >= 0);
         assert(x < m_width);
@@ -31,8 +26,7 @@ public:
         return m_data[y * m_width + x];
     }
 
-    const T& value(int x, int y) const
-    {
+    const T &value(int x, int y) const {
         assert(x >= 0);
         assert(y >= 0);
         assert(x < m_width);
@@ -43,7 +37,7 @@ public:
     int width() const { return m_width; }
     int height() const { return m_height; }
 
-    const T* getData() { return m_data.data(); }
+    const T *getData() { return m_data.data(); }
 };
 
 #endif /* ARRAY2D_HPP_ */

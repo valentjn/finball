@@ -2,7 +2,6 @@
 #define GAME_CONTROLLER_HPP_
 
 #include "Level.hpp"
-#include "Parameters.hpp"
 
 #include "GameLogic.hpp"
 #include "GameLogicInput.hpp"
@@ -20,18 +19,13 @@
 #include "renderer/RendererInput.hpp"
 
 class GameController {
-private:
-    Parameters &parameters;
-
 public:
-    GameController(Parameters &parameters) : parameters(parameters) {}
-
     void startGame(Level &level) {
-        GameLogic gameLogic(parameters);
-        UserInput userInput(parameters);
-        LatticeBoltzmann latticeBoltzmann(parameters, level);
-        RigidBodyPhysics rigidBodyPhysics(parameters, level);
-        Renderer renderer(parameters);
+        GameLogic gameLogic;
+        UserInput userInput;
+        LatticeBoltzmann latticeBoltzmann(level);
+        RigidBodyPhysics rigidBodyPhysics(level);
+        Renderer renderer;
 
         UserInputOutput userInputOutput;
         LatticeBoltzmannOutput latticeBoltzmannOutput;

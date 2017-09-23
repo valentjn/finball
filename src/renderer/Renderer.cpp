@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "Log.hpp"
 #include <renderer/Renderer.hpp>
 
 // Compiles a shader
@@ -56,8 +57,7 @@ GLuint createProgram(const char *vert_path, const char *frag_path) {
     return shader_program;
 }
 
-Renderer::Renderer(Parameters &parameters)
-    : parameters(parameters), m_resolution(960, 540), m_camera_pos(0.f, 0.f, 5.f) {
+Renderer::Renderer() : m_resolution(960, 540), m_camera_pos(0.f, 0.f, 5.f) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         throw std::runtime_error(SDL_GetError());
 
@@ -80,10 +80,9 @@ Renderer::Renderer(Parameters &parameters)
     if (!m_glcontext)
         throw std::runtime_error(SDL_GetError());
 
-    if (parameters.verbosity_level >= 1) {
-        std::cout << "OpenGL " << glGetString(GL_VERSION) << std::endl;
-        std::cout << "GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-    }
+    Log::info("Renderer startet with OpenGL version:");
+    Log::info("OpenGL %s", glGetString(GL_VERSION));
+    Log::info("GLSL %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // create shader programs
     m_shader_program_world =

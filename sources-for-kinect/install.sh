@@ -3,7 +3,10 @@
 # in order to get a kinect running on a PC.
 
 # Install dependencies (local packages from APT)
-sudo dpkg -i *.deb
+#sudo dpkg -i *.deb
+
+# New command to install packeges with apt
+sudo apt install git-core cmake freeglut3-dev pkg-config build-essential libxmu-dev libxi-dev libusb-1.0-0-dev doxygen graphviz mono-complete
 
 #mkdir kinect
 #cd ./kinect

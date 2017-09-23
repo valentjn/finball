@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 #include <chrono>
 
-#include "Parameters.hpp"
 #include "UserInputOutput.hpp"
 
 // standard library includes

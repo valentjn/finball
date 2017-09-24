@@ -55,6 +55,7 @@ public:
     int width() const { return m_width; }
     int height() const { return m_height; }
 
+    T *getData() { return m_data.data(); }
     const T *getData() const { return m_data.data(); }
 
     bool operator==(const Array2D<T>& other) const

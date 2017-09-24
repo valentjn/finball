@@ -25,6 +25,7 @@ public:
         m_width = other.m_width;
         m_height = other.m_height;
         m_data = other.m_data;
+        return *this;
     }
 
     Array2D(Array2D &&other)

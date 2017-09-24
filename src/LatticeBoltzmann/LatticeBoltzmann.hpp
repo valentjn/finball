@@ -24,21 +24,21 @@ private:
     Array2D<FICell> fi_New;
 
     // quadrature weights for approximating equilibrium distribution
-    float w [9] = {4./9., 1./9., 1./9., 1./9., 1./9., 1./36., 1./36., 1./36., 1./36.};
-    int cx [9] = {0, 1, 0, -1, 0 , 1, -1, -1, 1};
-    int cy [9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
-    int opp [9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
+    float w[9] = {4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1. / 9.,
+                  1. / 36., 1. / 36., 1. / 36., 1. / 36.};
+    int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
+    int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
+    int opp[9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
 
 public:
     LatticeBoltzmann(Level &level)
-        : level(level), fi_Old(level.width, level.height),
-          fi_New(level.width, level.height) {
+        : level(level), fi_Old(level.width, level.height), fi_New(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
-                //set initial values
+                // set initial values
                 for (int z = 0; z < 9; z++) {
-                    fi_New.value(x,y)[z] = w[z]*0.1/(0.1+x);
-                    fi_Old.value(x,y)[z] = w[z]*0.1/(0.1+x);
+                    fi_New.value(x, y)[z] = w[z] * 0.1 / (0.1 + x);
+                    fi_Old.value(x, y)[z] = w[z] * 0.1 / (0.1 + x);
                 }
             }
         }
@@ -46,83 +46,112 @@ public:
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output) {
 
-//######################################## Collision ####################################################
-for (int y = 1; y < level.height-1; ++y) {
-        for (int x = 1; x < level.width-1; ++x) {
-	    //check for boundary
-            if (input.flagfield->value(x,y)==Level::CellType::FLUID) {
+        //######################################## Collision
+        //####################################################
+        for (int y = 1; y < level.height - 1; ++y) {
+            for (int x = 1; x < level.width - 1; ++x) {
+                // check for boundary
+                if (input.flagfield->value(x, y) == Level::CellType::FLUID) {
 
-                float rho = 0.0 ;
-                float velx = 0.0 ;
-                float vely = 0.0 ;
+                    float rho = 0.0;
+                    float velx = 0.0;
+                    float vely = 0.0;
 
-		//calculate density
-		rho = fi_Old.value(x,y)[0] + fi_Old.value(x,y)[1] + fi_Old.value(x,y)[2] + fi_Old.value(x,y)[3] + fi_Old.value(x,y)[4] + fi_Old.value(x,y)[5] + fi_Old.value(x,y)[6] + fi_Old.value(x,y)[7] + fi_Old.value(x,y)[8];
+                    // calculate density
+                    rho = fi_Old.value(x, y)[0] + fi_Old.value(x, y)[1] + fi_Old.value(x, y)[2] +
+                          fi_Old.value(x, y)[3] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[5] +
+                          fi_Old.value(x, y)[6] + fi_Old.value(x, y)[7] + fi_Old.value(x, y)[8];
 
+                    // TODO later          density->get(x, y, vector::x) = rho ;
+                    const float rhoinv = 1.0 / rho;
 
-//TODO later          density->get(x, y, vector::x) = rho ;
-                const float rhoinv = 1.0 /rho;
+                    velx =
+                        ((fi_Old.value(x, y)[5] + fi_Old.value(x, y)[1] + fi_Old.value(x, y)[8]) -
+                         (fi_Old.value(x, y)[6] + fi_Old.value(x, y)[3] + fi_Old.value(x, y)[7])) *
+                        rhoinv;
 
-		velx = ( (fi_Old.value(x,y)[5] + fi_Old.value(x,y)[1] + fi_Old.value(x,y)[8]) - (fi_Old.value(x,y)[6] + fi_Old.value(x,y)[3] + fi_Old.value(x,y)[7]) ) * rhoinv;
+                    // TODO later   velocity->get(x, y, vector::x) = velx ;
+                    vely =
+                        ((fi_Old.value(x, y)[6] + fi_Old.value(x, y)[2] + fi_Old.value(x, y)[5]) -
+                         (fi_Old.value(x, y)[7] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[8])) *
+                        rhoinv;
 
-//TODO later   velocity->get(x, y, vector::x) = velx ;
-                vely = ( (fi_Old.value(x,y)[6] + fi_Old.value(x,y)[2] + fi_Old.value(x,y)[5]) - (fi_Old.value(x,y)[7] + fi_Old.value(x,y)[4] + fi_Old.value(x,y)[8]) ) * rhoinv;
+                    // TODO later              velocity->get(x, y, vector::y) = vely ;
 
-// TODO later              velocity->get(x, y, vector::y) = vely ;
+                    const float velxx = velx * velx;
+                    const float velyy = vely * vely;
 
-                const float velxx = velx * velx ;
-                const float velyy = vely * vely ;
+                    // TODO need to set omega
+                    float omega = 1.0;
+                    // For the center
+                    float feqC = w[0] * rho * (1.0 - 3.0 * (velxx + velyy) * 0.5);
+                    fi_Old.value(x, y)[0] += omega * (feqC - fi_Old.value(x, y)[0]);
 
-//TODO need to set omega
-float omega = 1.0;
-                // For the center
-                float feqC = w[0] * rho * (1.0 - 3.0 * (velxx + velyy) * 0.5 ) ;
-                fi_Old.value(x,y)[0] +=  omega * (feqC - fi_Old.value(x,y)[0]) ;
+                    // TODO later what is ax velocity of obsatcle
+                    float ax = 0;
+                    float ay = 0;
+                    // For the east distribution function
+                    float feqE =
+                        w[1] * rho * (1.0 + 3.0 * velx + 4.5 * velxx - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[1] +=
+                        omega * (feqE - fi_Old.value(x, y)[1]) + 3.0 * w[1] * rho * ax;
 
-//TODO later what is ax velocity of obsatcle
-	float ax = 0;
-	float ay = 0;
-                // For the east distribution function
-                float feqE = w[1] * rho * (1.0 + 3.0 * velx + 4.5 * velxx - 1.5 * (velxx + velyy))  ;
-                fi_Old.value(x,y)[1] +=  omega * ( feqE - fi_Old.value(x,y)[1]) + 3.0 * w[1] * rho * ax ;
+                    // for the North East Direction
+                    float feqNE =
+                        w[5] * rho * (1.0 + 3.0 * (velx + vely) +
+                                      4.5 * (velx + vely) * (velx + vely) - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[5] +=
+                        omega * (feqNE - fi_Old.value(x, y)[5]) + 3.0 * w[1] * rho * (ax + ay);
 
-                //for the North East Direction
-                float feqNE = w[5] * rho * (1.0 + 3.0*(velx + vely) + 4.5 * (velx+vely) * (velx + vely) - 1.5* (velxx+ velyy)) ;
-                fi_Old.value(x,y)[5] += omega * (feqNE - fi_Old.value(x,y)[5]) + 3.0 * w[1] * rho * (ax + ay) ;
+                    // For the north direction
+                    float feqN =
+                        w[2] * rho * (1.0 + 3.0 * vely + 4.5 * velyy - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[2] +=
+                        omega * (feqN - fi_Old.value(x, y)[2]) + 3.0 * w[1] * rho * ay;
 
-                // For the north direction
-                float feqN = w[2] * rho * (1.0 + 3.0 * vely + 4.5 * velyy - 1.5 * (velxx + velyy) ) ;
-                fi_Old.value(x,y)[2] += omega * (feqN - fi_Old.value(x,y)[2]) + 3.0 * w[1] * rho * ay;
+                    // For the North west direction
+                    float feqNW = w[6] * rho *
+                                  (1.0 + 3.0 * (-velx + vely) +
+                                   4.5 * (-velx + vely) * (-velx + vely) - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[6] +=
+                        omega * (feqNW - fi_Old.value(x, y)[6]) + 3.0 * w[1] * rho * (-ax + ay);
 
-                // For the North west direction
-                float feqNW = w[6] * rho * (1.0 + 3.0 * (-velx + vely) + 4.5 * (-velx + vely) * (-velx + vely) - 1.5 * (velxx + velyy) ) ;
-                fi_Old.value(x,y)[6] += omega * (feqNW - fi_Old.value(x,y)[6]) + 3.0 * w[1] * rho * (-ax + ay);
+                    // for the west direction
+                    float feqW =
+                        w[3] * rho * (1.0 - 3.0 * velx + 4.5 * velxx - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[3] +=
+                        omega * (feqW - fi_Old.value(x, y)[3]) + 3.0 * w[1] * rho * (-ax);
 
-                // for the west direction
-                float feqW  = w[3] * rho * (1.0 - 3.0 * velx + 4.5 * velxx - 1.5 * (velxx+ velyy)) ;
-                fi_Old.value(x,y)[3] += omega * (feqW - fi_Old.value(x,y)[3])+ 3.0 * w[1] * rho * (-ax) ;
+                    // for the south west
+                    float feqSW =
+                        w[7] * rho * (1.0 - 3.0 * (velx + vely) +
+                                      4.5 * (velx + vely) * (velx + vely) - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[7] +=
+                        omega * (feqSW - fi_Old.value(x, y)[7]) + 3.0 * w[1] * rho * (-ax - ay);
 
-                // for the south west
-                float feqSW = w[7] * rho * (1.0 -3.0 * (velx+ vely) + 4.5 * (velx+ vely) * (velx+ vely) - 1.5 * (velxx+ velyy) ) ;
-                fi_Old.value(x,y)[7] += omega * (feqSW - fi_Old.value(x,y)[7])+ 3.0 * w[1] * rho * (-ax-ay) ;
+                    // for the South direction
+                    float feqS =
+                        w[4] * rho * (1.0 - 3.0 * vely + 4.5 * velyy - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[4] +=
+                        omega * (feqS - fi_Old.value(x, y)[4]) + 3.0 * w[1] * rho * (-ay);
 
-                // for the South direction
-                float feqS = w[4] * rho * (1.0 -3.0 * vely + 4.5 *velyy - 1.5 * (velxx + velyy) ) ;
-                fi_Old.value(x,y)[4] += omega * (feqS  - fi_Old.value(x,y)[4]) + 3.0 * w[1] * rho * (-ay) ;
-
-                // for the south east direction
-                float feqSE = w[8] * rho * (1.0 + 3.0 * (velx - vely) + 4.5 * (velx-vely) * (velx-vely) - 1.5 * (velxx+ velyy) ) ;
-                fi_Old.value(x,y)[8] += omega * (feqSE - fi_Old.value(x,y)[8]) + 3.0 * w[1] * rho * (ax-ay)  ;
-		}
+                    // for the south east direction
+                    float feqSE =
+                        w[8] * rho * (1.0 + 3.0 * (velx - vely) +
+                                      4.5 * (velx - vely) * (velx - vely) - 1.5 * (velxx + velyy));
+                    fi_Old.value(x, y)[8] +=
+                        omega * (feqSE - fi_Old.value(x, y)[8]) + 3.0 * w[1] * rho * (ax - ay);
+                }
             }
         }
-//#################################### End of Collision ##################################################
+        //#################################### End of Collision
+        //##################################################
 
-        //output fi prestreaming
-	for (int y = 0; y < level.height; ++y) {
+        // output fi prestreaming
+        for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
                 for (int z = 0; z < 9; ++z) {
-                    output.prestream.value(x,y)[z] = fi_Old.value(x,y)[z];
+                    output.prestream.value(x, y)[z] = fi_Old.value(x, y)[z];
                 }
             }
         }
@@ -130,75 +159,82 @@ float omega = 1.0;
         // set f_i in obstacles to 0
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
-                if (input.flagfield->value(x,y)==Level::CellType::OBSTACLE) {
-                    for(int i= 0; i<9; ++i){
-                          fi_Old.value(x,y)[i] = 0.0;
+                if (input.flagfield->value(x, y) == Level::CellType::OBSTACLE) {
+                    for (int i = 0; i < 9; ++i) {
+                        fi_Old.value(x, y)[i] = 0.0;
                     }
                 }
             }
         }
 
-//#################################### Streaming ############################################
-        for (int y = 1; y < level.height-1; ++y) {
-            for (int x = 1; x < level.width-1; ++x) {
-	   	 //check for boundary 
-                if (input.flagfield->value(x,y)==Level::CellType::FLUID) {
-                    fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
-                    fi_New.value(x+1,y)[1]  = fi_Old.value(x,y)[1];
-                    fi_New.value(x+1,y+1)[5] = fi_Old.value(x,y)[5] ;
-                    fi_New.value(x,y+1)[2]  = fi_Old.value(x,y)[2] ;
-                    fi_New.value(x-1,y+1)[6] = fi_Old.value(x,y)[6] ;
-                    fi_New.value(x-1,y)[3]  = fi_Old.value(x,y)[3] ;
-                    fi_New.value(x-1,y-1)[7] = fi_Old.value(x,y)[7] ;
-                    fi_New.value(x,y-1)[4]  = fi_Old.value(x,y)[4];
-                    fi_New.value(x+1,y-1)[8] = fi_Old.value(x,y)[8] ;
+        //#################################### Streaming
+        //############################################
+        for (int y = 1; y < level.height - 1; ++y) {
+            for (int x = 1; x < level.width - 1; ++x) {
+                // check for boundary
+                if (input.flagfield->value(x, y) == Level::CellType::FLUID) {
+                    fi_New.value(x, y)[0] = fi_Old.value(x, y)[0];
+                    fi_New.value(x + 1, y)[1] = fi_Old.value(x, y)[1];
+                    fi_New.value(x + 1, y + 1)[5] = fi_Old.value(x, y)[5];
+                    fi_New.value(x, y + 1)[2] = fi_Old.value(x, y)[2];
+                    fi_New.value(x - 1, y + 1)[6] = fi_Old.value(x, y)[6];
+                    fi_New.value(x - 1, y)[3] = fi_Old.value(x, y)[3];
+                    fi_New.value(x - 1, y - 1)[7] = fi_Old.value(x, y)[7];
+                    fi_New.value(x, y - 1)[4] = fi_Old.value(x, y)[4];
+                    fi_New.value(x + 1, y - 1)[8] = fi_Old.value(x, y)[8];
                 }
             }
-   	}
+        }
 
-// now fi_New contains the streamed and collided values
-//#################################### End of Streaming ##########################################
+        // now fi_New contains the streamed and collided values
+        //#################################### End of Streaming
+        //##########################################
 
         // boundary handling
 
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
                 // Stream back the velocities streamed into obstacles.
-                if (input.flagfield->value(x,y)==Level::CellType::OBSTACLE) {
-                    for(int z = 1; z<9; ++z){
-                        if (fi_New.value(x,y)[z] != 0.0){
-                            fi_New.value(x+cx[opp[z]], y+cy[opp[z]])[opp[z]]=fi_New.value(x,y)[z];
-                            fi_New.value(x,y)[z] = 0.0;
+                if (input.flagfield->value(x, y) == Level::CellType::OBSTACLE) {
+                    for (int z = 1; z < 9; ++z) {
+                        if (fi_New.value(x, y)[z] != 0.0) {
+                            fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
+                                fi_New.value(x, y)[z];
+                            fi_New.value(x, y)[z] = 0.0;
                         }
                     }
                 }
                 // inflow
-                else if (input.flagfield->value(x,y)==Level::CellType::INFLOW) {
-                     for (int z = 0; z < 9; z++){
-                         // TODO adjust inflow values
-                         fi_New.value(x,y)[z] = w[z]*0.1;
-                         fi_Old.value(x,y)[z] = w[z]*0.1;
-                         if (0<= (x + cx[z]) && (x + cx[z]) < level.width &&  0<= (y +cy[z])
-                                 && (y + cy[z]) < level.height && input.flagfield->value(x+cx[z], y+cy[z])==Level::CellType::FLUID){
-                             fi_New.value(x+cx[z], y+cy[z])[z] = fi_New.value(x,y)[z];
-                         }
-                     }
-                 }
-                 // outflow
-                 else if (input.flagfield->value(x,y)==Level::CellType::OUTFLOW) {
-                      for (int z = 0; z < 9; z++){
-                           // TODO adjust outflow values
-                           fi_New.value(x,y)[z] = 0;
-                           fi_Old.value(x,y)[z] = 0;
-                           if (0<= (x + cx[z]) && (x + cx[z]) < level.width &&  0<= (y +cy[z])
-                                   && (y + cy[z]) < level.height && input.flagfield->value(x+cx[z], y+cy[z])==Level::CellType::FLUID){
-                               fi_New.value(x+cx[z], y+cy[z])[z] = fi_New.value(x,y)[z];
-                           }
-                      }
-                 }
+                else if (input.flagfield->value(x, y) == Level::CellType::INFLOW) {
+                    for (int z = 0; z < 9; z++) {
+                        // TODO adjust inflow values
+                        fi_New.value(x, y)[z] = w[z] * 0.1;
+                        fi_Old.value(x, y)[z] = w[z] * 0.1;
+                        if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
+                            (y + cy[z]) < level.height &&
+                            input.flagfield->value(x + cx[z], y + cy[z]) ==
+                                Level::CellType::FLUID) {
+                            fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
+                        }
+                    }
+                }
+                // outflow
+                else if (input.flagfield->value(x, y) == Level::CellType::OUTFLOW) {
+                    for (int z = 0; z < 9; z++) {
+                        // TODO adjust outflow values
+                        fi_New.value(x, y)[z] = 0;
+                        fi_Old.value(x, y)[z] = 0;
+                        if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
+                            (y + cy[z]) < level.height &&
+                            input.flagfield->value(x + cx[z], y + cy[z]) ==
+                                Level::CellType::FLUID) {
+                            fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
+                        }
+                    }
+                }
             }
         }
-            //#################################### Output #######################################
+        //#################################### Output #######################################
         // Calculate macroscopic quantities for the output
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
@@ -207,21 +243,21 @@ float omega = 1.0;
                     output.density.value(x, y) += fi_New.value(x, y)[i]; // density
                 }
                 output.velocity.value(x, y)[0] = fi_New.value(x, y)[1] - fi_New.value(x, y)[3] +
-                                                fi_New.value(x, y)[5] - fi_New.value(x, y)[6] -
-                                                fi_New.value(x, y)[7] +
-                                                fi_New.value(x, y)[8]; // x Velocity
+                                                 fi_New.value(x, y)[5] - fi_New.value(x, y)[6] -
+                                                 fi_New.value(x, y)[7] +
+                                                 fi_New.value(x, y)[8]; // x Velocity
                 output.velocity.value(x, y)[1] = fi_New.value(x, y)[2] - fi_New.value(x, y)[4] +
-                                                fi_New.value(x, y)[5] + fi_New.value(x, y)[6] -
-                                                fi_New.value(x, y)[7] -
-                                                fi_New.value(x, y)[8]; // y Velocity
+                                                 fi_New.value(x, y)[5] + fi_New.value(x, y)[6] -
+                                                 fi_New.value(x, y)[7] -
+                                                 fi_New.value(x, y)[8]; // y Velocity
             }
         }
 
-        //output fi afterstreaming
+        // output fi afterstreaming
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
                 for (int z = 0; z < 9; ++z) {
-                    output.afterstream.value(x,y)[z] = fi_New.value(x,y)[z];
+                    output.afterstream.value(x, y)[z] = fi_New.value(x, y)[z];
                 }
             }
         }
@@ -229,17 +265,17 @@ float omega = 1.0;
         // Set fi_old = fi_new
         // TODO: Swap pointers instead of values
         for (int y = 0; y < level.height; y++) {
-          for (int x = 0; x < level.width; x++) {
-            for (int z = 0; z < 9; ++z) {
-              output.prestream.value(x,y)[z] = fi_Old.value(x,y)[z];
-              output.afterstream.value(x,y)[z] = fi_New.value(x,y)[z];
-              fi_Old.value(x,y)[z] = fi_New.value(x,y)[z];
+            for (int x = 0; x < level.width; x++) {
+                for (int z = 0; z < 9; ++z) {
+                    output.prestream.value(x, y)[z] = fi_Old.value(x, y)[z];
+                    output.afterstream.value(x, y)[z] = fi_New.value(x, y)[z];
+                    fi_Old.value(x, y)[z] = fi_New.value(x, y)[z];
+                }
             }
-          }
         }
 
         // Pass some dummy values downstream until the real values work
-        //TODO remove
+        // TODO remove
         /*for (int y = 0; y < level.height; y++) {
           for (int x = 0; x < level.width; x++) {
             output.velocity.value(x,y)[0] = (x + 0.0)/level.width;
@@ -248,7 +284,5 @@ float omega = 1.0;
         }*/
     }
 };
-
-
 
 #endif

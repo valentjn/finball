@@ -47,18 +47,18 @@ public:
         Log::info("Rendering %d world_object of gameLogic.", world_objects.size());
 
         // handle rigid body physics output
-		for (const RigidBody& rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
-            Mesh& mesh = m_rigid_body_meshes[rigidBody.id];
+		for (const RigidBody* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
+            Mesh& mesh = m_rigid_body_meshes[rigidBody->id];
             if (mesh == Mesh{}) { // check if the mesh wasn't already in the map
 				Log::info(
                     "WARNING: rigid body with id %d does not have a render mesh, rendering as circle",
-                    rigidBody.id);
+                    rigidBody->id);
                 mesh = createCircleMesh(1.f);
             }
             RenderObject renderObject;
-            renderObject.position = glm::vec3(rigidBody.position, 0);
-            renderObject.scale = rigidBody.radius;
-			assert(m_rigid_body_meshes.count(rigidBody.id)!=0);
+            renderObject.position = glm::vec3(rigidBody->position, 0);
+            renderObject.scale = rigidBody->radius;
+			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = &mesh;
 
             /*switch (typeid(rigidBody)) {

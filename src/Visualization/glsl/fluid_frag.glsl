@@ -8,7 +8,7 @@ const int STEPS=10; // The number of adjacent locations in one direction to use 
 
 // perfrom line integral convolution
 float lic(vec2 normalized_coords) {
-	vec2 texel_size = 4.0 / textureSize(tex_noise, 0);
+	vec2 texel_size = 1.0 / textureSize(tex_noise, 0);
 
 	vec2 v; // the vector field's x and y components
 	vec2 step_coords; // current step x,y coordinate
@@ -53,7 +53,7 @@ float lic(vec2 normalized_coords) {
 layout(location = 0) out vec4 out_color;
 
 void main() {
-    vec2 normalized_coords = gl_FragCoord.xy / textureSize(tex_noise, 0);
+    vec2 normalized_coords = gl_FragCoord.xy / (textureSize(tex_noise, 0) * 2);
     ivec2 vecs_res = textureSize(tex_vecs, 0);
     normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
     out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA

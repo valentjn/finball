@@ -107,13 +107,13 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
         "src/Visualization/glsl/fluid_frag.glsl");
 
     // create the noise texture
-    Array2D<float> noise(m_resolution.x, m_resolution.y);
+    Array2D<float> noise(m_fluid_width / 2, m_fluid_height / 2);
     std::default_random_engine engine;
     std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
     for (int i = 0; i < noise.width(); ++i)
         for(int j = 0; j < noise.height(); ++j)
             noise.value(i, j) = dist(engine);
-    m_tex_noise = std::make_unique<Texture1F>(m_resolution);
+    m_tex_noise = std::make_unique<Texture1F>(glm::ivec2{m_fluid_width / 2, m_fluid_height / 2});
     m_tex_noise->setData(noise);
 
     // create lic output texture

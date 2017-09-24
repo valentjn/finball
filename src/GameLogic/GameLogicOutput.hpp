@@ -10,6 +10,7 @@ public:
     bool running;
     float highscore;
     std::vector<RenderObject> objectsToRender;
+    TexturedMesh* fluid_mesh;
 
     GameLogicOutput() : running(true), highscore(0) {}
 };

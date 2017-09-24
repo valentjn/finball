@@ -8,7 +8,7 @@ const int STEPS=10; // The number of adjacent locations in one direction to use 
 
 // perfrom line integral convolution
 float lic(vec2 normalized_coords) {
-	vec2 texel_size = 10.0 / textureSize(tex_noise, 0);
+	vec2 texel_size = 4.0 / textureSize(tex_noise, 0);
 
 	vec2 v; // the vector field's x and y components
 	vec2 step_coords; // current step x,y coordinate

@@ -9,23 +9,27 @@
 #include "Highscores.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
+#include <Level.hpp>
 
 using namespace std;
 using namespace std::chrono;
 
 class GameLogic {
 private:
-    std::unique_ptr<Mesh> fluid_mesh;
+    std::unique_ptr<TexturedMesh> fluid_mesh;
     RenderObject fluid_surface;
 
     steady_clock::time_point startTime;
 
 public:
-    GameLogic() : fluid_mesh(createFluidMesh(16.f, 16.f)) {
-        fluid_surface.position = {8.f, 8.f, 0.f};
-        fluid_surface.scale = 1.f;
+    GameLogic(const Level& level) {
+        auto rectangle = Mesh::createRectangle({0.f, 0.f}, {1.f, 1.f});
+        fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
+        fluid_surface.position = {0.f, 0.f, 0.f};
+        fluid_surface.scale = level.width;
         // TODO: add proper mesh!
         fluid_surface.mesh = fluid_mesh.get();
+
         startTime = steady_clock::now();
         Log::debug("Haiscore clock started ;-)");
     }
@@ -43,17 +47,8 @@ public:
         if (output.objectsToRender.empty()) {
             output.objectsToRender.push_back(fluid_surface);
         }
-    }
 
-private:
-    void saveHighscore(float highscore) {
-        fstream file;
-        file.open("build/haiscores.txt", fstream::out | fstream::app);
-        if (file.is_open()) {
-            file << highscore << "\n";
-        } else {
-            Log::error("Failed to save Haiscore");
-        }
+        output.fluid_mesh = fluid_mesh.get();
     }
 };
 

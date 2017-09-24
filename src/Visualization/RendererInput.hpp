@@ -13,53 +13,54 @@
 
 class RendererInput {
     std::unordered_map<int, std::unique_ptr<Mesh>> m_rigid_body_meshes;
-    std::unique_ptr<Mesh> dummyUIMesh;
 
 public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
     const Array2D<glm::vec2> *fluid_velocity;
     const Array2D<float> *fluid_density;
+    TexturedMesh* fluid_mesh;
 
-	/*~RendererInput() {
-		//delete dummyUIMesh;
-		//delete fluid_velocity;
-		//delete fluid_density;
-	}*/
-
-    RendererInput() :m_rigid_body_meshes(), dummyUIMesh(createCircleMesh(1.f)), fluid_velocity(nullptr), fluid_density(nullptr) {}
+    RendererInput() : fluid_velocity(nullptr), fluid_density(nullptr) {}
 
     RendererInput(const GameLogicOutput &gameLogicOutput,
                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
-                  const LatticeBoltzmannOutput &latticeBoltzmannOutput):
-                	  m_rigid_body_meshes(),dummyUIMesh(createCircleMesh(1.f)){
-        // handle game logic output
+                  const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+    {   // handle game logic output
         world_objects.insert(world_objects.end(), gameLogicOutput.objectsToRender.begin(),
                              gameLogicOutput.objectsToRender.end());
 
-        for (auto& gameLogicObject : world_objects){
-        	if(!gameLogicObject.mesh){
+        static std::unique_ptr<Mesh> dummy_mesh;
+        if (!dummy_mesh) {
+            auto circle = Mesh::createCircle(glm::vec2{0, 0}, 1.f);
+            dummy_mesh = std::make_unique<ColoredMesh>(circle, glm::vec3{1, 0.3, 0.4});
+        }
+
+        for (auto& gameLogicObject : world_objects) {
+        	if (!gameLogicObject.mesh) {
 				Log::warn("A game_logic object does not have a render mesh, rendering as circle");
-				gameLogicObject.mesh = dummyUIMesh.get();
+                gameLogicObject.mesh = dummy_mesh.get();
         	}
         }
 
-        Log::info("Rendering %d world_object of gameLogic.", world_objects.size());
+        Log::info("Rendering %d world object of gameLogic.", world_objects.size());
+
+        fluid_mesh = gameLogicOutput.fluid_mesh;
 
         // handle rigid body physics output
-		for (const RigidBody& rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
-            auto& mesh = m_rigid_body_meshes[rigidBody.id];
+		for (const RigidBody* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
+            const Mesh* mesh = m_rigid_body_meshes[rigidBody->id].get();
             if (!mesh) { // check if the mesh wasn't already in the map
-				Log::info(
-                    "WARNING: rigid body with id %d does not have a render mesh, rendering as circle",
-                    rigidBody.id);
-                mesh = createCircleMesh(1.f);
+				//Log::info(
+                //    "WARNING: rigid body with id %d does not have a render mesh, rendering as circle",
+                //    rigidBody->id);
+                mesh = dummy_mesh.get();
             }
             RenderObject renderObject;
-            renderObject.position = glm::vec3(rigidBody.position, 0);
-            renderObject.scale = rigidBody.radius;
-			assert(m_rigid_body_meshes.count(rigidBody.id)!=0);
-			renderObject.mesh = mesh.get();
+            renderObject.position = glm::vec3(rigidBody->position, 0);
+            renderObject.scale = rigidBody->radius;
+			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
+			renderObject.mesh = mesh;
 
             /*switch (typeid(rigidBody)) {
             case typeid(RigidRectangle):

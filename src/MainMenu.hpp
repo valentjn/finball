@@ -13,7 +13,7 @@
 
 class MainMenu {
 private:
-    const SDLWindow window;
+    const SDLWindow &window;
     SDLRenderer renderer;
 
     TTF_Font *headerFont;

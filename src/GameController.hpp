@@ -24,11 +24,11 @@ using namespace chrono;
 class GameController {
 public:
     void startGame(SDLWindow &window, Level &level) {
-        GameLogic gameLogic;
+        Renderer renderer(window);
+        GameLogic gameLogic(level);
         UserInput userInput;
         LatticeBoltzmann latticeBoltzmann(level);
         RigidBodyPhysics rigidBodyPhysics(level);
-        Renderer renderer(window);
 
         UserInputOutput userInputOutput;
         LatticeBoltzmannOutput latticeBoltzmannOutput(level);

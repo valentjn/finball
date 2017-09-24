@@ -190,29 +190,81 @@ float omega = 1.0;
 			output.prestream.value(x,y)[z] = fi_Old.value(x,y)[z]; 
 	}}}
 
-//TODO set f_i in obstacles to 0
+// set f_i in obstacles to 0
+        for (int y = 0; y < level.height; ++y) {
+            for (int x = 0; x < level.width; ++x) {
+                if (input.matrix->value(x,y)[2]==1) { //TODO: enum
+                    for(int i= 0; i<9; ++i){
+                          fi_Old.value(x,y)[i] = 0.0;
+                     }
+                 }
+            }
+        }
 
 //#################################### Streaming ############################################
         for (int y = 1; y < level.height-1; ++y) {
-        	for (int x = 1; x < level.width-1; ++x) {
-	   	 //check for boundary
-            	if (input.flagfield->value(x,y)==Level::CellType::FLUID) {
-               		fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
-                	fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
-                	fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
-                	fi_New.value(x,y)[2]  = fi_Old.value(x,y-1)[2] ;
-                	fi_New.value(x,y)[6] = fi_Old.value(x+1,y-1)[6] ;
-                	fi_New.value(x,y)[3]  = fi_Old.value(x+1,y)[3] ;
-                	fi_New.value(x,y)[7] = fi_Old.value(x+1,y+1)[7] ;
-                	fi_New.value(x,y)[4]  = fi_Old.value(x,y+1)[4];
-                	fi_New.value(x,y)[8] = fi_Old.value(x-1,y+1)[8] ;
-                      	}
-        	}
+            for (int x = 1; x < level.width-1; ++x) {
+	   	 //check for boundary 
+                if (input.matrix->value(x,y)[2]==0) {
+                    fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
+                    fi_New.value(x+1,y)[1]  = fi_Old.value(x,y)[1];
+                    fi_New.value(x+1,y+1)[5] = fi_Old.value(x,y)[5] ;
+                    fi_New.value(x,y+1)[2]  = fi_Old.value(x,y)[2] ;
+                    fi_New.value(x-1,y+1)[6] = fi_Old.value(x,y)[6] ;
+                    fi_New.value(x-1,y)[3]  = fi_Old.value(x,y)[3] ;
+                    fi_New.value(x-1,y-1)[7] = fi_Old.value(x,y)[7] ;
+                    fi_New.value(x,y-1)[4]  = fi_Old.value(x,y)[4];
+                    fi_New.value(x+1,y-1)[8] = fi_Old.value(x,y)[8] ;
+                }
+            }
    	}
+
+
+
 // now fi_New contains the streamed and collided values
 //#################################### End of Streaming ##########################################
 
-        // TODO Stream back the velocities streamed into obstacles.
+        // boundary handling
+
+        for (int y = 0; y < level.height; ++y) {
+            for (int x = 0; x < level.width; ++x) {
+                // Stream back the velocities streamed into obstacles.
+                if (input.matrix->value(x,y)[2]==1) { //TODO: enum
+                    for(int z = 1; z<9; ++z){
+                        if (fi_New.value(x,y)[z] != 0.0){
+                            fi_New.value(x+cx[opp[z]], y+cy[opp[z]])[opp[z]]=fi_New.value(x,y)[z];
+                            fi_New.value(x,y)[z] = 0.0;
+                        }
+                    }
+                }
+                // inflow
+                else if (input.matrix->value(x,y)[2]==2) { //TODO: enum
+                     for (int z = 0; z < 9; z++)
+                     {
+                         // TODO adjust inflow values
+                         fi_New.value(x,y)[z] = w[z]*0.1;
+                         fi_Old.value(x,y)[z] = w[z]*0.1;
+                         if (0<= (x + cx[z]) && (x + cx[z]) < level.width &&  0<= (y +cy[z])
+                                 && (y + cy[z]) < level.height && input.matrix->value(x+cx[z], y+cy[z])[2]==0){ // TODO enum
+                             fi_New.value(x+cx[z], y+cy[z])[z] = fi_New.value(x,y)[z];
+                         }
+                     }
+                }
+                 // outflow
+                 else if (input.matrix->value(x,y)[2]==3) { //TODO: enum
+                      for (int z = 0; z < 9; z++)
+                      {
+                           // TODO adjust outflow values
+                           fi_New.value(x,y)[z] = 0;
+                           fi_Old.value(x,y)[z] = 0;
+                           if (0<= (x + cx[z]) && (x + cx[z]) < level.width &&  0<= (y +cy[z])
+                                   && (y + cy[z]) < level.height && input.matrix->value(x+cx[z], y+cy[z])[2]==0){ // TODO enum
+                               fi_New.value(x+cx[z], y+cy[z])[z] = fi_New.value(x,y)[z];
+                           }
+                      }
+                 }
+            }
+        }
 
 //#################################### Output #######################################
         // Calculate macroscopic quantities for the output
@@ -260,6 +312,9 @@ float omega = 1.0;
           }
         }
     }
+
 };
+
+
 
 #endif

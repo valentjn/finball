@@ -46,9 +46,6 @@ public:
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output) {
 
-
-
-
 //######################################## Collision ####################################################
 for (int y = 1; y < level.height-1; ++y) {
         for (int x = 1; x < level.width-1; ++x) {
@@ -121,83 +118,23 @@ float omega = 1.0;
         }
 //#################################### End of Collision ##################################################
 
-//#################################### Bounce Back Boundary #################################
-/*	for (int y = 0; y < level.height; ++y) {
-        	for (int x = 0; x < level.width; ++x) {
-	   	 //check for boundary
-            	if (input.matrix->value(x,y)[2]==1)
-		{
-			fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0];
-			if (x+1 >= level.width || input.matrix->value(x+1,y)[2] == 2){ //E
-				fi_New.value(x,y)[1] = fi_Old.value(x,y)[opp[1]];
-			} else
-			{
-                		fi_New.value(x,y)[1]  = fi_Old.value(x-1,y)[1];
-			}
-			if (x+1 >= level.width || y+1 >= level.height || input.matrix->value(x+1,y+1)[2] == 2){ //NE
-				fi_New.value(x,y)[5] = fi_Old.value(x,y)[opp[5]];
-			} else
-			{
-                		fi_New.value(x,y)[5] = fi_Old.value(x-1,y-1)[5] ;
-			}
-			if (y+1 >= level.height || input.matrix->value(x,y+1)[2] == 2){ //N
-				fi_New.value(x,y)[2] = fi_Old.value(x,y)[opp[2]];
-			} else
-			{
-                		fi_New.value(x,y)[2]  = fi_Old.value(x,y-1)[2] ;
-			}
-			if (x-1 < 0 || y+1 >= level.height || input.matrix->value(x-1,y+1)[2] == 2){ //NW
-				fi_New.value(x,y)[6] = fi_Old.value(x,y)[opp[6]];
-			} else
-			{
-                		fi_New.value(x,y)[6] = fi_Old.value(x+1,y-1)[6] ;
-			}
-			if (x-1 < 0 || input.matrix->value(x-1,y)[2] == 2){ //W
-				fi_New.value(x,y)[3] = fi_Old.value(x,y)[opp[3]];
-			} else
-			{
-                		fi_New.value(x,y)[3]  = fi_Old.value(x+1,y)[3] ;
-			}
-			if (x-1 < 0 || y-1 < 0 || input.matrix->value(x-1,y-1)[2] == 2){ //SW
-				fi_New.value(x,y)[7] = fi_Old.value(x,y)[opp[7]];
-			} else
-			{
-                		fi_New.value(x,y)[7] = fi_Old.value(x+1,y+1)[7] ;
-			}
-			if ( y-1 < 0 || input.matrix->value(x,y-1)[2] == 2){ //S
-				fi_New.value(x,y)[4] = fi_Old.value(x,y)[opp[4]];
-			} else
-			{
-                		fi_New.value(x,y)[4]  = fi_Old.value(x,y+1)[4];
-			}
-             		if (x+1 >= level.width || y-1 < 0 || input.matrix->value(x+1,y-1)[2] == 2){ //SE
-				fi_New.value(x,y)[8] = fi_Old.value(x,y)[opp[8]];
-			} else
-			{
-                		fi_New.value(x,y)[8] = fi_Old.value(x-1,y+1)[8] ;
-			}
-
-                }
-        	}
-   	}
-*/
-//#################################### End of Bounce Back ##############################################
-
-//output fi prestreaming
+        //output fi prestreaming
 	for (int y = 0; y < level.height; ++y) {
-        		for (int x = 0; x < level.width; ++x) {
-        	                for (int z = 0; z < 9; ++z) {
-			output.prestream.value(x,y)[z] = fi_Old.value(x,y)[z]; 
-	}}}
+            for (int x = 0; x < level.width; ++x) {
+                for (int z = 0; z < 9; ++z) {
+                    output.prestream.value(x,y)[z] = fi_Old.value(x,y)[z];
+                }
+            }
+        }
 
-// set f_i in obstacles to 0
+        // set f_i in obstacles to 0
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
-                if (input.matrix->value(x,y)[2]==1) { //TODO: enum
+                if (input.flagfield->value(x,y)[2]==Level::CellType::OBSTACLE) {
                     for(int i= 0; i<9; ++i){
                           fi_Old.value(x,y)[i] = 0.0;
-                     }
-                 }
+                    }
+                }
             }
         }
 
@@ -205,7 +142,7 @@ float omega = 1.0;
         for (int y = 1; y < level.height-1; ++y) {
             for (int x = 1; x < level.width-1; ++x) {
 	   	 //check for boundary 
-                if (input.matrix->value(x,y)[2]==0) {
+                if (input.flagfield->value(x,y)[2]==Level::CellType::FLUID) {
                     fi_New.value(x,y)[0]  = fi_Old.value(x,y)[0] ;
                     fi_New.value(x+1,y)[1]  = fi_Old.value(x,y)[1];
                     fi_New.value(x+1,y+1)[5] = fi_Old.value(x,y)[5] ;
@@ -219,8 +156,6 @@ float omega = 1.0;
             }
    	}
 
-
-
 // now fi_New contains the streamed and collided values
 //#################################### End of Streaming ##########################################
 
@@ -229,7 +164,7 @@ float omega = 1.0;
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
                 // Stream back the velocities streamed into obstacles.
-                if (input.matrix->value(x,y)[2]==1) { //TODO: enum
+                if (input.flagfield->value(x,y)[2]==Level::CellType::OBSTACLE) {
                     for(int z = 1; z<9; ++z){
                         if (fi_New.value(x,y)[z] != 0.0){
                             fi_New.value(x+cx[opp[z]], y+cy[opp[z]])[opp[z]]=fi_New.value(x,y)[z];
@@ -238,35 +173,32 @@ float omega = 1.0;
                     }
                 }
                 // inflow
-                else if (input.matrix->value(x,y)[2]==2) { //TODO: enum
-                     for (int z = 0; z < 9; z++)
-                     {
+                else if (input.flagfield->value(x,y)[2]==Level::CellType::INFLOW) {
+                     for (int z = 0; z < 9; z++){
                          // TODO adjust inflow values
                          fi_New.value(x,y)[z] = w[z]*0.1;
                          fi_Old.value(x,y)[z] = w[z]*0.1;
                          if (0<= (x + cx[z]) && (x + cx[z]) < level.width &&  0<= (y +cy[z])
-                                 && (y + cy[z]) < level.height && input.matrix->value(x+cx[z], y+cy[z])[2]==0){ // TODO enum
+                                 && (y + cy[z]) < level.height && input.flagfield->value(x+cx[z], y+cy[z])[2]==Level::CellType::FLUID){
                              fi_New.value(x+cx[z], y+cy[z])[z] = fi_New.value(x,y)[z];
                          }
                      }
-                }
+                 }
                  // outflow
-                 else if (input.matrix->value(x,y)[2]==3) { //TODO: enum
-                      for (int z = 0; z < 9; z++)
-                      {
+                 else if (input.flagfield->value(x,y)[2]==Level::CellType::OUTFLOW) {
+                      for (int z = 0; z < 9; z++){
                            // TODO adjust outflow values
                            fi_New.value(x,y)[z] = 0;
                            fi_Old.value(x,y)[z] = 0;
                            if (0<= (x + cx[z]) && (x + cx[z]) < level.width &&  0<= (y +cy[z])
-                                   && (y + cy[z]) < level.height && input.matrix->value(x+cx[z], y+cy[z])[2]==0){ // TODO enum
+                                   && (y + cy[z]) < level.height && input.flagfield->value(x+cx[z], y+cy[z])[2]==Level::CellType::FLUID){
                                fi_New.value(x+cx[z], y+cy[z])[z] = fi_New.value(x,y)[z];
                            }
                       }
                  }
             }
         }
-
-//#################################### Output #######################################
+            //#################################### Output #######################################
         // Calculate macroscopic quantities for the output
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
@@ -285,12 +217,14 @@ float omega = 1.0;
             }
         }
 
-	//output fi afterstreaming
-		for (int y = 0; y < level.height; ++y) {
-        		for (int x = 0; x < level.width; ++x) {
-        	                for (int z = 0; z < 9; ++z) {
-			output.afterstream.value(x,y)[z] = fi_New.value(x,y)[z]; 
-	}}}
+        //output fi afterstreaming
+        for (int y = 0; y < level.height; ++y) {
+            for (int x = 0; x < level.width; ++x) {
+                for (int z = 0; z < 9; ++z) {
+                    output.afterstream.value(x,y)[z] = fi_New.value(x,y)[z];
+                }
+            }
+        }
 
         // Set fi_old = fi_new
         // TODO: Swap pointers instead of values
@@ -305,14 +239,14 @@ float omega = 1.0;
         }
 
         // Pass some dummy values downstream until the real values work
-        for (int y = 0; y < level.height; y++) {
+        //TODO remove
+        /*for (int y = 0; y < level.height; y++) {
           for (int x = 0; x < level.width; x++) {
             output.velocity.value(x,y)[0] = (x + 0.0)/level.width;
             output.velocity.value(x,y)[1] = (y + 0.0)/level.height;
           }
-        }
+        }*/
     }
-
 };
 
 

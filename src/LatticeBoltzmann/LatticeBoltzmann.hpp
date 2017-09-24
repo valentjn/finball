@@ -272,16 +272,15 @@ public:
                     fi_Old.value(x, y)[z] = fi_New.value(x, y)[z];
                 }
             }
-        }
+        } 
 
         // Pass some dummy values downstream until the real values work
         // TODO remove
-        /*for (int y = 0; y < level.height; y++) {
+        for (int y = 0; y < level.height; y++) {
           for (int x = 0; x < level.width; x++) {
-            output.velocity.value(x,y)[0] = (x + 0.0)/level.width;
-            output.velocity.value(x,y)[1] = (y + 0.0)/level.height;
+            output.velocity.value(x,y) = { (x + 0.0)/level.width , (y + 0.0)/level.height };
           }
-        }*/
+        }
     }
 };
 

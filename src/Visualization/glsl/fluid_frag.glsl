@@ -57,5 +57,7 @@ void main() {
     ivec2 vecs_res = textureSize(tex_vecs, 0);
     normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
     out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA
+    //out_color = texture(tex_vecs, normalized_coords);
+    //out_color = normalized_coords.xxyy;
 }
 

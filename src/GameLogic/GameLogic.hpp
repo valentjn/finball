@@ -23,11 +23,10 @@ private:
 
 public:
     GameLogic(const Level& level) {
-        auto rectangle = Mesh::createRectangle({0.f, 0.f}, {1.f, 1.f});
+        auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
         fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
-        fluid_surface.position = {0.f, 0.f, 0.f};
-        fluid_surface.scale = level.width;
-        // TODO: add proper mesh!
+        fluid_surface.position = {level.width * 0.5f, level.height * 0.5f, 0.f};
+        fluid_surface.scale = level.width * 0.5f;
         fluid_surface.mesh = fluid_mesh.get();
 
         startTime = steady_clock::now();

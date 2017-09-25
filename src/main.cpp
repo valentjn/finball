@@ -19,12 +19,17 @@ int main(int argc, char *argv[]) {
                      "Finball", parameters.fullscreen);
     window.setIcon("data/haicon.png");
 
+    Highscores highscores("haiscores.txt");
+
     // show main menu and obtain level from it
-    MainMenu menu(window);
-    std::unique_ptr<Level> level = menu.show();
+    std::unique_ptr<Level> level;
+    {
+        MainMenu menu(window, highscores);
+        level = menu.show();
+    }
 
     // run the game
-    GameController gameController;
+    GameController gameController(highscores);
     gameController.startGame(window, *level);
 
     return 0;

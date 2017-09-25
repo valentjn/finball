@@ -6,10 +6,9 @@
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "Highscores.hpp"
+#include "Level.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
-#include <Level.hpp>
 
 using namespace std;
 using namespace std::chrono;
@@ -37,9 +36,15 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.highscore = duration.count();
 
+        for (RigidBody const *rigidBody : *input.rigidBodies) {
+            if (rigidBody->id == 1 && rigidBody->position.y < 0) {
+                output.running = false;
+                return;
+            }
+        }
+
         if (input.quit) {
             output.running = false;
-            Highscores::saveHighscore(output.highscore);
             return;
         }
 

@@ -3,10 +3,7 @@
 
 #include <string>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-
+#include "Highscores.hpp"
 #include "Level.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
@@ -16,14 +13,17 @@ private:
     const SDLWindow &window;
     SDLRenderer renderer;
 
-    TTF_Font *headerFont;
-    TTF_Font *defaultFont;
+    SDLRenderer::Font headerFont;
+    SDLRenderer::Font defaultFont;
 
-    SDL_Color colorLight;
-    SDL_Color colorDark;
+    SDLRenderer::Color colorLight;
+    SDLRenderer::Color colorDark;
+
+    Highscores &highscores;
 
 public:
-    MainMenu(const SDLWindow &window) : window(window), renderer(window) {
+    MainMenu(const SDLWindow &window, Highscores &highscores) :
+            window(window), renderer(window), highscores(highscores) {
         int windowHeight = window.getHeight();
         int headerFontSize = windowHeight * 0.12;
         int defaultFontSize = windowHeight * 0.05;

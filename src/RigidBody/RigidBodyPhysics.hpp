@@ -115,11 +115,10 @@ public:
             bt_rigid_body->setAngularFactor(btVector3(0, 0, 1));
 
             auto rigid_body =
-                std::make_unique<RigidBody>(level_body.position.x, level_body.position.y);
-            rigid_body->id = next_id;
-            rigid_bodies[next_id] = std::move(rigid_body);
-
-            bt_rigid_body->setUserIndex(next_id); // -> RigidBody.id
+                std::make_unique<RigidBody>(level_body.id, level_body.position.x, level_body.position.y);
+            rigid_bodies[level_body.id] = std::move(rigid_body);
+            
+            bt_rigid_body->setUserIndex(level_body.id); // -> RigidBody.id
             // bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
             dynamics_world->addRigidBody(bt_rigid_body);
 

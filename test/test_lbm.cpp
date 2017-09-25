@@ -1,6 +1,7 @@
 #pragma once
 #include "gtest/gtest.h"
 #include "../src/LatticeBoltzmann/LatticeBoltzmann.hpp"
+#include <cmath>
 
 void printFlagField(Array2D<Level::CellType> &flagfield) {
 
@@ -104,7 +105,7 @@ bool isSmooth(Array2D<float> &rho, float threshold) {
       float left = rho.value(i-1,j);
       float down = rho.value(i,j-1);
 
-      if ((abs(me-left) > threshold) || (abs(me-down) > threshold)) {
+      if ((fabs(me-left) > threshold) || (fabs(me-down) > threshold)) {
           return false;
       }
     }

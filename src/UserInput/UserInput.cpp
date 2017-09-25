@@ -214,6 +214,9 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 				userInputOutput.rightAngle[k] = -M_PI -min_angle[k];
 			}
 
+			rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
+				- userInputOutput.rightAngle[k];
+
 			double previousRightPsi = copysign(M_PI, previousRightAngles[k])
 				- previousRightAngles[k];
 			double ldAngle = userInputOutput.leftAngle[k] - previousLeftAngles[k];

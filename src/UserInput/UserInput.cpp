@@ -245,7 +245,9 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			case SDLK_SPACE:
 				userInputOutput.start = true;
 				usedInputSource = KEYBOARD;
+#ifndef WITHOUT_KINECT_LIBRARIES
 				tryInitializingKinect = false;
+#endif
 				break;
 			}
 			break;

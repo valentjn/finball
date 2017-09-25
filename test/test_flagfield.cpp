@@ -23,6 +23,31 @@ void printRBPosition(RigidBodyPhysics& sut, int idx){
     printRBPosition(sut.getRigidBody(idx));
 }
 
+//TODO use
+bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
+    int width = flagfield.width();
+    int height = flagfield.height();
+
+    int j=height-1;
+    for (int i=0; i<width; i++) {
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
+    }
+    j=0;
+    for (int i=0; i<width; i++) {
+        std::cout << flagfield.value(i,j) << " ";
+    }
+    int i=width-1;
+    for (int j=0; j<height; j++) {
+        std::cout << flagfield.value(i,j) << " ";
+    }
+    i=0;
+    for (int j=0; j<height; j++) {
+        std::cout << flagfield.value(i,j) << " ";
+    }
+    return true;
+}
+
 
 // if the rigid body is in the middle in the beginning,
 // then nothing should move in the first few time steps

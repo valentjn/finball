@@ -243,15 +243,11 @@ public:
         // grid_vel.value(1, 3) = glm::vec2{1.0, 0.5};
     }
 
-    void setGravity(float yval){
-        dynamics_world->setGravity(btVector3(0.,-yval,0.));
-    }
-
     void setGravity(bool on){
         if(on)
-            setGravity(10.);
+            dynamics_world->setGravity(btVector3(0.,-10.,0.));
         else
-            setGravity(0.);
+            dynamics_world->setGravity(btVector3(0.,0.,0.));
     }
 
     RigidBody getRigidBody(int idx){

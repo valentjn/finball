@@ -216,7 +216,8 @@ public:
                             // TODO: scale with DISTANCE_GRID_CELLS
                             if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <= static_cast<RigidBodyCircle *>(level.rigidBodies[id-1].get())->radius * DISTANCE_GRID_CELLS) {
                                 grid_ball.value(x, y) = Level::CellType::OBSTACLE;
-                                grid_vel.value(x, y) = glm::vec2(1.0, 2.0); // TODO
+								// TODO: Proper scaling of velocity. Right now only scale the length.
+                                grid_vel.value(x, y) = DISTANCE_GRID_CELLS*glm::vec2(bt_rigid_body->getLinearVelocity().x(), bt_rigid_body->getLinearVelocity().y());
                             }
                         }
                     }

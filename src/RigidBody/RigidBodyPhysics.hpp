@@ -229,8 +229,7 @@ public:
             }
         }
 
-        // grid_finFlag(grid_obj, glm::vec2(0,0), glm::vec2(0,1), glm::vec2(1,1));
-
+        // grid_finFlag(grid_obj, glm::vec2(0,0),
         // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
         //     for (int j = 0; j < GRID_WIDTH; ++j) {
         //         printf("%2d", grid_obj.value(j, i));
@@ -246,6 +245,10 @@ public:
 
     void setGravity(bool on) {
         dynamics_world->setGravity(btVector3(0., (on ? -10. : 0.), 0.));
+    }
+
+    Transform getRigidBody(int idx){
+        return *(rigid_bodies[idx].get());
     }
 
     void grid_finFlag(Array2D<Level::CellType> &grid_fin, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3) {

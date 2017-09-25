@@ -28,7 +28,7 @@ void printRBPosition(RigidBodyPhysics& sut, int idx){
 // then nothing should move in the first few time steps
 // TODO do the same with lb time steps executed
 TEST(RigidBodyTest, static64) {
-  int idx = 666;
+  int idx = 1;
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<RigidBody>();
@@ -83,7 +83,7 @@ TEST(RigidBodyTest, static64) {
 //AND we have gravity,
 // then something should move in the first few time steps
 TEST(RigidBodyTest, gravity64) {
-  int idx = 666;
+  int idx = 1;
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<RigidBody>();
@@ -137,7 +137,7 @@ TEST(RigidBodyTest, gravity64) {
 //AND we have gravity,
 // then the x coordinate should not change in the first few time steps
 TEST(RigidBodyTest, stop64) {
-  int idx = 666;
+  int idx = 1;
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<RigidBody>();

@@ -7,8 +7,8 @@
 #include "LatticeBoltzmann.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "LatticeBoltzmannInput.hpp"
-#include "../Level.hpp"
-#include "../Array2D.hpp"
+#include "Level.hpp"
+#include "Array2D.hpp"
 #include <omp.h>
 
 using namespace glm;

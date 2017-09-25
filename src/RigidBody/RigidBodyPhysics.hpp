@@ -58,6 +58,7 @@ private:
     // Array2D<bool> grid_pedals;
     Array2D<glm::vec2> grid_velocities;
 
+    int ball_id; // FIXME: ...
     float BALL_RADIUS; // FIXME: this should really not be necessary
     // FIXME: for now in LBM coords
 
@@ -92,6 +93,7 @@ public:
         for (auto level_body : level.rigidBodies) {
             DetectionType detection_type = DetectionType::GENERAL;
             if (!level_body.isFixed) {
+                ball_id = next_id;
                 detection_type = DetectionType::CIRCLE;
             }
 
@@ -118,7 +120,7 @@ public:
             rigid_bodies[next_id] = std::move(rigid_body);
 
             bt_rigid_body->setUserIndex(next_id); // -> RigidBody.id
-            bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
+            // bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
             dynamics_world->addRigidBody(bt_rigid_body);
 
             next_id++;
@@ -174,12 +176,12 @@ public:
                 rigid_body->angle = transform.getRotation().getAngle();
                 output.rigid_bodies.push_back(rigid_body);
 
-                DetectionType detection_type =
-                    static_cast<DetectionType>(bt_rigid_body->getUserIndex2());
-                switch (detection_type) {
-                case DetectionType::CIRCLE:
-                    printf("%f %f\n", rigid_body->position.x, rigid_body->position.y);
-                    // printf("%f\n", DISTANCE_GRID_CELLS);
+                // DetectionType detection_type =
+                //     static_cast<DetectionType>(bt_rigid_body->getUserIndex2());
+                // TODO: find other way than setUserIndex2 to store this
+                // switch (detection_type) {
+                // case DetectionType::CIRCLE:
+                if (rigid_body->id == ball_id) {
                     for (int y = 0; y < GRID_HEIGHT; ++y) {
                         for (int x = 0; x < GRID_WIDTH; ++x) {
                             glm::vec2 pos = gridToBullet(x, y);
@@ -194,10 +196,11 @@ public:
                             }
                         }
                     }
-                    break;
-                default:
-                    Log::error("Unimplemented detection type!");
                 }
+                    // break;
+                // default:
+                    // Log::error("Unimplemented detection type!");
+                // }
             } else {
                 assert(false);
             }

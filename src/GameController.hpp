@@ -71,7 +71,7 @@ public:
             }
         });
 
-        timer.start(16, gameLogicOutput.running);
+        timer.start(33, gameLogicOutput.running);
     }
 };
 

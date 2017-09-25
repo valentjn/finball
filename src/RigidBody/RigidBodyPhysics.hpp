@@ -247,6 +247,10 @@ public:
         dynamics_world->setGravity(btVector3(0., (on ? -10. : 0.), 0.));
     }
 
+    Transform getRigidBody(int idx){
+        return *(rigid_bodies[idx].get());
+    }
+
     void grid_finFlag(Array2D<Level::CellType> &grid_fin, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3) {
         glm::vec2 norm1(-(pos1.y - pos2.y), pos1.x - pos2.x);
         glm::vec2 norm2(-(pos2.y - pos3.y), pos2.x - pos3.x);

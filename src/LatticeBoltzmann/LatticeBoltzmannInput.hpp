@@ -12,16 +12,18 @@
 
 class LatticeBoltzmannInput {
 public:
+	// TODO: Both should be const
     // input x, y velocity of moving bodies
-    const Array2D<glm::vec2> *velocities = nullptr;
+    Array2D<glm::vec2> *velocities = nullptr;
 
     // input flag matrix
-    const Array2D<Level::CellType> *flagfield = nullptr;
+    Array2D<Level::CellType> *flagfield = nullptr;
 
     LatticeBoltzmannInput(Level &level) {}
 
+	// TODO: const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput
     LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {
+                          RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {
         velocities = &rigidBodyPhysicsOutput.grid_velocities;
         flagfield = &rigidBodyPhysicsOutput.grid_objects;
     }

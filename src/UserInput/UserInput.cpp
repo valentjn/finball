@@ -38,7 +38,8 @@ bool UserInput::initializeKinect() {
 		kinectIsInitialized = false;
 		return false;
 	}
-	
+
+	// directions are mirrored (so right hand is on the right)
 	errorCode = context->SetGlobalMirror(true);
 	if(errorCode != XN_STATUS_OK) {
 		Log::info("Can't initialize context for kinect.");
@@ -47,6 +48,7 @@ bool UserInput::initializeKinect() {
 		return false;
 	}
 
+	// initialize depth generator
     errorCode = context->FindExistingNode(XN_NODE_TYPE_DEPTH, *depthGenerator);
     if(errorCode != XN_STATUS_OK) {
 		Log::info("Failed to initialize Depth Generator. Retrying...");
@@ -59,6 +61,7 @@ bool UserInput::initializeKinect() {
 		}
     }
 
+	// initialize user generator
     errorCode = context->FindExistingNode(XN_NODE_TYPE_USER, *userGenerator);
     if(errorCode != XN_STATUS_OK) {
 		Log::info("Failed to initialize User Generator. Retrying...");
@@ -74,6 +77,7 @@ bool UserInput::initializeKinect() {
     // register callbacks
     XnCallbackHandle hUserCallbacks, hCalibrationStart, hCalibrationComplete;
 
+	// register user callbacks
     errorCode = userGenerator->RegisterUserCallbacks(
         [](UserGenerator& userGenerator, XnUserID nID, void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
@@ -92,6 +96,7 @@ bool UserInput::initializeKinect() {
 		return false;
 	}
 
+	// register calibration callbacks
     errorCode = userGenerator->GetSkeletonCap().RegisterToCalibrationStart(
         [](SkeletonCapability& skeletonCapability, XnUserID nID, void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
@@ -139,6 +144,7 @@ bool UserInput::initializeKinect() {
 		return false;
 	}
 
+	// set flags
 	kinectIsInitialized = true;
 	return true;
 }
@@ -146,9 +152,9 @@ bool UserInput::initializeKinect() {
 
 // initialization of user input facilities
 UserInput::UserInput(){
+	previous_time_point = std::chrono::high_resolution_clock::now();
 
 #ifndef WITHOUT_KINECT_LIBRARIES
-    previous_time_point = std::chrono::high_resolution_clock::now();
 	kinectIsInitialized = false;
 	nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
 	

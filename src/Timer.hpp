@@ -9,19 +9,23 @@ class Timer
 {
 private:
 	std::function<void(void)> func;
+    std::chrono::steady_clock::time_point next;
 
 public:
-	Timer(std::function<void(void)> func) : func(func) {}
+    template<class Fn>
+	Timer(Fn func) : func(func), next(std::chrono::steady_clock::now()) {}
 
 	/**
 	 * Run the given function every interval (in ms)
 	 */
-	void start(unsigned int interval, const bool &running) {
+	void start(int interval, const bool &running) {
+        assert(interval >= 0);
 		while (running) {
-			auto next = std::chrono::steady_clock::now() +
-				std::chrono::milliseconds(interval);
+            std::this_thread::sleep_until(next);
+            next += std::chrono::milliseconds(interval);
+            if (next < std::chrono::steady_clock::now())
+                next = std::chrono::steady_clock::now();
 			func();
-			std::this_thread::sleep_until(next);
 		}
 	}
 };

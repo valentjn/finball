@@ -23,6 +23,7 @@
 #include "UserInput/UserInputOutput.hpp"
 #include "Visualization/Renderer.hpp"
 #include "Visualization/RendererInput.hpp"
+#include "Timer.hpp"
 
 using namespace chrono;
 

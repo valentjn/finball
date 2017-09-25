@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"

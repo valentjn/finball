@@ -1,23 +1,23 @@
-#include "Menus/GameOverScreen.hpp"
+#include "Scenes/GameOverScene.hpp"
 
 #include <SDL2/SDL.h>
 
 #include "Log.hpp"
 #include "SDL/SDLEvents.hpp"
 
-void GameOverScreen::show(float highscore) {
-    gameScreen.addBackgroundImage("data/background.jpg");
+void GameOverScene::show(float highscore) {
+    menuRenderer.addBackgroundImage("data/background.jpg");
 
-    gameScreen.addTitle("Game Over :(");
-    gameScreen.addActionText("This was HAIkel! Your HAIscore is " + std::to_string(highscore) + ".");
-    gameScreen.addLeftText("Enter your name:\n__________________");
+    menuRenderer.addTitle("Game Over :(");
+    menuRenderer.addActionText("This was HAIkel! Your HAIscore is " + std::to_string(highscore) + ".");
+    menuRenderer.addLeftText("Enter your name:\n__________________");
 
-    gameScreen.render();
+    menuRenderer.render();
 
     listen(highscore);
 }
 
-void GameOverScreen::listen(float highscore) {
+void GameOverScene::listen(float highscore) {
     // Flag for quitting the program
     bool running = true;
     std::string name = "";
@@ -36,8 +36,8 @@ void GameOverScreen::listen(float highscore) {
         Log::info("Key pressed: %c, sym: %d", c, sym);
         if (SDLK_a <= sym && sym <= SDLK_z && name.length() < 10) {
             name += c;
-            gameScreen.addLeftText("\n" + name);
-            gameScreen.render();
+            menuRenderer.addLeftText("\n" + name);
+            menuRenderer.render();
         }
     });
     events.setListener(SDL_QUIT, [&](SDL_Event &event) {

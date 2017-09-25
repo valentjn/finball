@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "gtest/gtest.h"
 
 #include "test_lbm.hpp"
@@ -10,8 +12,8 @@
 TEST(RigidBodyTest, static64) {
 
   Level level("data/testLevel.txt");
-  level.rigidBodies = vector<RigidBody>();
-  level.rigidBodies.push_back(RigidBody(666, level.width/2, level.height/2, false));
+  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
+  level.rigidBodies.push_back(std::make_unique<RigidBody>(1, level.width/2, level.height/2, 1, 0));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -67,8 +69,8 @@ TEST(RigidBodyTest, static64) {
 TEST(RigidBodyTest, gravity64) {
 
   Level level("data/testLevel.txt");
-  level.rigidBodies = vector<RigidBody>();
-  level.rigidBodies.push_back(RigidBody(666, level.width/2, level.height/2, false));
+  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
+  level.rigidBodies.push_back(std::make_unique<RigidBody>(1, level.width/2, level.height/2, 1, 0.f));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -114,5 +116,6 @@ TEST(RigidBodyTest, gravity64) {
   EXPECT_TRUE(changed);
   if(! changed){
     printFlagField(init_flagfield);
+    printFlagField(output.grid_objects);
   }
 }

@@ -30,7 +30,7 @@ private:
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
-    static const int BALL_ID = 1;
+    static const int BALL_ID;
 
     int width, height;
     int flipperLeftId, flipperRightId;
@@ -69,15 +69,12 @@ public:
                     meshes[BALL_ID] = meshCircle.get();
                 } else {
                     CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
-                    switch (cell) {
-                        // TODO: what needs LBM??
-                        case OBSTACLE:
-                            rigidBodies.push_back(make_unique<RigidBodyRect>(rigidBodyId, x, y, 1, 1, 0));
-                            meshes[rigidBodyId] = meshRect.get();
-                            rigidBodyId++;
-                            break;
-                        default: matrix.value(x, y) = cell; break;
+                    if (cell == OBSTACLE) {
+                        rigidBodies.push_back(make_unique<RigidBodyRect>(rigidBodyId, x, y, 1, 1, 0));
+                        meshes[rigidBodyId] = meshRect.get();
+                        rigidBodyId++;
                     }
+                    matrix.value(x, y) = cell;
                 }
             }
         }

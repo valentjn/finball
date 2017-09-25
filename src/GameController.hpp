@@ -29,11 +29,11 @@
 using namespace chrono;
 
 class GameController {
-
     Highscores &highscores;
+    int frameTime;
 
 public:
-    GameController(Highscores &highscores) : highscores(highscores) {}
+    GameController(Highscores &highscores, int frameRate) : highscores(highscores), frameTime(1000 / frameRate) {}
 
     void startGame(SDLWindow &window, Level &level) {
         Renderer renderer(window);
@@ -82,7 +82,7 @@ public:
             }
         });
 
-        timer.start(100, gameLogicOutput.running);
+        timer.start(frameTime, gameLogicOutput.running);
 
         GameOverScreen gameOverScreen(window, highscores);
         gameOverScreen.show(gameLogicOutput.highscore);

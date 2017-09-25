@@ -14,10 +14,11 @@ public:
     bool fullscreen = false;
     int windowWidth = 800;
     int windowHeight = 600;
+    int frameRate = 30;
 
     Parameters(int argc, char *const argv[]) {
         int optchar;
-        const char *options = "v:fw:h:";
+        const char *options = "v:fw:h:r:";
 
         while ((optchar = getopt(argc, argv, options)) > 0) {
             switch (optchar) {
@@ -37,6 +38,10 @@ public:
                 windowHeight = atoi(optarg);
                 break;
 
+            case 'r':
+                frameRate = atoi(optarg);
+                break;
+
             default:
                 printHelp(argv);
                 break;
@@ -51,6 +56,9 @@ public:
         cout << "Parameters for " << argv[0] << endl;
         cout << "	-v [level]		Verbosity level (default: 0)" << endl;
         cout << "	-f              Enable fullscreen" << endl;
+        cout << "	-w [width]      Screen height (default: 800)" << endl;
+        cout << "	-h [height]     Screen width (default: 600)" << endl;
+        cout << "	-r [frameRate]  Max. frame rate (default: 30)" << endl;
         exit(EXIT_FAILURE);
     }
 };

@@ -57,6 +57,7 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
     std::unordered_map<int, std::unique_ptr<RigidBody>> rigid_bodies;
+	std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
     // Array2D<bool> grid_pedals;
@@ -85,6 +86,7 @@ public:
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
 	{
+		dynamics_world->setGravity(btVector3(0.0f,0.0f,0.0f));
         // TODO: set correct radius once it's available; scale with DISTANCE_GRID_CELLS
         // TODO: static objects are rectangles for now
         BALL_RADIUS = DISTANCE_GRID_CELLS;
@@ -148,6 +150,23 @@ public:
         output.rigid_bodies.clear(); // currently not needed as we get a new output each time
         // TODO: try to give out a const reference to our internal rigid_bodies vector
 
+		// Compute impulses
+		// TODO: Make it work for multiple balls.
+		input.computeImpulses(grid_ball, impulses);
+		// TODO: apply impulses
+		for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
+            auto &obj = dynamics_world->getCollisionObjectArray()[j];
+            btRigidBody *bt_rigid_body = btRigidBody::upcast(obj);
+			int id = bt_rigid_body->getUserIndex();
+			RigidBody *rigid_body = rigid_bodies[id].get();
+			if (bt_rigid_body && bt_rigid_body->getMotionState() && rigid_body->id == ball_id) {
+				bt_rigid_body->applyCentralImpulse(btVector3(impulses[1].x,impulses[1].y,0.0f));
+			}
+		}
+
+		// Clear the impulses for the next time step
+		impulses.clear();
+
         // clear dynamic flag fields
         for (int y = 0; y < GRID_HEIGHT; ++y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
@@ -158,7 +177,6 @@ public:
             }
         }
 
-        // TODO: apply impulses
 
         dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
 

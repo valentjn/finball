@@ -39,23 +39,23 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 	// set f_i in obstacles to 0
 	initFiObstacles(input);
 
-	auto time1 = std::chrono::steady_clock::now();
+	time1 = std::chrono::steady_clock::now();
 	measuredTimes[1] += time1 - time2;
 
 	stream(input);
 
-	auto time2 = std::chrono::steady_clock::now();
-	auto colTime = time2 - time1;
+	time2 = std::chrono::steady_clock::now();
+	measuredTimes[2] = time2 - time1;
 
 	handleBoundaries(input);
 	
-	auto time2 = std::chrono::steady_clock::now();
-	auto colTime = time2 - time1;
+	time1 = std::chrono::steady_clock::now();
+	measuredTimes[3] = time1 - time2;
 
 	reinitilizeFI(output);
 
-	auto time2 = std::chrono::steady_clock::now();
-	auto colTime = time2 - time1;
+	time2 = std::chrono::steady_clock::now();
+	measuredTimes[4] = time2 - time1;
 
 }
 

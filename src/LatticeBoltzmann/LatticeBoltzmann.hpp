@@ -58,7 +58,7 @@ public:
             }
         }
         for (int i=0; i<5; i++){
-        	measuredTimes[i]=0;
+			measuredTimes[i] = std::chrono::duration<float>(0.);
         }
     }
 

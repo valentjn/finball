@@ -12,24 +12,24 @@
 
 class LatticeBoltzmannInput {
 public:
+	// TODO: Both should be const
     // input x, y velocity of moving bodies
-    std::unique_ptr<Array2D<glm::vec2>> velocities = nullptr;
+    Array2D<glm::vec2> velocities;
 
     // input flag matrix
-    std::unique_ptr<Array2D<Level::CellType>> flagfield = nullptr;
+    Array2D<Level::CellType> flagfield;
 
-    LatticeBoltzmannInput(Level &level) {
-        velocities = std::make_unique<Array2D<glm::vec2>>(level.width, level.height);
-        flagfield = std::make_unique<Array2D<Level::CellType>>(level.width, level.height);
-    }
+    LatticeBoltzmannInput(Level &level) :
+        velocities(level.width,level.height),
+        flagfield(level.matrix)
+    {}
 
+	// TODO: const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput
     LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) {
-        int width = rigidBodyPhysicsOutput.grid_objects.width();
-        int height = rigidBodyPhysicsOutput.grid_objects.height();
-        velocities = std::make_unique<Array2D<glm::vec2>>(width, height);
-        flagfield = std::make_unique<Array2D<Level::CellType>>(width, height);
-    }
+                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) :
+        velocities(rigidBodyPhysicsOutput.grid_velocities),
+        flagfield(rigidBodyPhysicsOutput.grid_objects)
+    {}
 };
 
 #endif

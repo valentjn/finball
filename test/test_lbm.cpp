@@ -1,15 +1,15 @@
 #include "gtest/gtest.h"
 #include "../src/LatticeBoltzmann/LatticeBoltzmann.hpp"
 
-void printFlagField(LatticeBoltzmannInput &input) {
+void printFlagField(Array2D<Level::CellType> &flagfield) {
 
   std::cout << "FLAGS:" << std::endl << std::endl;
-  int width = input.flagfield->width();
-  int height = input.flagfield->height();
+  int width = flagfield.width();
+  int height = flagfield.height();
 
-  for (int i=0; i<width; i++) {
-    for (int j=0; j<height; j++) {
-      std::cout << input.flagfield->value(i,j) << " ";
+  for (int j=height-1; j>=0; j--) {
+    for (int i=0; i<width; i++) {
+      std::cout << flagfield.value(i,j) << " ";
     }
     std::cout << std::endl;
   }
@@ -18,13 +18,13 @@ void printFlagField(LatticeBoltzmannInput &input) {
 void printVelocities(LatticeBoltzmannInput &input) {
 
   std::cout << "Input velocities:" << std::endl << std::endl;
-  int width = input.velocities->width();
-  int height = input.velocities->height();
+  int width = input.velocities.width();
+  int height = input.velocities.height();
 
-  for (int i=0; i<width; i++) {
-    for (int j=0; j<height; j++) {
-      float u = input.velocities->value(i,j)[0];
-      float v = input.velocities->value(i,j)[1];
+  for (int j=height-1; j>=0; j--) {
+    for (int i=0; i<width; i++) {
+      float u = input.velocities.value(i,j)[0];
+      float v = input.velocities.value(i,j)[1];
       std::cout << u << "," << v << " ";
     }
     std::cout << std::endl;
@@ -37,8 +37,8 @@ void printVelocities(LatticeBoltzmannOutput &output) {
   int width = output.velocity.width();
   int height = output.velocity.height();
 
-  for (int i=0; i<width; i++) {
-    for (int j=0; j<height; j++) {
+  for (int j=height-1; j>=0; j--) {
+    for (int i=0; i<width; i++) {
       float u = output.velocity.value(i,j)[0];
       float v = output.velocity.value(i,j)[1];
       std::cout << u << "," << v << " ";
@@ -51,13 +51,13 @@ void printFIs(Array2D<FICell> &fi) {
   int width = fi.width();
   int height = fi.height();
   std::cout << "FIs:" << std::endl << std::endl;
-  for (int i=0; i<width; i++) {
-    for (int j=0; j<height; j++) {
-      std::cout << "{";
+  for (int j=height-1; j>=0; j--) {
+    for (int i=0; i<width; i++) {
+      std::cout << i << j << " {";
       for (int k=0; k<9; k++) {
         std::cout << fi.value(i,j)[k] << ",";
       }
-      std::cout << "}  ";
+      std::cout << "}  " << std::endl;
     }
     std::cout << std::endl;
   }
@@ -114,11 +114,11 @@ bool isSmooth(Array2D<float> &rho, float threshold) {
 
 TEST(LBMTest, CollideStep1x1) {
 
-  Level level("data/testLevel.txt");
-  level.width=1;
-  level.height=1;
+  Level level("test/level5x5.txt");
+  printFlagField(level.matrix);
 
   LatticeBoltzmannInput input(level);
+  printFlagField(input.flagfield);
   LatticeBoltzmannOutput output(level);
   output.density.value(0,0) = 0;
   output.velocity.value(0,0) = glm::vec2(0,0);
@@ -128,7 +128,7 @@ TEST(LBMTest, CollideStep1x1) {
   std::cout << output.density.value(0,0) << std::endl;
   std::cout << output.velocity.value(0,0)[0] << std::endl;
   std::cout << output.velocity.value(0,0)[1] << std::endl;
-  EXPECT_EQ(1,level.width);
+  EXPECT_EQ(5,level.width);
 }
 
 TEST(LBMTest, EquilibriumTrue) {
@@ -141,14 +141,20 @@ TEST(LBMTest, EquilibriumTrue) {
 
   for (int i=0; i<5; i++) {
     for (int j=0; j<5; j++) {
-      input.velocities->value(i,j)[0] = 0.1;
+      input.velocities.value(i,j)[0] = 0.1;
     }
   }
   printVelocities(input);
-  printFIs(output.afterstream);
+  //printFIs(output.afterstream);
   sut.compute(input, output);
-  printFIs(output.afterstream);
+  //printFIs(output.prestream);
+  //printFIs(output.afterstream);
   printVelocities(output);
+  for (int i =0; i < 1000; ++i){
+     sut.compute(input, output);
+  }
+  printVelocities(output);
+  //printFIs(output.afterstream);
   EXPECT_EQ(5,level.width);
 }
 

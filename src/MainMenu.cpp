@@ -16,17 +16,17 @@ std::unique_ptr<Level> MainMenu::show() {
     SDL_Event event;
 
     while (!quit) {
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                    quit = true;
-                }
-                break;
-            case SDL_QUIT: // User hits the "x" in the corner of the window
-                exit(0);
-                break;
+        SDL_WaitEvent(&event);
+
+        switch (event.type) {
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_SPACE) {
+                quit = true;
             }
+            break;
+        case SDL_QUIT: // User hits the "x" in the corner of the window
+            exit(0);
+            break;
         }
     }
 
@@ -50,15 +50,12 @@ void MainMenu::setup() {
 }
 
 std::string MainMenu::getHighscoreText() {
-    std::vector<float> highscores;
-    Highscores::loadHighscores(highscores);
-
     std::stringstream stream;
     int counter = 1;
 
     stream << std::fixed << std::setprecision(2);
-    for (auto it = highscores.begin(); it != highscores.end() && counter <= 5; it++) {
-        stream << "(" << counter++ << ") " << *it << "\n";
+    for (const auto &highscore : highscores.getHighscores()) {
+        stream << "(" << counter++ << ") " << highscore.name << " " << highscore.score << "\n";
     }
     return stream.str();
 }

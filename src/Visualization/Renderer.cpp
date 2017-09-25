@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "Log.hpp"
 #include "Level.hpp"
@@ -147,13 +147,13 @@ void Renderer::update(const RendererInput &input) {
     glUseProgram(m_shader_program_fluid);
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
 
-    // bind & fill velocities texture
+    // bind & fill fluid input texture
     auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
     glUniform1i(loc, 0);
     if (!m_tex_fluid_input)
-        m_tex_fluid_input = std::make_unique<Texture2F>(glm::ivec2{ input.fluid_velocity->width(), input.fluid_velocity->height() });
+        m_tex_fluid_input = std::make_unique<Texture3F>(glm::ivec2{ input.fluid_input.width(), input.fluid_input.height() });
     m_tex_fluid_input->bind(0);
-    m_tex_fluid_input->setData(*input.fluid_velocity);
+    m_tex_fluid_input->setData(input.fluid_input);
 
     // bind noise texture
     loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
@@ -210,7 +210,8 @@ void Renderer::update(const RendererInput &input) {
 void Renderer::render(const RenderObject &object, GLint model_location, GLint mode_location) const {
     glm::mat4 model;
 	model = glm::translate(model, object.position);
-    model = glm::scale(model, glm::vec3{ object.scale });
+    model = glm::scale(model, glm::vec3{ object.scale, 1 });
+    model = glm::rotate(model, object.rotation, glm::vec3{ 0, 0, 1 });
 	glUniformMatrix4fv(
 		model_location,         // uniform location of the model matrix in the shader
 		1,                      // matrix count

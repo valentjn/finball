@@ -6,10 +6,9 @@
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "Highscores.hpp"
+#include "Level.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
-#include <Level.hpp>
 
 using namespace std;
 using namespace std::chrono;
@@ -26,7 +25,7 @@ public:
         auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
         fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
         fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.f};
-        fluid_surface.scale = level.width * 0.5f;
+        fluid_surface.scale = { level.width * 0.5f, level.height * 0.5f };
         fluid_surface.mesh = fluid_mesh.get();
 
         startTime = steady_clock::now();
@@ -37,9 +36,15 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.highscore = duration.count();
 
+        for (RigidBody const *rigidBody : *input.rigidBodies) {
+            if (rigidBody->id == 1 && rigidBody->position.y < 0) {
+                output.running = false;
+                return;
+            }
+        }
+
         if (input.quit) {
             output.running = false;
-            Highscores::saveHighscore(output.highscore);
             return;
         }
 

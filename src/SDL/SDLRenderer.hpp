@@ -12,9 +12,13 @@
 
 class SDLRenderer {
 
+public:
+    typedef TTF_Font * Font;
+    typedef SDL_Color Color;
+
 private:
     SDL_Renderer *renderer;
-    std::vector<TTF_Font *> fonts;
+    std::vector<Font> fonts;
     int windowWidth;
 
 public:
@@ -31,8 +35,8 @@ public:
         SDL_DestroyRenderer(renderer);
     }
 
-    TTF_Font *loadFont(const char* path, int ptsize) {
-        TTF_Font *font = TTF_OpenFont(path, ptsize);
+    Font loadFont(const char* path, int ptsize) {
+        Font font = TTF_OpenFont(path, ptsize);
         fonts.push_back(font);
         return font;
     }
@@ -45,7 +49,7 @@ public:
         SDL_DestroyTexture(texture);
     }
 
-    void addText(std::string text, int x, int y, TTF_Font *font, SDL_Color color, bool center) {
+    void addText(std::string text, int x, int y, Font font, Color color, bool center) {
         SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, windowWidth);
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);

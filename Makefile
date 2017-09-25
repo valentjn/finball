@@ -49,10 +49,10 @@ debug:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
-run:
+run: release
 	build/fa_2017_release ${args}
 
-run_verbose:
+run_verbose: release
 	build/fa_2017_release -v 10 ${args}
 
 tidy:
@@ -69,7 +69,7 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) src/Log.cpp test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
+	$(CXX) src/Log.cpp src/LatticeBoltzmann/LatticeBoltzmann.cpp test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
 	build/test
 
 test_test: test_deps

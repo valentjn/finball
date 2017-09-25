@@ -3,6 +3,7 @@
 
 uniform sampler2D tex_vecs; // velocities texture
 uniform sampler2D tex_noise; // noise texture
+uniform sampler2D tex_density; // density texture
 
 const int STEPS=10; // The number of adjacent locations in one direction to use for smearing
 
@@ -56,8 +57,16 @@ void main() {
     vec2 normalized_coords = gl_FragCoord.xy / (textureSize(tex_noise, 0) * 2);
     ivec2 vecs_res = textureSize(tex_vecs, 0);
     normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
-    out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA
-    //out_color = texture(tex_vecs, normalized_coords);
-    //out_color = normalized_coords.xxyy;
+    //out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA
+    float velocity_val = lic(normalized_coords);
+    float density_val = 1.9 * texture(tex_vecs, normalized_coords).z;
+    if (density_val < 1)
+        out_color = vec4(0, 0, 1, 1) * (1 - density_val) + vec4(0, 1, 0, 1) * density_val;
+    else {
+        density_val -= 1;
+        density_val = min(density_val, 1);
+        out_color = vec4(0, 1, 0, 1) * (1 - density_val) + vec4(1, 0, 0, 1) * density_val;
+    }
+    out_color *= velocity_val;
 }
 

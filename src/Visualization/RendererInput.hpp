@@ -17,11 +17,10 @@ class RendererInput {
 public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
-    const Array2D<glm::vec2> *fluid_velocity;
-    const Array2D<float> *fluid_density;
+    Array2D<glm::vec3> fluid_input;
     TexturedMesh* fluid_mesh;
 
-    RendererInput() : fluid_velocity(nullptr), fluid_density(nullptr) {}
+    RendererInput() : fluid_mesh(nullptr) {}
 
     RendererInput(const GameLogicOutput &gameLogicOutput,
                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
@@ -32,13 +31,15 @@ public:
 
         static std::unique_ptr<Mesh> dummy_mesh;
         if (!dummy_mesh) {
-            auto circle = Mesh::createCircle(glm::vec2{0, 0}, 1.f);
-            dummy_mesh = std::make_unique<ColoredMesh>(circle, glm::vec3{1, 0.3, 0.4});
+            auto square = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
+            dummy_mesh = std::make_unique<ColoredMesh>(
+                square,
+                std::vector<glm::vec3>{{1, 0, 0.4},{0.3, 1, 0.4},{1, 1, 0.4},{1, 0, 0.4},{1, 1, 0.4},{0, 0, 1}});
         }
 
         for (auto& gameLogicObject : world_objects) {
         	if (!gameLogicObject.mesh) {
-				Log::warn("A game_logic object does not have a render mesh, rendering as circle");
+				Log::warn("A game_logic object does not have a render mesh, rendering as rectangle");
                 gameLogicObject.mesh = dummy_mesh.get();
         	}
         }
@@ -58,7 +59,8 @@ public:
             }
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody->position, 0);
-            renderObject.scale = rigidBody->radius;
+            renderObject.scale = { rigidBody->radius, rigidBody->radius };
+            renderObject.rotation = rigidBody->angle;
 			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = mesh;
 
@@ -76,8 +78,12 @@ public:
         }
 
         // handle lattice boltzmann output
-        fluid_velocity = &latticeBoltzmannOutput.velocity;
-        fluid_density = &latticeBoltzmannOutput.density;
+        assert(latticeBoltzmannOutput.velocity.width() == latticeBoltzmannOutput.density.width());
+        assert(latticeBoltzmannOutput.velocity.height() == latticeBoltzmannOutput.density.height());
+        fluid_input = Array2D<glm::vec3>{ latticeBoltzmannOutput.velocity.width(), latticeBoltzmannOutput.velocity.height() };
+        for (int x = 0; x < fluid_input.width(); ++x)
+            for (int y = 0; y < fluid_input.height(); ++y)
+                fluid_input.value(x,y) = glm::vec3{ latticeBoltzmannOutput.velocity.value(x,y), latticeBoltzmannOutput.density.value(x,y) };
         /* test input
         static Array2D<glm::vec2> test_fluid_velocity;
         if (test_fluid_velocity == Array2D<glm::vec2>{}) {

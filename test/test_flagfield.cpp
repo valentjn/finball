@@ -27,7 +27,6 @@ void printRBPosition(RigidBodyPhysics& sut, int idx){
     printRBPosition(sut.getRigidBody(idx));
 }
 
-//TODO use
 bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
     int width = flagfield.width();
     int height = flagfield.height();
@@ -64,9 +63,9 @@ TEST(RigidBodyTest, static64) {
 
   LevelLoader levelLoader("data/testLevel.txt");
   Level level;
-  level.setBallPosition(level.width/2, level.height/2);
 
   levelLoader.load(level);
+  level.setBallPosition(level.width/2, level.height/2);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -122,9 +121,9 @@ TEST(RigidBodyTest, gravity64) {
 
   LevelLoader levelLoader("data/testLevel.txt");
   Level level;
-  level.setBallPosition(level.width/2, level.height/2);  
 
   levelLoader.load(level);
+  level.setBallPosition(level.width/2, level.height/2);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -179,9 +178,9 @@ TEST(RigidBodyTest, stop64) {
 
   LevelLoader levelLoader("data/testLevel.txt");
   Level level;
-  level.setBallPosition(level.width/4, level.height*0.9);
 
   levelLoader.load(level);
+  level.setBallPosition(level.width/4, level.height*0.9);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -223,7 +222,7 @@ TEST(RigidBodyTest, stop64) {
   EXPECT_TRUE(changed);
   EXPECT_FLOAT_EQ(before.position.x, after.position.x);
   EXPECT_LE(48, after.position.y);
-  //if(! changed)
+  if(! changed)
   {
     printFlagField(init_flagfield);
     printFlagField(output.grid_objects);

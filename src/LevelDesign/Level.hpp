@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 #include "Array2D.hpp"
 #include "RigidBody/RigidBody.hpp"
@@ -35,6 +36,7 @@ struct Level {
             }
         }
     }
+
 };
 
 #endif

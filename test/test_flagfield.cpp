@@ -152,7 +152,6 @@ TEST(RigidBodyTest, gravity64) {
       }
   }
 
-  //TODO make work!
   EXPECT_TRUE(changed);
   if(! changed){
     printFlagField(init_flagfield);
@@ -171,7 +170,7 @@ TEST(RigidBodyTest, stop64) {
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/4, level.height*0.9, false));
+  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/4, level.height*0.9));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -209,8 +208,11 @@ TEST(RigidBodyTest, stop64) {
       }
   }
   // TODO
-  //EXPECT_TRUE(changed);
-  if(! changed){
+  EXPECT_TRUE(changed);
+  EXPECT_FLOAT_EQ(before.position.x, after.position.x);
+  EXPECT_LE(48, after.position.y);
+  //if(! changed)
+  {
     printFlagField(init_flagfield);
     printFlagField(output.grid_objects);
   }

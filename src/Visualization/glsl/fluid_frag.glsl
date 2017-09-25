@@ -210,6 +210,5 @@ void main() {
 	}
 
 	out_color *= 0.5 + 0.8 * out_wave;
-	out_color = vec3(out_wave);
 }
 

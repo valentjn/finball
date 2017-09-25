@@ -30,7 +30,7 @@ private:
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
-    static const int BALL_ID;
+    static const int BALL_ID = 1;
 
     int width, height;
     int flipperLeftId, flipperRightId;

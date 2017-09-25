@@ -212,6 +212,50 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
         case SDL_QUIT:
             userInputOutput.quit = true;
             break;
+		case SDL_KEYDOWN:
+			switch (event.key.keysym.sym){
+			case SDLK_LEFT:
+				// 1 keypress is pi/40, velocity starts at pi/10
+				userInputOutput.pressedL = userInputOutput.pressedL - userInputOutput.stepSize;
+				if (userInputOutput.pressedL >= -max_angle[0]) {
+					userInputOutput.leftAngle[0] = userInputOutput.pressedL;
+					userInputOutput.leftVelocity[0] = 4*userInputOutput.pressedL;
+				}
+				break;
+			case SDLK_RIGHT:
+				// 1 keypress is pi/40, velocity starts at pi/10
+				userInputOutput.pressedR = userInputOutput.pressedR + userInputOutput.stepSize;
+				if (userInputOutput.pressedR <= max_angle[0]) {
+					userInputOutput.rightAngle[0] = userInputOutput.pressedR-3.141;
+					userInputOutput.rightVelocity[0] = 4*userInputOutput.pressedR;
+				}
+				break;
+			}
+			break;
+		case SDL_KEYUP:
+			switch (event.key.keysym.sym){
+			case SDLK_LEFT:
+				// reset pressedL for the next time
+				userInputOutput.pressedL = 0;
+				break;
+			case SDLK_RIGHT:
+				// reset pressedR for the next time
+				userInputOutput.pressedR = 0;
+				break;
+			}
+			break;
+		case SDL_MOUSEMOTION:
+			userInputOutput.mouseX = event.motion.x;
+			userInputOutput.mouseY = event.motion.y;
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			userInputOutput.mouseX = event.button.x;
+			userInputOutput.mouseY = event.button.y;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			userInputOutput.mouseX = event.button.x;
+			userInputOutput.mouseY = event.button.y;
+			break;
         }
     }
 
@@ -222,7 +266,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			finalizeKinect();
 			initializeKinect();
 		}
-	} else {
+	} else if(usedInputSource == KINECT) {
 		// TODO: handle error codes
 		XnStatus errorCode = XN_STATUS_OK;
 

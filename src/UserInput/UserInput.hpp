@@ -29,6 +29,14 @@ private:
 	static const int MAX_USERS = 4;
 	static const int PLAYERS = 2;
 	static constexpr const double MIN_DIFFERENCE = 0.1;
+
+	enum InputSource {
+		KEYBOARD
+#ifndef WITHOUT_KINECT_LIBRARIES
+		, KINECT
+#endif
+	};
+	InputSource usedInputSource;
 	
 #ifndef WITHOUT_KINECT_LIBRARIES
     std::unique_ptr<xn::Context> context;

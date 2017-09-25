@@ -210,7 +210,8 @@ void Renderer::update(const RendererInput &input) {
 void Renderer::render(const RenderObject &object, GLint model_location, GLint mode_location) const {
     glm::mat4 model;
 	model = glm::translate(model, object.position);
-    model = glm::scale(model, glm::vec3{ object.scale });
+    model = glm::scale(model, glm::vec3{ object.scale, 1 });
+    model = glm::rotate(model, object.rotation, glm::vec3{ 0, 0, 1 });
 	glUniformMatrix4fv(
 		model_location,         // uniform location of the model matrix in the shader
 		1,                      // matrix count

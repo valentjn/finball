@@ -12,6 +12,9 @@
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 
+//TODO: Maybe name variables properly??
+// To distinguish bullet unit variables from grid unit variables
+
 // GET THE BODY SHAPE RESPONSIBILITY THING SORTED OUT!!!! (global id for each object)
 // then only send out transform related to the objects with that id (rename RigidBody to Transform)
 // (convince others to use r_ball = GRID_WIDTH / 16 / 2)
@@ -68,7 +71,7 @@ public:
     RigidBodyPhysics(Level &level)
         : level(level), GRID_WIDTH(level.width), GRID_HEIGHT(level.height),
           DISTANCE_GRID_CELLS(BULLET_WORLD_WIDTH / GRID_WIDTH),
-          DISTANCE_GRID_CELLS_INV(1 / DISTANCE_GRID_CELLS), // TODO: currently end of grid != (BULLET_WORLD_WITH | BULLET_WORLD_WIDTH)
+          DISTANCE_GRID_CELLS_INV(GRID_WIDTH / BULLET_WORLD_WIDTH), // TODO: currently end of grid != (BULLET_WORLD_WITH | BULLET_WORLD_WIDTH)
           collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
           collision_configuration(std::make_unique<btDefaultCollisionConfiguration>()),
           dispatcher(std::make_unique<btCollisionDispatcher>(collision_configuration.get())),
@@ -79,11 +82,12 @@ public:
           grid_static_objects_flow(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_ball(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
-          grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT)) {
+          grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
+	{
         // TODO: set correct radius once it's available; scale with DISTANCE_GRID_CELLS
         // TODO: static objects are rectangles for now
         BALL_RADIUS = DISTANCE_GRID_CELLS;
-        btCollisionShape *sphere_shape = new btSphereShape(4*BALL_RADIUS);
+        btCollisionShape *sphere_shape = new btSphereShape(BALL_RADIUS);
 
         grid_static_objects_flow = level.matrix;
 
@@ -117,7 +121,7 @@ public:
             auto rigid_body =
                 std::make_unique<RigidBody>(level_body.id, level_body.position.x, level_body.position.y);
             rigid_bodies[level_body.id] = std::move(rigid_body);
-            
+
             bt_rigid_body->setUserIndex(level_body.id); // -> RigidBody.id
             // bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
             dynamics_world->addRigidBody(bt_rigid_body);

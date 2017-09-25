@@ -11,6 +11,16 @@ struct UserInputOutput {
     bool playerIsCalibrating[2];
     bool playerIsCalibrated[2];
 
+	double pressedL = 0; // increasing with duration of left / right arrow pressed
+	double pressedR = 0;
+	double maxAngle = 1.571;
+	double stepSize = maxAngle/20; // increase of angle with every keydown event
+	bool fakedata = false;
+	
+
+	int mouseX; // x position of mouse in pixels
+	int mouseY; // y position of mouse in pixels
+
     bool quit, start;
 
     UserInputOutput() : quit(false), start(false) {}

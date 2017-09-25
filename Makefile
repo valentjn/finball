@@ -1,5 +1,5 @@
 CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
-COMMON_CFLAGS= -pedantic \
+COMMON_CFLAGS:= -pedantic \
 		       -Wall \
 		       -Wextra \
 		       -fmessage-length=0 \
@@ -9,8 +9,8 @@ COMMON_CFLAGS= -pedantic \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src \
-		       -I ext \
-		       -I/usr/include/ni -I/usr/include/nite
+		       -I ext
+KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
@@ -18,8 +18,8 @@ LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs` \
-		  -lOpenNI -lXnVNite_1_5_2
+		  `pkg-config bullet --libs`
+KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2
 
 .PHONY: test_all
 
@@ -41,15 +41,27 @@ install_icon:
 
 release:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
 
 optimal:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
 
 debug:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
+	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
+
+release-kinect:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) $(KINECT_LDFLAGS)
+
+optimal-kinect:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) $(KINECT_LDFLAGS)
+
+debug-kinect:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_debug $(LDFLAGS) $(KINECT_LDFLAGS)
 
 run:
 	build/fa_2017_release ${args}

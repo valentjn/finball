@@ -25,7 +25,6 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 
 void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
-
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
@@ -36,7 +35,6 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 
 	Stream(input);
 	HandleBoundaries(input);
-	
 }
 
 void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)

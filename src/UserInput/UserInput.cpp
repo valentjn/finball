@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include "../Log.hpp"
 
 #ifndef WITHOUT_KINECT_LIBRARIES
 
@@ -41,12 +42,14 @@ UserInput::UserInput(){
 
     errorCode = context->Init();
     errorCode = context->FindExistingNode(XN_NODE_TYPE_DEPTH, *depthGenerator);
-    if(errorCode != XN_STATUS_OK) {
+    while(errorCode != XN_STATUS_OK) {
+		Log::info("Failed to initialize Depth Generator. Retrying...");
         errorCode = depthGenerator->Create(*context);
     }
 
     errorCode = context->FindExistingNode(XN_NODE_TYPE_USER, *userGenerator);
-    if(errorCode != XN_STATUS_OK) {
+    while(errorCode != XN_STATUS_OK) {
+		Log::info("Failed to initialize User Generator. Retrying...");
         errorCode = userGenerator->Create(*context);
     }
 
@@ -90,6 +93,7 @@ UserInput::UserInput(){
     userGenerator->GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
 
     // start generating data
+	Log::debug("Start generating input data...");
     errorCode = context->StartGeneratingAll();
 #endif
 }

@@ -169,6 +169,8 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 					  fi_Old.value(x, y)[6] + fi_Old.value(x, y)[7] + fi_Old.value(x, y)[8];
 
 				if (rho == 0.) {
+					// this happens when a rigid body moves and an empty cell remains.
+					//TODO: reinitialize density to something proper!
 					rho = 1.;
 				}
 

@@ -100,7 +100,7 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
         "src/Visualization/glsl/world_vert.glsl",
         "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_ui = createProgram( // TODO: use different shaders
-        "src/Visualization/glsl/world_vert.glsl",
+        "src/Visualization/glsl/ui_vert.glsl",
         "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_fluid = createProgram(
         "src/Visualization/glsl/fluid_vert.glsl",

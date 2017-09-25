@@ -41,6 +41,7 @@ UserInput::UserInput(){
     XnStatus errorCode = XN_STATUS_OK;
 
     errorCode = context->Init();
+	errorCode = context->SetGlobalMirror(true);
     errorCode = context->FindExistingNode(XN_NODE_TYPE_DEPTH, *depthGenerator);
     while(errorCode != XN_STATUS_OK) {
 		Log::info("Failed to initialize Depth Generator. Retrying...");
@@ -168,11 +169,14 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 	for(XnUInt16 k = 0; k < nPlayers; k++) {
 		if(playerJoined[k]) {
 			if(!userGenerator->GetSkeletonCap().IsTracking(players[k])) {
+				userInputOutput.playerIsTracked[k] = false;
 				playerJoined[k] = false;
 				userIsPlayer[playerIndices[k]] = false;
 				trackedUsers--;
 				continue;
 			}
+
+			userInputOutput.playerIsTracked[k] = true;
 
 			XnSkeletonJointTransformation leftHandJoint, rightHandJoint,
 				leftElbowJoint, rightElbowJoint;
@@ -228,6 +232,16 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			userInputOutput.leftVelocity[k] = (1000000*ldAngle) / delta.count();
 			userInputOutput.rightVelocity[k] = (1000000*rdAngle) / delta.count();
 
+			
+			if(ldAngle < MIN_DIFFERENCE && ldAngle > -MIN_DIFFERENCE) {
+				userInputOutput.leftAngle[k] = previousLeftAngles[k];
+				userInputOutput.leftVelocity[k] = 0;
+			}
+			if(rdAngle < MIN_DIFFERENCE && rdAngle > -MIN_DIFFERENCE) {
+				userInputOutput.rightAngle[k] = previousRightAngles[k];
+				userInputOutput.rightVelocity[k] = 0;
+			}
+			
 		}
 	}
 

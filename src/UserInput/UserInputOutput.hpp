@@ -10,8 +10,6 @@ struct UserInputOutput {
     double rightVelocity[2];
 
     bool playerIsTracked[2];
-    bool playerIsCalibrating[2];
-    bool playerIsCalibrated[2];
 
     bool quit, start;
 
@@ -21,8 +19,6 @@ struct UserInputOutput {
 		std::cout << (quit?"Q":"") << (start?"S":"");
 		for(int k = 0; k<2; k++) {
 			std::cout << (playerIsTracked[k]?"T":"")
-					  << (playerIsCalibrating[k]?"c":"")
-					  << (playerIsCalibrated[k]?"C":"")
 					  << " L: " << std::setw(15) << leftAngle[k]
 					  << " | " << std::setw(15) << leftVelocity[k]
 					  << " R: " << std::setw(15) << rightAngle[k]

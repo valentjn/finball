@@ -34,6 +34,7 @@ private:
 
 	static const int MAX_USERS = 4;
 	static const int PLAYERS = 2;
+	static constexpr const double MIN_DIFFERENCE = 0.1;
 	
 	user_id_t players[PLAYERS];
 	user_id_t users[MAX_USERS];
@@ -49,7 +50,7 @@ private:
 
 	float max_angle[2] = { 1.5, 1.5 };
 	float min_angle[2] = { -1.5, -1.5 };
-	float zero_angle[2] = { 1, 1 };
+	float zero_angle[2] = { 0, 0 };
 
 public:
 	UserInput();

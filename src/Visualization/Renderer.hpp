@@ -26,11 +26,12 @@ private:
     GLuint m_shader_program_world;
     GLuint m_shader_program_ui;
     GLuint m_shader_program_fluid;
-    
+
     std::unique_ptr<Texture2F> m_tex_fluid_input;
     std::unique_ptr<Texture1F> m_tex_noise;
+	std::unique_ptr<Texture1F> m_tex_density;
     std::unique_ptr<Texture3F> m_tex_fluid_output;
-    
+
     GLuint m_framebuffer_fluid_output;
 
     glm::ivec2 m_resolution;

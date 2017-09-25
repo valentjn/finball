@@ -5,11 +5,11 @@
 #include <stdexcept>
 #include <string>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "../../ext/glm/gtc/matrix_transform.hpp"
+#include "../../ext/glm/gtc/type_ptr.hpp"
 
-#include "Log.hpp"
-#include "Level.hpp"
+#include "../Log.hpp"
+#include "../Level.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
 
@@ -154,6 +154,14 @@ void Renderer::update(const RendererInput &input) {
         m_tex_fluid_input = std::make_unique<Texture2F>(glm::ivec2{ input.fluid_velocity->width(), input.fluid_velocity->height() });
     m_tex_fluid_input->bind(0);
     m_tex_fluid_input->setData(*input.fluid_velocity);
+
+	// bind & fill density texture
+	loc = glGetUniformLocation(m_shader_program_fluid, "tex_density");
+    glUniform1i(loc, 0);
+    if (!m_tex_density)
+        m_tex_density = std::make_unique<Texture1F>(glm::ivec2{ input.fluid_density->width(), input.fluid_density->height() });
+    m_tex_density->bind(0);
+    m_tex_density->setData(*input.fluid_density);
 
     // bind noise texture
     loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");

@@ -59,7 +59,7 @@ private:
     std::unordered_map<int, std::unique_ptr<RigidBody>> rigid_bodies;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
-    // Array2D<bool> grid_pedals;
+    Array2D<Level::CellType> grid_fins;
     Array2D<glm::vec2> grid_velocities;
 
     int ball_id; // FIXME: ...
@@ -119,8 +119,8 @@ public:
             bt_rigid_body->setLinearFactor(btVector3(1, 1, 0));
             bt_rigid_body->setAngularFactor(btVector3(0, 0, 1));
 
-            auto rigid_body = // TODO: fix id
-                std::make_unique<RigidBody>(next_id, level_body.position.x, level_body.position.y);
+            auto rigid_body =
+                std::make_unique<RigidBody>(level_body.id, level_body.position.x, level_body.position.y);
             rigid_bodies[level_body.id] = std::move(rigid_body);
 
             bt_rigid_body->setUserIndex(level_body.id); // -> RigidBody.id
@@ -228,14 +228,16 @@ public:
             }
         }
 
-        // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
-        //     for (int j = 0; j < GRID_WIDTH; ++j) {
-        //         printf("%2d", grid_obj.value(j, i));
-        //     }
-        //     printf("\n");
-        // }
-        // printf("-----------\n");
+        // grid_finFlag(grid_obj, glm::vec2(0,0), glm::vec2(0,1), glm::vec2(1,1));
 
+        //for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
+        //    for (int j = 0; j < GRID_WIDTH; ++j) {
+        //        printf("%2d", grid_obj.value(j, i));
+        //    }
+        //    printf("\n");
+        //}
+        //printf("-----------\n");
+        //
         // TODO: determine which cells are occupied by obj
         // grid_obj.value(1, 3) = Level::CellType::FLUID;
         // grid_vel.value(1, 3) = glm::vec2{1.0, 0.5};
@@ -251,6 +253,31 @@ public:
     RigidBody getRigidBody(int idx){
         return *(rigid_bodies[idx].get());
     }
+
+    void grid_finFlag(Array2D<Level::CellType> &grid_fin, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3){
+        glm::vec2 norm1(-(pos1.y- pos2.y), pos1.x- pos2.x);
+        glm::vec2 norm2(-(pos2.y- pos3.y), pos2.x- pos3.x);
+        glm::vec2 norm3(-(pos3.y- pos1.y), pos3.x- pos1.x);
+
+        for (int i = 0; i< grid_fin.width(); i++ ){
+            for (int j= 0 ; j <grid_fin.height(); j++){
+
+                glm::vec2 tempVec1 = gridToBullet(i, j) - pos1;
+                glm::vec2 tempVec2 = gridToBullet(i, j) - pos2;
+                glm::vec2 tempVec3 = gridToBullet(i, j) - pos3;
+                if ((tempVec1.x* norm1.x + tempVec1.y* norm1.y >= 0) &&
+                    (tempVec2.x* norm2.x + tempVec2.y* norm2.y >= 0) &&
+                    (tempVec3.x* norm3.x + tempVec3.y* norm3.y >= 0)){
+                    grid_fin.value(i, j) = Level:: CellType ::OBSTACLE;
+                }
+
+
+            }
+        }
+
+
+    }
+
 };
 
 #endif

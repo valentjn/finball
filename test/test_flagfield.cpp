@@ -122,6 +122,7 @@ TEST(RigidBodyTest, gravity64) {
       }
   }
 
+  //TODO make work!
   EXPECT_TRUE(changed);
   if(! changed){
     printFlagField(init_flagfield);

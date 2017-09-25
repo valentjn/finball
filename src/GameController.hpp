@@ -150,7 +150,6 @@ private:
                 break;
             }
         }
->>>>>>> master
     }
 };
 

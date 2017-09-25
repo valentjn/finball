@@ -91,10 +91,10 @@ public:
         static int next_id = 1;
 
         for (auto level_body : level.rigidBodies) {
-            DetectionType detection_type = DetectionType::GENERAL;
+            // DetectionType detection_type = DetectionType::GENERAL;
             if (!level_body.isFixed) {
                 ball_id = next_id;
-                detection_type = DetectionType::CIRCLE;
+                // detection_type = DetectionType::CIRCLE;
             }
 
             btTransform transform;
@@ -187,10 +187,10 @@ public:
                             glm::vec2 pos = gridToBullet(x, y);
                             // printf("%f %f\n", pos.x, pos.y);
                             // printf("-------\n");
-                            float length = (pos - rigid_body->position).length();
-                            printf("%f\n", length);
+                            // float length = (pos - rigid_body->position).length();
+                            // printf("%f\n", length);
                             if (glm::distance(pos, rigid_body->position) <= BALL_RADIUS) {
-                                printf("ASDSADAd\n");
+                                // printf("ASDSADAd\n");
                                 grid_ball.value(x, y) = Level::CellType::OBSTACLE;
                                 grid_vel.value(x, y) = glm::vec2(1.0, 2.0); // TODO
                             }
@@ -224,13 +224,13 @@ public:
             }
         }
 
-        for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
-            for (int j = 0; j < GRID_WIDTH; ++j) {
-                printf("%2d", grid_ball.value(j, i));
-            }
-            printf("\n");
-        }
-        printf("-----------\n");
+        // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
+        //     for (int j = 0; j < GRID_WIDTH; ++j) {
+        //         printf("%2d", grid_ball.value(j, i));
+        //     }
+        //     printf("\n");
+        // }
+        // printf("-----------\n");
 
         // TODO: determine which cells are occupied by obj
         // grid_obj.value(1, 3) = Level::CellType::FLUID;

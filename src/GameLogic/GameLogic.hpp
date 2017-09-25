@@ -44,9 +44,7 @@ public:
         output.highscore = duration.count();
 
         for (RigidBody const *rigidBody : *input.rigidBodies) {
-            if (rigidBody->id == 1) {
-                Log::debug("Ball y pos: %f", rigidBody->position.y);
-                if(rigidBody->position.y < 0) {
+            if (rigidBody->id == 1 && rigidBody->position.y < 0) {
                     endGame(output);
                     return;
                 }

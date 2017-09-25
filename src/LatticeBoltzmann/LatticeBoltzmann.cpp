@@ -65,9 +65,14 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 						if (fi_New.value(x, y)[z] == 0.0) {
 							break;
 						}
+                                                constexpr static float c = 1. / 1.732050;
+                                                float density = 0.0f;
+                                                for (int i = 0; i < 9; i++) {
+                                                        density += fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[i]; // density
+                                                }
 
 						fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
-								fi_New.value(x, y)[z];
+                                                                fi_New.value(x, y)[z]-2/(c*c)*density*w[z]*(input.velocities.value(x,y)[0]*cx[z]+input.velocities.value(x,y)[1]*cy[z]);
 						fi_New.value(x, y)[z] = 0.0;
 					}
 					break;

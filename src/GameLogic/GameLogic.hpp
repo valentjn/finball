@@ -21,6 +21,12 @@ private:
 
     steady_clock::time_point startTime;
 
+    void endGame(GameLogicOutput &output) {
+        output.running = false;
+        Highscores::saveHighscore(output.highscore);
+        return;
+    }
+
 public:
     GameLogic(const Level& level) {
         auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
@@ -37,9 +43,18 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.highscore = duration.count();
 
+        for (RigidBody const *rigidBody : *input.rigidBodies) {
+            if (rigidBody->id == 1) {
+                Log::debug("Ball y pos: %f", rigidBody->position.y);
+                if(rigidBody->position.y < 0) {
+                    endGame(output);
+                    return;
+                }
+            }
+        }
+
         if (input.quit) {
-            output.running = false;
-            Highscores::saveHighscore(output.highscore);
+            endGame(output);
             return;
         }
 

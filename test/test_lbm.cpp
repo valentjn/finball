@@ -53,11 +53,11 @@ void printFIs(Array2D<FICell> &fi) {
   std::cout << "FIs:" << std::endl << std::endl;
   for (int j=height-1; j>=0; j--) {
     for (int i=0; i<width; i++) {
-      std::cout << "{";
+      std::cout << i << j << " {";
       for (int k=0; k<9; k++) {
         std::cout << fi.value(i,j)[k] << ",";
       }
-      std::cout << "}  ";
+      std::cout << "}  " << std::endl;
     }
     std::cout << std::endl;
   }
@@ -145,10 +145,16 @@ TEST(LBMTest, EquilibriumTrue) {
     }
   }
   printVelocities(input);
-  printFIs(output.afterstream);
+  //printFIs(output.afterstream);
   sut.compute(input, output);
-  printFIs(output.afterstream);
+  //printFIs(output.prestream);
+  //printFIs(output.afterstream);
   printVelocities(output);
+  for (int i =0; i < 1000; ++i){
+     sut.compute(input, output);
+  }
+  printVelocities(output);
+  //printFIs(output.afterstream);
   EXPECT_EQ(5,level.width);
 }
 

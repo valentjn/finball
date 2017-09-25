@@ -35,12 +35,12 @@ private:
         int height = flagfield.height();
         bool result = true;
         for (int i=0; i<width; i++) {  // top and bottom
-          if (flagfield.value(i,0) == Level::CellType::FLUID) result=false;
-          if (flagfield.value(i,height-1) == Level::CellType::FLUID) result=false;
+          if (flagfield.value(i,0) == Level::FLUID) result=false;
+          if (flagfield.value(i,height-1) == Level::FLUID) result=false;
         }
         for (int j=1; j<height-1; j++) {  // left and right sides
-          if (flagfield.value(0,j) == Level::CellType::FLUID) result=false;
-          if (flagfield.value(width-1,j) == Level::CellType::FLUID) result=false;
+          if (flagfield.value(0,j) == Level::FLUID) result=false;
+          if (flagfield.value(width-1,j) == Level::FLUID) result=false;
         }
         if (!result) {
           std::cout << "FLAGS:" << std::endl << std::endl;
@@ -80,7 +80,7 @@ public:
         for (int y = 1; y < level.height - 1; ++y) {
             for (int x = 1; x < level.width - 1; ++x) {
                 // check for boundary
-                if (input.flagfield.value(x, y) == Level::CellType::FLUID) {
+                if (input.flagfield.value(x, y) == Level::FLUID) {
 
                     float rho = 0.0;
                     float velx = 0.0;
@@ -188,9 +188,10 @@ public:
         // set f_i in obstacles to 0
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
-                if (input.flagfield.value(x, y) == Level::CellType::OBSTACLE) {
+                if (input.flagfield.value(x, y) == Level::OBSTACLE) {
                     for (int i = 0; i < 9; ++i) {
                         fi_Old.value(x, y)[i] = 0.0;
+			fi_New.value(x, y)[i] = 0.0;
                     }
                 }
             }
@@ -201,7 +202,7 @@ public:
         for (int y = 1; y < level.height - 1; ++y) {
             for (int x = 1; x < level.width - 1; ++x) {
                 // check for boundary
-                if (input.flagfield.value(x, y) == Level::CellType::FLUID) {
+                if (input.flagfield.value(x, y) == Level::FLUID) {
                     fi_New.value(x, y)[0] = fi_Old.value(x, y)[0];
                     fi_New.value(x + 1, y)[1] = fi_Old.value(x, y)[1];
                     fi_New.value(x + 1, y + 1)[5] = fi_Old.value(x, y)[5];
@@ -224,7 +225,7 @@ public:
         for (int y = 0; y < level.height; ++y) {
             for (int x = 0; x < level.width; ++x) {
                 // Stream back the velocities streamed into obstacles.
-                if (input.flagfield.value(x, y) == Level::CellType::OBSTACLE) {
+                if (input.flagfield.value(x, y) == Level::OBSTACLE) {
                     for (int z = 1; z < 9; ++z) {
                         if (fi_New.value(x, y)[z] != 0.0) {
                             fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
@@ -234,7 +235,7 @@ public:
                     }
                 }
                 // inflow
-                else if (input.flagfield.value(x, y) == Level::CellType::INFLOW) {
+                else if (input.flagfield.value(x, y) == Level::INFLOW) {
                     for (int z = 0; z < 9; z++) {
                         // TODO adjust inflow values
                         fi_New.value(x, y)[z] = w[z] * 0.1;
@@ -242,13 +243,13 @@ public:
                         if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
                             (y + cy[z]) < level.height &&
                             input.flagfield.value(x + cx[z], y + cy[z]) ==
-                                Level::CellType::FLUID) {
+                                Level::FLUID) {
                             fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
                         }
                     }
                 }
                 // outflow
-                else if (input.flagfield.value(x, y) == Level::CellType::OUTFLOW) {
+                else if (input.flagfield.value(x, y) == Level::OUTFLOW) {
                     for (int z = 0; z < 9; z++) {
                         // TODO adjust outflow values
                         fi_New.value(x, y)[z] = 0;
@@ -256,7 +257,7 @@ public:
                         if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
                             (y + cy[z]) < level.height &&
                             input.flagfield.value(x + cx[z], y + cy[z]) ==
-                                Level::CellType::FLUID) {
+                                Level::FLUID) {
                             fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
                         }
                     }

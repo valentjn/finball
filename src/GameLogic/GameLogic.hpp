@@ -25,6 +25,7 @@ public:
         auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
         fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
         fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.2f};
+        fluid_surface.rotation = 0;
         fluid_surface.scale = { level.width * 0.5f, level.height * 0.5f };
         fluid_surface.mesh = fluid_mesh.get();
 

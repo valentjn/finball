@@ -39,7 +39,6 @@ private:
 	void Output(LatticeBoltzmannOutput &output);
 	void Stream(const LatticeBoltzmannInput &input);
 	void HandleBoundaries(const LatticeBoltzmannInput &input);
-	void outputFiPrestream(LatticeBoltzmannOutput &output);
 	void initFiObstacles(const LatticeBoltzmannInput &input);
 
 

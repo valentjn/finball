@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <glm/vec3.hpp>
+#include <chrono>
 
 #include "Array2D.hpp"
 #include "LatticeBoltzmann/FICell.hpp"
@@ -17,6 +18,8 @@ using namespace glm;
 
 class LatticeBoltzmann {
 private:
+	std::chrono::duration<float> measuredTimes[5];
+
     Level &level;
 
     // previous f_i field
@@ -53,6 +56,9 @@ public:
                     fi_Old.value(x, y)[z] = w[z] * 0.5;
                 }
             }
+        }
+        for (int i=0; i<5; i++){
+			measuredTimes[i] = std::chrono::duration<float>(0.);
         }
     }
 

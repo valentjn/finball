@@ -11,6 +11,11 @@ struct UserInputOutput {
     bool playerIsCalibrating[2];
     bool playerIsCalibrated[2];
 
+    // increasing with duration of left / right arrow pressed
+    // equivalence: pressedL == leftAngle[0] and pressedR == rightAngle[0]+PI
+    double pressedL = 0;
+    double pressedR = 0;
+
     bool quit, start;
 
     UserInputOutput() : quit(false), start(false) {}

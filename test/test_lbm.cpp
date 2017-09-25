@@ -44,7 +44,7 @@ void printVelocities(LatticeBoltzmannOutput &output) {
     for (int i=0; i<width; i++) {
       float u = output.velocity.value(i,j)[0];
       float v = output.velocity.value(i,j)[1];
-      std::cout << u << "," << v << " ";
+      std::cout << "velocity (" << i << ", " << j << ") is: "<< u << ", " << v << " " << std::endl;
     }
     std::cout << std::endl;
   }
@@ -128,9 +128,9 @@ TEST(LBMTest, CollideStep1x1) {
 
   LatticeBoltzmann sut(level);
   sut.compute(input, output);
-  std::cout << output.density.value(0,0) << std::endl;
-  std::cout << output.velocity.value(0,0)[0] << std::endl;
-  std::cout << output.velocity.value(0,0)[1] << std::endl;
+  //std::cout << output.density.value(0,0) << std::endl;
+  //std::cout << output.velocity.value(0,0)[0] << std::endl;
+  //std::cout << output.velocity.value(0,0)[1] << std::endl;
   EXPECT_EQ(5,level.width);
 }
 
@@ -147,16 +147,16 @@ TEST(LBMTest, EquilibriumTrue) {
       input.velocities.value(i,j)[0] = 0.1;
     }
   }
-  printVelocities(input);
+  //printVelocities(input);
   //printFIs(output.afterstream);
   sut.compute(input, output);
   //printFIs(output.prestream);
   //printFIs(output.afterstream);
   printVelocities(output);
-  for (int i =0; i < 1000; ++i){
-     sut.compute(input, output);
-  }
-  printVelocities(output);
+  //for (int i =0; i < 1000; ++i){
+  //   sut.compute(input, output);
+  //}
+  //printVelocities(output);
   //printFIs(output.afterstream);
   EXPECT_EQ(5,level.width);
 }

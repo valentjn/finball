@@ -8,10 +8,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "Log.hpp"
 
-//using namespace std;
+using namespace std;
 
 class Highscores {
 public:
@@ -54,8 +55,8 @@ private:
         float score;
         string name;
         string line;
-        while(std::getline(file,line)){
-			std::istringstream iss(line);
+        while(getline(file,line)){
+			istringstream iss(line);
 			iss >> score;
 			if (iss >> name) {
 			} else {

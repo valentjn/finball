@@ -48,7 +48,7 @@ public:
         std::copy(t_data, t_data + m_data.size(), m_data.begin());
     }
 
-    T &value(int x, int y) {
+    inline T &value(int x, int y) {
         assert(x >= 0);
         assert(y >= 0);
         assert(x < m_width);
@@ -56,7 +56,7 @@ public:
         return m_data[y * m_width + x];
     }
 
-    const T &value(int x, int y) const {
+    inline const T &value(int x, int y) const {
         assert(x >= 0);
         assert(y >= 0);
         assert(x < m_width);

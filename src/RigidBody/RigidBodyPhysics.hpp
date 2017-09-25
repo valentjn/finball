@@ -11,6 +11,7 @@
 #include "Level.hpp"
 #include "Log.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
+#include "RigidBody/Transform.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 
 //TODO: Maybe name variables properly??
@@ -56,10 +57,11 @@ private:
     std::unique_ptr<btConstraintSolver> solver;
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
-    std::unordered_map<int, std::unique_ptr<RigidBody>> rigid_bodies;
+    std::unordered_map<int, std::unique_ptr<Transform>> rigid_bodies;
+	std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
-    // Array2D<bool> grid_pedals;
+    Array2D<Level::CellType> grid_fins;
     Array2D<glm::vec2> grid_velocities;
 
     int ball_id; // FIXME: ...
@@ -85,6 +87,7 @@ public:
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
 	{
+		dynamics_world->setGravity(btVector3(0.0f,0.0f,0.0f));
         // TODO: set correct radius once it's available; scale with DISTANCE_GRID_CELLS
         // TODO: static objects are rectangles for now
         BALL_RADIUS = DISTANCE_GRID_CELLS;
@@ -92,25 +95,18 @@ public:
 
         grid_static_objects_flow = level.matrix;
 
-        // TODO: remove this
-        static int next_id = 1;
+        ball_id = level.BALL_ID;
 
-        for (auto level_body : level.rigidBodies) {
+        for (auto &level_body : level.rigidBodies) {
             // DetectionType detection_type = DetectionType::GENERAL;
-            if (!level_body.isFixed) {
-                ball_id = next_id;
                 // detection_type = DetectionType::CIRCLE;
-            }
 
             btTransform transform;
             transform.setIdentity();
-            transform.setOrigin(btVector3(level_body.position.x * DISTANCE_GRID_CELLS,
-                level_body.position.y * DISTANCE_GRID_CELLS, 0));
+            transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
+                level_body->position.y * DISTANCE_GRID_CELLS, 0));
             btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
-            btScalar mass = 1;
-            if (level_body.isFixed) {
-                mass = 0;
-            }
+            btScalar mass = level_body->mass;
             btVector3 inertia;
             sphere_shape->calculateLocalInertia(mass, inertia);
             btRigidBody *bt_rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
@@ -119,15 +115,19 @@ public:
             bt_rigid_body->setLinearFactor(btVector3(1, 1, 0));
             bt_rigid_body->setAngularFactor(btVector3(0, 0, 1));
 
-            auto rigid_body = // TODO: fix id
-                std::make_unique<RigidBody>(next_id, level_body.position.x, level_body.position.y);
-            rigid_bodies[level_body.id] = std::move(rigid_body);
+            auto rigid_body =
+                std::make_unique<Transform>(level_body->id, glm::vec2{level_body->position.x, level_body->position.y}, level_body->rotation);
+            rigid_bodies[level_body->id] = std::move(rigid_body);
 
-            bt_rigid_body->setUserIndex(level_body.id); // -> RigidBody.id
+            bt_rigid_body->setUserIndex(level_body->id);
             // bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
             dynamics_world->addRigidBody(bt_rigid_body);
 
-            next_id++;
+            if (level_body->mass == 0.) {
+                // TODO: do this more accurately?
+                // TODO: this only works for rectangles atm
+                grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
+            }
         }
     }
 
@@ -148,6 +148,23 @@ public:
         output.rigid_bodies.clear(); // currently not needed as we get a new output each time
         // TODO: try to give out a const reference to our internal rigid_bodies vector
 
+		// Compute impulses
+		// TODO: Make it work for multiple balls.
+		input.computeImpulses(grid_ball, impulses);
+		// TODO: apply impulses
+		for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
+            auto &obj = dynamics_world->getCollisionObjectArray()[j];
+            btRigidBody *bt_rigid_body = btRigidBody::upcast(obj);
+			int id = bt_rigid_body->getUserIndex();
+			Transform *rigid_body = rigid_bodies[id].get();
+			if (bt_rigid_body && bt_rigid_body->getMotionState() && rigid_body->id == ball_id) {
+				bt_rigid_body->applyCentralImpulse(btVector3(impulses[1].x,impulses[1].y,0.0f));
+			}
+		}
+
+		// Clear the impulses for the next time step
+		impulses.clear();
+
         // clear dynamic flag fields
         for (int y = 0; y < GRID_HEIGHT; ++y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
@@ -158,7 +175,6 @@ public:
             }
         }
 
-        // TODO: apply impulses
 
         dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
 
@@ -172,33 +188,33 @@ public:
 
                 // update the RigidBody and push the reference to our output
                 int id = bt_rigid_body->getUserIndex();
-                RigidBody *rigid_body = rigid_bodies[id].get();
+                Transform *output_transform = rigid_bodies[id].get();
 
                 // TODO: SCALE WITH DISTANCE_GRID_CELLS_INV
-                rigid_body->position.x = origin.getX() * DISTANCE_GRID_CELLS_INV;
-                rigid_body->position.y = origin.getY() * DISTANCE_GRID_CELLS_INV;
+                output_transform->position.x = origin.getX() * DISTANCE_GRID_CELLS_INV;
+                output_transform->position.y = origin.getY() * DISTANCE_GRID_CELLS_INV;
                 // TODO: check that this behaves correctly
 				auto quaternion = transform.getRotation();
 				if (quaternion.getAxis().z() < 0.)
 				{
-					rigid_body->angle = 2*M_PI-quaternion.getAngle();
+					output_transform->rotation = 2*M_PI-quaternion.getAngle();
 				} else {
-					rigid_body->angle = quaternion.getAngle();
+					output_transform->rotation = quaternion.getAngle();
 				}
-                output.rigid_bodies.push_back(rigid_body);
+                output.rigid_bodies.push_back(output_transform);
 
                 // DetectionType detection_type =
                 //     static_cast<DetectionType>(bt_rigid_body->getUserIndex2());
                 // TODO: find other way than setUserIndex2 to store this
                 // switch (detection_type) {
                 // case DetectionType::CIRCLE:
-                if (rigid_body->id == ball_id) {
+                if (output_transform->id == ball_id) {
                     for (int y = 0; y < GRID_HEIGHT; ++y) {
                         for (int x = 0; x < GRID_WIDTH; ++x) {
                             glm::vec2 pos = gridToBullet(x, y);
                             // printf("%f %f\n", pos.x, pos.y);
                             // printf("-------\n");
-                            // float length = (pos - rigid_body->position).length();
+                            // float length = (pos - output_transform->position).length();
                             // printf("%f\n", length);
                             if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <= BALL_RADIUS) {
                                 // printf("ASDSADAd\n");
@@ -228,6 +244,8 @@ public:
             }
         }
 
+        // grid_finFlag(grid_obj, glm::vec2(0,0), glm::vec2(0,1), glm::vec2(1,1));
+
         // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
         //     for (int j = 0; j < GRID_WIDTH; ++j) {
         //         printf("%2d", grid_obj.value(j, i));
@@ -247,6 +265,30 @@ public:
         else
             dynamics_world->setGravity(btVector3(0.,0.,0.));
     }
+    void grid_finFlag(Array2D<Level::CellType> &grid_fin, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3){
+        glm::vec2 norm1(-(pos1.y- pos2.y), pos1.x- pos2.x);
+        glm::vec2 norm2(-(pos2.y- pos3.y), pos2.x- pos3.x);
+        glm::vec2 norm3(-(pos3.y- pos1.y), pos3.x- pos1.x);
+
+        for (int i = 0; i< grid_fin.width(); i++ ){
+            for (int j= 0 ; j <grid_fin.height(); j++){
+
+                glm::vec2 tempVec1 = gridToBullet(i, j) - pos1;
+                glm::vec2 tempVec2 = gridToBullet(i, j) - pos2;
+                glm::vec2 tempVec3 = gridToBullet(i, j) - pos3;
+                if ((tempVec1.x* norm1.x + tempVec1.y* norm1.y >= 0) &&
+                    (tempVec2.x* norm2.x + tempVec2.y* norm2.y >= 0) &&
+                    (tempVec3.x* norm3.x + tempVec3.y* norm3.y >= 0)){
+                    grid_fin.value(i, j) = Level:: CellType ::OBSTACLE;
+                }
+
+
+            }
+        }
+
+
+    }
+
 };
 
 #endif

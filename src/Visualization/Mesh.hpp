@@ -17,7 +17,7 @@ protected:
 
 public:
     Mesh(GLsizei vertex_count);
-    ~Mesh();
+    virtual ~Mesh();
     virtual void render(GLint mode_location) const = 0;
     Mesh(const Mesh&) = delete;
     Mesh& operator=(const Mesh&) = delete;

@@ -30,6 +30,7 @@ private:
             fprintf(stream, "%-11s", LOG_NAMES[logLevel]);
             vfprintf(stream, message.c_str(), format_args);
             fprintf(stream, "\n");
+            fflush(stream);
         }
     }
 

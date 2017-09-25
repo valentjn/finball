@@ -6,10 +6,10 @@
 #include "Visualization/Mesh.hpp"
 
 struct RenderObject {
-	Mesh* mesh;
+	const Mesh* mesh;
     glm::vec3 position;
-    float scale;
 	float rotation;
+    glm::vec2 scale;
 };
 
 #endif

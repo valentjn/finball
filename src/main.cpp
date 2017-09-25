@@ -2,7 +2,7 @@
 
 #include "GameController.hpp"
 #include "Log.hpp"
-#include "MainMenu.hpp"
+#include "Menus/MainMenu.hpp"
 #include "Parameters.hpp"
 #include "SDL/SDLWindow.hpp"
 
@@ -15,15 +15,21 @@ int main(int argc, char *argv[]) {
     Log::setLogLevel(parameters.verbosityLevel);
 
     // create SDL Controller
-    SDLWindow window(800, 600, "Finball", parameters.fullscreen);
+    SDLWindow window(parameters.windowWidth, parameters.windowHeight,
+                     "Finball", parameters.fullscreen);
     window.setIcon("data/haicon.png");
 
+    Highscores highscores("haiscores.txt");
+
     // show main menu and obtain level from it
-    MainMenu menu(window);
-    std::unique_ptr<Level> level = menu.show();
+    std::unique_ptr<Level> level;
+    {
+        MainMenu menu(window, highscores);
+        level = menu.show();
+    }
 
     // run the game
-    GameController gameController;
+    GameController gameController(highscores, parameters.frameRate);
     gameController.startGame(window, *level);
 
     return 0;

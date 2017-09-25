@@ -12,7 +12,7 @@ class RigidBodyPhysicsOutput {
 public:
     Array2D<Level::CellType> grid_objects;
     Array2D<glm::vec2> grid_velocities;
-    std::vector<RigidBody> rigid_bodies;
+    std::vector<RigidBody*> rigid_bodies;
 
     RigidBodyPhysicsOutput(Level const &level)
         : grid_objects(level.width, level.height), grid_velocities(level.width, level.height) {}

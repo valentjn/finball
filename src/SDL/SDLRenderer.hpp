@@ -12,13 +12,19 @@
 
 class SDLRenderer {
 
+public:
+    typedef TTF_Font * Font;
+    typedef SDL_Color Color;
+
 private:
     SDL_Renderer *renderer;
-    std::vector<TTF_Font *> fonts;
+    std::vector<Font> fonts;
+    int windowWidth;
 
 public:
     SDLRenderer(const SDLWindow &window) {
         renderer = SDL_CreateRenderer(window.getWindow(), -1, SDL_RENDERER_ACCELERATED);
+        windowWidth = window.getWidth();
     }
 
     ~SDLRenderer() {
@@ -29,22 +35,22 @@ public:
         SDL_DestroyRenderer(renderer);
     }
 
-    TTF_Font *loadFont(const char* path, int ptsize) {
-        TTF_Font *font = TTF_OpenFont(path, ptsize);
+    Font loadFont(const std::string &path, int ptsize) {
+        Font font = TTF_OpenFont(path.c_str(), ptsize);
         fonts.push_back(font);
         return font;
     }
 
-    void addImage(const char* path) {
-        SDL_Surface *surface = IMG_Load(path);
+    void addImage(const std::string &path) {
+        SDL_Surface *surface = IMG_Load(path.c_str());
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_DestroyTexture(texture);
     }
 
-    void addText(std::string text, int x, int y, TTF_Font *font, SDL_Color color, bool center) {
-        SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, 1000);
+    void addText(std::string text, int x, int y, Font font, Color color, bool center) {
+        SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, windowWidth);
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
 

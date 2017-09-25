@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "Log.hpp"
 #include "Level.hpp"
@@ -67,7 +67,7 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // TODO: dynamically set camera positon depending on level size
-Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
+Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
     m_window = window.getWindow();
     m_resolution = glm::ivec2(window.getWidth(), window.getHeight());
 
@@ -75,7 +75,6 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     m_glcontext = SDL_GL_CreateContext(m_window);
     if (!m_glcontext) {
         auto error = SDL_GetError();
@@ -87,53 +86,53 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, 32.f, 100.f) {
     Log::debug("OpenGL %s", glGetString(GL_VERSION));
     Log::debug("GLSL %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    glDebugMessageCallback(&debugCallback, nullptr);
+    //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    //glDebugMessageCallback(&debugCallback, nullptr);
+    //GLuint unusedIDs = 0;
+    //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIDs, GL_TRUE);
+
     int glError = glGetError();
-    if (glError != 0) {
+    if (glError != 0)
         Log::error("OpenGL Error: %d", glError);
-    }
 
     // create shader programs
-    m_shader_program_world =
-        createProgram("src/Visualization/glsl/world_vert.glsl", "src/Visualization/glsl/world_frag.glsl");
+    m_shader_program_world = createProgram(
+        "src/Visualization/glsl/world_vert.glsl",
+        "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_ui = createProgram( // TODO: use different shaders
-        "src/Visualization/glsl/world_vert.glsl", "src/Visualization/glsl/world_frag.glsl");
-    m_shader_program_fluid =
-        createProgram("src/Visualization/glsl/fluid_vert.glsl", "src/Visualization/glsl/fluid_frag.glsl");
-
-    // full window viewport
-    glViewport(0, 0, m_resolution.x, m_resolution.y);
-
-    // create a rectangle mesh so that we have some dummy to render (WIP)
-	m_full_quad = createRectangleMesh(2.f, 2.f);
-
-    // create the texture for the velocities of the fluid
-    glGenTextures(1, &m_tex_fluid);
-    glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        "src/Visualization/glsl/ui_vert.glsl",
+        "src/Visualization/glsl/world_frag.glsl");
+    m_shader_program_fluid = createProgram(
+        "src/Visualization/glsl/fluid_vert.glsl",
+        "src/Visualization/glsl/fluid_frag.glsl");
 
     // create the noise texture
-    glGenTextures(1, &m_tex_noise);
-    std::vector<float> noise(m_resolution.x * m_resolution.y);
+    Array2D<float> noise(m_fluid_width / 2, m_fluid_height / 2);
     std::default_random_engine engine;
     std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
-    for (float& val : noise) {
-	    val = dist(engine);
-    }
-    glBindTexture(GL_TEXTURE_2D, m_tex_noise);
-    glTexImage2D(GL_TEXTURE_2D,
-	    0,
-	    GL_RGBA,
-	    m_resolution.x,
-	    m_resolution.y,
-	    0,
-	    GL_LUMINANCE,
-	    GL_FLOAT,
-	    noise.data());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    for (int i = 0; i < noise.width(); ++i)
+        for(int j = 0; j < noise.height(); ++j)
+            noise.value(i, j) = dist(engine);
+    m_tex_noise = std::make_unique<Texture1F>(glm::ivec2{m_fluid_width / 2, m_fluid_height / 2});
+    m_tex_noise->setData(noise);
+
+    // create lic output texture
+    m_tex_fluid_output = std::make_unique<Texture3F>(glm::ivec2{ m_fluid_width, m_fluid_height });
+    glGenFramebuffers(1, &m_framebuffer_fluid_output);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_tex_fluid_output->texture(), 0);
+    GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &draw_buffer);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        Log::error("Failed to create framebuffer for fluid visualization.");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    // create a rectangle mesh to use in the first render pass where the fluid is visualized
+    auto full_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
+	m_full_quad = std::make_unique<ColoredMesh>(full_quad, glm::vec3{});
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 Renderer::~Renderer() {
@@ -146,38 +145,35 @@ void Renderer::update(const RendererInput &input) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // setup for the rendering of the fluid
+    glViewport(0, 0, m_fluid_width, m_fluid_height);
     glUseProgram(m_shader_program_fluid);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
+
+    // bind & fill fluid input texture
     auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
     glUniform1i(loc, 0);
-    loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
-    glUniform1i(loc, 1);
-
-    // bind & fill velocities texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_tex_fluid);
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,                                // mipmap level
-                 GL_RGBA,                                // internal format
-                 42,                              // width
-                 21,                              // height
-                 0,                                // must be 0, according to khronos.org
-                 GL_RG,                            // data format
-                 GL_FLOAT,                         // data format
-                 input.fluid_velocity->getData()); // data pointer
+    if (!m_tex_fluid_input)
+        m_tex_fluid_input = std::make_unique<Texture3F>(glm::ivec2{ input.fluid_input.width(), input.fluid_input.height() });
+    m_tex_fluid_input->bind(0);
+    m_tex_fluid_input->setData(input.fluid_input);
 
     // bind noise texture
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_tex_noise);
+    loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
+    glUniform1i(loc, 1);
+    m_tex_noise->bind(1);
 
     // render fluid
-	m_full_quad.render();
+	m_full_quad->render(0);
 
     // setup for rendering the world objects
+    glViewport(0, 0, m_resolution.x, m_resolution.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(m_shader_program_world);
+    input.fluid_mesh->setTexture(*m_tex_fluid_output);
 
     // update view matrix in shader_program_world
     glm::mat4 view = glm::lookAt(m_camera_pos,                       // eye
-                                 m_camera_pos + glm::vec3{0, 0, -1}, // center
+                                 glm::vec3{32, 24, 0}, // center
                                  glm::vec3{0, 1, 0});                // up
     glUniformMatrix4fv(glGetUniformLocation(m_shader_program_world, "view"),
                        1,                     // matrix count
@@ -185,42 +181,44 @@ void Renderer::update(const RendererInput &input) {
                        glm::value_ptr(view)); // data pointer
 
     // update projection matrix in shader_program_world
-    glm::mat4 projection =
-        glm::perspective(glm::pi<float>() * 0.25f, // vertical field of view
-                         static_cast<float>(m_resolution.x) / m_resolution.y, // aspect ratio
-                         1.0f, 128.f); // distance near & far plane
-    glUniformMatrix4fv(glGetUniformLocation(m_shader_program_world, "projection"),
-                       1,                           // matrix count
-                       GL_FALSE,                    // is not transposed
-                       glm::value_ptr(projection)); // data pointer
+    glm::mat4 projection = glm::perspective(
+        glm::pi<float>() * 0.25f,                               // vertical field of view
+        static_cast<float>(m_resolution.x) / m_resolution.y,    // aspect ratio
+        1.0f, 256.f);                                           // distance near & far plane
+    glUniformMatrix4fv(
+        glGetUniformLocation(m_shader_program_world, "projection"),
+        1,                           // matrix count
+        GL_FALSE,                    // is not transposed
+        glm::value_ptr(projection)); // data pointer
 
     // render the world objects
     GLint model_location = glGetUniformLocation(m_shader_program_world, "model");
+    GLint mode_location = glGetUniformLocation(m_shader_program_world, "mode");
     for (const RenderObject &object : input.world_objects)
-        render(object, model_location);
-    m_world_objects.clear();
+        render(object, model_location, mode_location);
 
     // render the ui object
     glUseProgram(m_shader_program_ui);
     model_location = glGetUniformLocation(m_shader_program_ui, "model");
+    mode_location = glGetUniformLocation(m_shader_program_world, "mode");
     for (const RenderObject &object : input.ui_objects)
-        render(object, model_location);
-    m_ui_objects.clear();
+        render(object, model_location, mode_location);
 
     // Swap back and front buffer
     SDL_GL_SwapWindow(m_window);
 }
 
 // renders an object to the screen (private method)
-void Renderer::render(const RenderObject &object, GLint model_location) const {
+void Renderer::render(const RenderObject &object, GLint model_location, GLint mode_location) const {
     glm::mat4 model;
 	model = glm::translate(model, object.position);
-    //model = glm::scale(model, glm::vec3{ object.scale });
+    model = glm::scale(model, glm::vec3{ object.scale, 1 });
+    model = glm::rotate(model, object.rotation, glm::vec3{ 0, 0, 1 });
 	glUniformMatrix4fv(
 		model_location,         // uniform location of the model matrix in the shader
 		1,                      // matrix count
 		GL_FALSE,               // is not transposed
 		glm::value_ptr(model)); // data pointer
-	assert(object.mesh != nullptr);
-	object.mesh->render();
+	assert(object.mesh);
+	object.mesh->render(mode_location);
 }

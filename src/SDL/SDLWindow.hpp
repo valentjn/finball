@@ -2,6 +2,7 @@
 #define SDL_WINDOW_HPP_
 
 #include <cstdint>
+#include <stdexcept>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -22,9 +23,17 @@ public:
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         atexit(SDL_Quit);
-        createWindow(width, height, title, fullscreen);
 
+        if (fullscreen) {
+            SDL_DisplayMode displayMode;
+            SDL_GetCurrentDisplayMode(0, &displayMode);
+            width = displayMode.w;
+            height = displayMode.h;
+        }
+        createWindow(width, height, title, fullscreen);
         SDL_GetWindowSize(window, &this->width, &this->height);
+
+        Log::info("Window size is %d x %d", this->width, this->height);
     }
 
     ~SDLWindow() {
@@ -64,7 +73,6 @@ private:
 
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-            width = height = 0;
         }
 
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

@@ -19,6 +19,14 @@ using namespace xn;
 using namespace std;
 using namespace std::chrono;
 
+#ifndef WITHOUT_KINECT_LIBRARIES
+void checkErrorCode(const char* msg, XnStatus status) {
+	if(status != XN_STATUS_OK) {
+		Log::error("Kinect initialization failed: %s", msg);
+	}
+}
+#endif
+
 // initialization of user input facilities
 UserInput::UserInput(){
 
@@ -41,7 +49,9 @@ UserInput::UserInput(){
     XnStatus errorCode = XN_STATUS_OK;
 
     errorCode = context->Init();
+	checkErrorCode("Can't initialize context", errorCode);
 	errorCode = context->SetGlobalMirror(true);
+	checkErrorCode("Can't initialize context", errorCode);
     errorCode = context->FindExistingNode(XN_NODE_TYPE_DEPTH, *depthGenerator);
     while(errorCode != XN_STATUS_OK) {
 		Log::info("Failed to initialize Depth Generator. Retrying...");
@@ -68,12 +78,14 @@ UserInput::UserInput(){
             // user lost
         },
         this, hUserCallbacks);
+	checkErrorCode("Can't register user callbacks", errorCode);
 
     errorCode = userGenerator->GetSkeletonCap().RegisterToCalibrationStart(
         [](SkeletonCapability& skeletonCapability, XnUserID nID, void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
             // calibration start
         }, this, hCalibrationStart);
+	checkErrorCode("Can't register calibration callbacks", errorCode);
 
     errorCode = userGenerator->GetSkeletonCap().RegisterToCalibrationComplete(
         [](SkeletonCapability& skeletonCapability, XnUserID nID,
@@ -89,6 +101,7 @@ UserInput::UserInput(){
                     .RequestCalibration(nID, TRUE);
             }
         }, this, hCalibrationComplete);
+	checkErrorCode("Can't register after-calibration callbacks", errorCode);
 
     // Get Skeleton
     userGenerator->GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);

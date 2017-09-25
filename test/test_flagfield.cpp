@@ -4,6 +4,7 @@
 
 #include "test_lbm.hpp"
 
+#include "Level.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
 
 // if the rigid body is in the middle in the beginning,
@@ -13,7 +14,7 @@ TEST(RigidBodyTest, static64) {
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBody>(1, level.width/2, level.height/2, 1, 0));
+  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -55,7 +56,7 @@ TEST(RigidBodyTest, static64) {
 		}
       }
   }
-  
+
   EXPECT_TRUE(changed);
   if(! changed){
     printFlagField(output.grid_objects);
@@ -70,7 +71,7 @@ TEST(RigidBodyTest, gravity64) {
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBody>(1, level.width/2, level.height/2, 1, 0.f));
+  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;

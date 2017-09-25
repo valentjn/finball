@@ -242,6 +242,11 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 				// reset pressedR for the next time
 				userInputOutput.pressedR = 0;
 				break;
+			case SDLK_SPACE:
+				userInputOutput.start = true;
+				usedInputSource = KEYBOARD;
+				tryInitializingKinect = false;
+				break;
 			}
 			break;
 		case SDL_MOUSEMOTION:
@@ -266,7 +271,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			finalizeKinect();
 			initializeKinect();
 		}
-	} else if(usedInputSource == KINECT) {
+	} else {
 		// TODO: handle error codes
 		XnStatus errorCode = XN_STATUS_OK;
 
@@ -393,7 +398,9 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 		}
 		userInputOutput.start = std::all_of(playerJoined, playerJoined+PLAYERS,
 			[](bool x){return x;});
-
+		if(userInputOutput.start) {
+			usedInputSource = KINECT;
+		}
 	}
 
 #endif

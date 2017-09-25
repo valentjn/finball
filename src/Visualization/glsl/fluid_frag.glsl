@@ -6,6 +6,7 @@ uniform sampler2D tex_noise; // noise texture
 uniform sampler2D tex_density; // density texture
 
 const int STEPS=10; // The number of adjacent locations in one direction to use for smearing
+const int velocity_scale=10;
 
 // perfrom line integral convolution
 float lic(vec2 normalized_coords) {
@@ -21,7 +22,7 @@ float lic(vec2 normalized_coords) {
 	
 	// step FORWARD along the vector field
 	for(int i=0; i < STEPS; i++) {
-		v = texture(tex_vecs, normalized_coords).xy;
+		v = texture(tex_vecs, normalized_coords).xy * velocity_scale;
 
 		// use Euler's Method. Get the next approximate point along the curve
 		step_coords += v * texel_size;
@@ -35,7 +36,7 @@ float lic(vec2 normalized_coords) {
 
 	// step BACKWARD along the vector field
 	for(int i=0; i<STEPS; i++) {
-		v = texture(tex_vecs, normalized_coords).xy;
+		v = texture(tex_vecs, normalized_coords).xy * velocity_scale;
 
 		// use Euler's Method. Get the next approximate point along the curve
 		step_coords -= v * texel_size;

@@ -49,10 +49,10 @@ debug:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
-run: release
+run:
 	build/fa_2017_release ${args}
 
-run_verbose: release
+run_verbose:
 	build/fa_2017_release -v 10 ${args}
 
 tidy:

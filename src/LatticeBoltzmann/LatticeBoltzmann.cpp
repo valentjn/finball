@@ -15,6 +15,16 @@ using namespace glm;
 
 void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
+	for(int i = 0; i < 2; i++)
+	{
+		step(input, output);
+	}
+
+	Output(output);
+}
+
+void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
+{
 
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
@@ -29,7 +39,7 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 
 	Stream(input);
 	HandleBoundaries(input);
-	Output(output);
+	
 }
 
 void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)

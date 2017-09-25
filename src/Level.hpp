@@ -5,7 +5,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
+#include "Visualization/Mesh.hpp"
 #include "Array2D.hpp"
 #include "Log.hpp"
 #include "RigidBody/RigidBody.hpp"
@@ -13,12 +15,15 @@
 using namespace std;
 
 class Level {
+    std::unique_ptr<Mesh> test_rigid_body_mesh;
+
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
 
     int width, height;
     Array2D<CellType> matrix;
     vector<RigidBody> rigidBodies;
+    unordered_map<int, Mesh*> rigidBodyMeshes;
 
     Level(string levelFilePath) {
         fstream file;
@@ -27,6 +32,10 @@ public:
             Log::error("Failed to load level");
             throw runtime_error("Failed to load level");
         }
+
+        test_rigid_body_mesh = std::make_unique<ColoredMesh>(
+            Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f}),
+            std::vector<glm::vec3>{{1, 0, 0.4},{0.3, 1, 0.4},{1, 1, 0.4},{1, 0, 0.4},{1, 1, 0.4},{0, 0, 1}});
 
         string file_line;
         file >> width >> height;

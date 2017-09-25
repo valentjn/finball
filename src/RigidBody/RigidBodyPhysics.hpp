@@ -214,7 +214,7 @@ public:
         for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 // TODO: grid_pedals
-                switch (grid_static_objects_flow.value(x, y)) {
+                /*switch (grid_static_objects_flow.value(x, y)) {
                     case Level::CellType::INFLOW:
                     case Level::CellType::OUTFLOW:
                     case Level::CellType::OBSTACLE:
@@ -222,8 +222,9 @@ public:
                         break;
                     default:
                         break;
-                }
+                }*/
                 
+
                 if (grid_ball.value(x, y) == Level::CellType::OBSTACLE) {
                     grid_obj.value(x, y) = Level::CellType::OBSTACLE;
                 }

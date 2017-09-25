@@ -118,8 +118,8 @@ public:
             bt_rigid_body->setLinearFactor(btVector3(1, 1, 0));
             bt_rigid_body->setAngularFactor(btVector3(0, 0, 1));
 
-            auto rigid_body =
-                std::make_unique<RigidBody>(level_body.id, level_body.position.x, level_body.position.y);
+            auto rigid_body = // TODO: fix id
+                std::make_unique<RigidBody>(next_id, level_body.position.x, level_body.position.y);
             rigid_bodies[level_body.id] = std::move(rigid_body);
 
             bt_rigid_body->setUserIndex(level_body.id); // -> RigidBody.id
@@ -142,6 +142,7 @@ public:
     }
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
+        printf("%d\n", ball_id);
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
         output.rigid_bodies.clear(); // currently not needed as we get a new output each time

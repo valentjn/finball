@@ -152,6 +152,13 @@ void LatticeBoltzmann::reinitilizeFI(LatticeBoltzmannOutput &output)
 	fi_Old = fi_New;
 }
 
+float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int x, int y) {
+	// this happens when a rigid body moves and an empty cell remains.
+	//TODO: reinitialize density and everything else to something proper!
+	float rho = 1.;
+	return rho;
+}
+
 void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 {
 	for (int y = 1; y < level.height - 1; ++y) {
@@ -170,8 +177,7 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 
 				if (rho == 0.) {
 					// this happens when a rigid body moves and an empty cell remains.
-					//TODO: reinitialize density to something proper!
-					rho = 1.;
+					rho = handleWindShadow(input, x, y);
 				}
 
 				const float rhoinv = 1.0 / rho;

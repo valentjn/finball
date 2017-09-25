@@ -26,11 +26,11 @@ private:
     Array2D<FICell> fi_New;
 
     // quadrature weights for approximating equilibrium distribution
-    float w[9] = {4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1. / 9.,
+    const float w[9] = {4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1. / 9.,
                   1. / 36., 1. / 36., 1. / 36., 1. / 36.};
-    int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
-    int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
-    int opp[9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
+    const int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
+    const int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
+    const int opp[9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
 
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
 

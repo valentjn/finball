@@ -16,7 +16,7 @@ public:
     // density field
     Array2D<float> density;
     // constants
-    constexpr static float c = 1. / 1.414213; // 1 / sqrt 2
+    constexpr static float c = 1. / 1.732050; // 1 / sqrt 3
     constexpr static float dt = 1;
     constexpr static float dx = 1;
     int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};

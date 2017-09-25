@@ -10,3 +10,5 @@ haiscores.txt
 .idea/
 cmake-build-debug/
 /CMakeLists.txt
+
+*.swp

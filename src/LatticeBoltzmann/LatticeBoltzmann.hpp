@@ -34,6 +34,7 @@ private:
     const int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
     const int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
     const int opp[9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
+    const int iter = 15;
 
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
 

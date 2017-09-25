@@ -19,7 +19,7 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
-	for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < iter; i++) {
 
 		step(input, output);
 	}
@@ -83,11 +83,23 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 			switch (input.flagfield.value(x, y)) {
 				case Level::OBSTACLE:
 					for (int z = 1; z < 9; ++z) {
-						if (fi_New.value(x, y)[z] != 0.0) {
-						fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
-								fi_New.value(x, y)[z];
-						fi_New.value(x, y)[z] = 0.0;
-						}
+
+                                            if (fi_New.value(x, y)[z] != 0.0) {
+                                                constexpr static float c = 1. / 1.732050;
+                                                float density = 0.0f;
+                                                for (int i = 0; i < 9; i++) {
+                                                        density += fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[i]; // density
+                                                }
+
+                                            fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
+                                                         fi_New.value(x, y)[z] - 2 / (c*c) *
+                                                      density*w[z]/(4.*iter)*(input.velocities.value(x,y)[0]*cx[z] +
+                                                    input.velocities.value(x,y)[1]*cy[z]);
+                                            if (input.velocities.value(x,y)[0] != 0 || input.velocities.value(x,y)[1] !=0){
+                                                std::cout << input.velocities.value(x,y)[0] << " " << input.velocities.value(x,y)[1] <<  std::endl;
+                                            }
+                                            fi_New.value(x, y)[z] = 0.0;
+                                            }
 					}
 					break;
 				case Level::INFLOW:
@@ -175,7 +187,24 @@ void LatticeBoltzmann::reinitializeFI(LatticeBoltzmannOutput &output)
 float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int x, int y) {
 	// this happens when a rigid body moves and an empty cell remains.
 	//TODO: reinitialize density and everything else to something proper!
-	float rho = 1.;
+        float rho = 0.;
+        int count = 0;
+        for (int i = 1; i < 9; ++i){
+            for(int j = 0; j < 9; ++j){
+                if (input.flagfield.value(x,y) == Level::FLUID){
+                    rho+=fi_Old.value(x+cx[i],y+cy[i])[j];
+                    count++;
+                }
+            }
+        }
+        if (count > 0){
+            rho /= count;
+        } else {
+            rho = 0.1;
+        }
+        for(int j = 0; j < 9 ; ++j){
+            fi_Old.value(x,y)[j] = rho*w[j];
+        }
 	return rho;
 }
 

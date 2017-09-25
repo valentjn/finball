@@ -81,25 +81,33 @@ public:
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
 	{
-		dynamics_world->setGravity(btVector3(0.0f,0.0f,0.0f));
-        btCollisionShape *sphere_shape = new btSphereShape(BALL_RADIUS);
+		dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
+        btCollisionShape *default_sphere_shape = new btSphereShape(DISTANCE_GRID_CELLS);
 
         grid_static_objects_flow = level.matrix;
 
-        for (auto &level_body : level.rigidBodies) {
+        for (const unique_ptr<RigidBody> &level_body : level.rigidBodies) {
             btTransform transform;
             transform.setIdentity();
             transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
-                level_body->position.y * DISTANCE_GRID_CELLS, 0));
+                level_body->position.y * DISTANCE_GRID_CELLS, 0.f));
             btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
             btScalar mass = level_body->mass;
             btVector3 inertia;
-            sphere_shape->calculateLocalInertia(mass, inertia);
-            btRigidBody *bt_rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
+            default_sphere_shape->calculateLocalInertia(mass, inertia);
+
+            // TODO: set correct collision shape based on RigidBody type
+            btRigidBody *bt_rigid_body;
+            if (typeid(*level_body) == typeid(RigidBodyCircle)) {
+                btCollisionShape *sphere_shape = new btSphereShape(static_cast<RigidBodyCircle *>(level_body.get())->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
+                bt_rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
+            } else {
+                bt_rigid_body = new btRigidBody(mass, motion_state, default_sphere_shape, inertia);
+            }
 
             // Constrain to two dimensions
-            bt_rigid_body->setLinearFactor(btVector3(1, 1, 0));
-            bt_rigid_body->setAngularFactor(btVector3(0, 0, 1));
+            bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
+            bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
 
             auto rigid_body =
                 std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
@@ -188,7 +196,7 @@ public:
 				}
                 output.rigid_bodies.push_back(output_transform);
 
-                if (output_transform->id == Level::BALL_ID) {
+                if (id == Level::BALL_ID) {
                     for (int y = 0; y < GRID_HEIGHT; ++y) {
                         for (int x = 0; x < GRID_WIDTH; ++x) {
                             glm::vec2 pos = gridToBullet(x, y);
@@ -197,7 +205,7 @@ public:
                             // float length = (pos - output_transform->position).length();
                             // printf("%f\n", length);
                             // TODO: scale with DISTANCE_GRID_CELLS
-                            if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <= BALL_RADIUS) {
+                            if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <= static_cast<RigidBodyCircle *>(level.rigidBodies[id].get())->radius * DISTANCE_GRID_CELLS) {
                                 grid_ball.value(x, y) = Level::CellType::OBSTACLE;
                                 grid_vel.value(x, y) = glm::vec2(1.0, 2.0); // TODO
                             }
@@ -237,7 +245,7 @@ public:
     }
 
     void setGravity(bool on) {
-        dynamics_world->setGravity(btVector3(0., (on ? -10. : 0.),0.));
+        dynamics_world->setGravity(btVector3(0., (on ? -10. : 0.), 0.));
     }
 
     void grid_finFlag(Array2D<Level::CellType> &grid_fin, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3) {

@@ -30,7 +30,7 @@ private:
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
-    static const int BALL_ID = 1;
+    static const int BALL_ID;
 
     int width, height;
     int flipperLeftId, flipperRightId;
@@ -65,7 +65,7 @@ public:
             file >> file_line;
             for (int x = 0; x < width; x++) {
                 if (file_line[x] == 'B') {
-                    rigidBodies.push_back(make_unique<RigidBodyCircle>(BALL_ID, x, y, 2));
+                    rigidBodies.push_back(make_unique<RigidBodyCircle>(BALL_ID, x, y, 1));
                     meshes[BALL_ID] = meshCircle.get();
                 } else {
                     CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');

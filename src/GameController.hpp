@@ -18,6 +18,7 @@
 #include "UserInput/UserInputOutput.hpp"
 #include "Visualization/Renderer.hpp"
 #include "Visualization/RendererInput.hpp"
+#include "Timer.hpp"
 
 using namespace chrono;
 
@@ -42,7 +43,7 @@ public:
 
         steady_clock::time_point lastFrame = steady_clock::now();
 
-        while (gameLogicOutput.running) {
+        Timer([&]() {
             // 1. get user input (kinect)
             userInput.getInput(userInputOutput);
 
@@ -68,7 +69,7 @@ public:
                 Log::debug("FPS: %f", 1 / duration.count());
                 lastFrame = thisFrame;
             }
-        }
+        }).start(16, gameLogicOutput.running);
     }
 };
 

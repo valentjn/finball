@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <math.h>
 
 #include <btBulletDynamicsCommon.h>
 #include <glm/glm.hpp>
@@ -177,7 +178,13 @@ public:
                 rigid_body->position.x = origin.getX() * DISTANCE_GRID_CELLS_INV;
                 rigid_body->position.y = origin.getY() * DISTANCE_GRID_CELLS_INV;
                 // TODO: check that this behaves correctly
-                rigid_body->angle = transform.getRotation().getAngle();
+				auto quaternion = transform.getRotation();
+				if (quaternion.getAxis().z() < 0.)
+				{
+					rigid_body->angle = 2*M_PI-quaternion.getAngle();
+				} else {
+					rigid_body->angle = quaternion.getAngle();
+				}
                 output.rigid_bodies.push_back(rigid_body);
 
                 // DetectionType detection_type =
@@ -214,16 +221,6 @@ public:
         for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 // TODO: grid_pedals
-                /*switch (grid_static_objects_flow.value(x, y)) {
-                    case Level::CellType::INFLOW:
-                    case Level::CellType::OUTFLOW:
-                    case Level::CellType::OBSTACLE:
-                        grid_obj.value(x, y) = grid_static_objects_flow.value(x, y);
-                        break;
-                    default:
-                        break;
-                }*/
-                
 
                 if (grid_ball.value(x, y) == Level::CellType::OBSTACLE) {
                     grid_obj.value(x, y) = Level::CellType::OBSTACLE;

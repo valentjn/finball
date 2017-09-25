@@ -8,10 +8,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "Log.hpp"
 
-//using namespace std;
+using namespace std;
 
 class Highscores {
 public:
@@ -35,7 +36,7 @@ public:
         highscores.push_back(Highscore(score, name));
         sortHighscores(highscores);
         saveHighscores(highscores);
-        Log::info("Saved haiscore: %f %s", score, name);
+        Log::info("Saved haiscore: %f %s", score, name.c_str());
     }
 
     const vector<Highscore> &getHighscores() const {
@@ -54,8 +55,8 @@ private:
         float score;
         string name;
         string line;
-        while(std::getline(file,line)){
-			std::istringstream iss(line);
+        while(getline(file,line)){
+			istringstream iss(line);
 			iss >> score;
 			if (iss >> name) {
 			} else {

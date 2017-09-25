@@ -1,0 +1,15 @@
+#include <typeinfo>
+
+// INFO:
+// parent class must have a "virtual" method
+// RigidBody has that already!
+
+RigidBodyRect rect = RigidBodyRect();
+RigidBody *r = &rect;
+
+if (typeid(&r) == typeid(RigidBody)) // false
+if (typeid(&r) == typeid(RigidBodyRect)) // true
+
+// Dereferencing is important!
+if (typeid(r) == typeid(RigidBody)) // true
+if (typeid(r) == typeid(RigidBodyRect)) // false

@@ -1,7 +1,10 @@
+#include <memory>
+
 #include "gtest/gtest.h"
 
 #include "test_lbm.hpp"
 
+#include "Level.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
 
 //set density to 1 and velocity to 0
@@ -56,8 +59,13 @@ TEST(RigidBodyTest, static64) {
   int idx = 1;
 
   Level level("data/testLevel.txt");
+<<<<<<< HEAD
   level.rigidBodies = vector<RigidBody>();
   level.rigidBodies.push_back(RigidBody(idx, level.width/2, level.height/2, false));
+=======
+  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
+  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
+>>>>>>> master
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -92,11 +100,18 @@ TEST(RigidBodyTest, static64) {
 		}
       }
   }
+<<<<<<< HEAD
   
   EXPECT_FALSE(changed);
   if(changed){
       printFlagField(init_flagfield);
       printFlagField(output.grid_objects);
+=======
+
+  EXPECT_TRUE(changed);
+  if(! changed){
+    printFlagField(output.grid_objects);
+>>>>>>> master
   }
 
   EXPECT_FLOAT_EQ(before.position.x, after.position.x);
@@ -111,8 +126,13 @@ TEST(RigidBodyTest, gravity64) {
   int idx = 1;
 
   Level level("data/testLevel.txt");
+<<<<<<< HEAD
   level.rigidBodies = vector<RigidBody>();
   level.rigidBodies.push_back(RigidBody(idx, level.width/2, level.height/2, false));
+=======
+  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
+  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
+>>>>>>> master
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -204,9 +224,17 @@ TEST(RigidBodyTest, stop64) {
       }
   }
 
+<<<<<<< HEAD
   // EXPECT_TRUE(changed);
   //if(! changed){
   printFlagField(init_flagfield);
   printFlagField(output.grid_objects);
   //}
+=======
+  EXPECT_TRUE(changed);
+  if(! changed){
+    printFlagField(init_flagfield);
+    printFlagField(output.grid_objects);
+  }
+>>>>>>> master
 }

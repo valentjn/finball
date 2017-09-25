@@ -31,13 +31,13 @@ public:
 
         static std::unique_ptr<Mesh> dummy_mesh;
         if (!dummy_mesh) {
-            auto circle = Mesh::createCircle(glm::vec2{0, 0}, 1.f);
-            dummy_mesh = std::make_unique<ColoredMesh>(circle, glm::vec3{1, 0.3, 0.4});
+            auto square = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
+            dummy_mesh = std::make_unique<ColoredMesh>(square, glm::vec3{1, 0.3, 0.4});
         }
 
         for (auto& gameLogicObject : world_objects) {
         	if (!gameLogicObject.mesh) {
-				Log::warn("A game_logic object does not have a render mesh, rendering as circle");
+				Log::warn("A game_logic object does not have a render mesh, rendering as rectangle");
                 gameLogicObject.mesh = dummy_mesh.get();
         	}
         }
@@ -57,7 +57,9 @@ public:
             }
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody->position, 0);
-            renderObject.scale = rigidBody->radius;
+            renderObject.scale = { rigidBody->radius, rigidBody->radius };
+            renderObject.rotation = rigidBody->angle;
+            std::cout << rigidBody->angle << " " << rigidBody->id << "\n";
 			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = mesh;
 

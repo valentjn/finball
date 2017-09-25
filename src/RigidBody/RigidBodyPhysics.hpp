@@ -87,42 +87,51 @@ public:
         grid_static_objects_flow = level.matrix;
 
         for (const unique_ptr<RigidBody> &level_body : level.rigidBodies) {
-            btTransform transform;
-            transform.setIdentity();
-            transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
-                                          level_body->position.y * DISTANCE_GRID_CELLS, 0.f));
-            btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
-            btScalar mass = level_body->mass;
-            btVector3 inertia;
-            default_sphere_shape->calculateLocalInertia(mass, inertia);
-
-            // TODO: set correct collision shape based on RigidBody type
-            btRigidBody *bt_rigid_body;
-            if (typeid(*level_body) == typeid(RigidBodyCircle)) {
-                btCollisionShape *sphere_shape = new btSphereShape(static_cast<RigidBodyCircle *>(level_body.get())->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
-                bt_rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
-            } else {
-                bt_rigid_body = new btRigidBody(mass, motion_state, default_sphere_shape, inertia);
-            }
-
-            // Constrain to two dimensions
-            bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
-            bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
-
-            auto rigid_body =
-                    std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
-            rigid_bodies[level_body->id] = std::move(rigid_body);
-
-            bt_rigid_body->setUserIndex(level_body->id);
-            // bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
-            dynamics_world->addRigidBody(bt_rigid_body);
-
-            if (level_body->mass == 0.f) {
-                // TODO: do this more accurately?
-                // TODO: this only works for rectangles atm
-                grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
-            }
+            initRigidBody(level_body, default_sphere_shape);
         }
+    }
+
+    void initRigidBody(const unique_ptr<RigidBody> &level_body, btCollisionShape * default_sphere_shape){
+        btRigidBody* bt_rigid_body = createRigidBody(level_body, default_sphere_shape);
+
+        // Constrain to two dimensions
+        bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
+        bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
+
+        auto rigid_body =
+                std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
+        rigid_bodies[level_body->id] = std::move(rigid_body);
+
+        // bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
+        dynamics_world->addRigidBody(bt_rigid_body);
+
+        if (level_body->mass == 0.f) {
+            // TODO: do this more accurately?
+            // TODO: this only works for rectangles atm
+            grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
+        }
+    }
+
+    btRigidBody* createRigidBody(const unique_ptr<RigidBody> &level_body, btCollisionShape * default_sphere_shape){
+        btTransform transform;
+        transform.setIdentity();
+        transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
+                                      level_body->position.y * DISTANCE_GRID_CELLS, 0.f));
+        btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
+        btScalar mass = level_body->mass;
+        btVector3 inertia;
+        default_sphere_shape->calculateLocalInertia(mass, inertia);
+
+        // TODO: set correct collision shape based on RigidBody type
+        btRigidBody *bt_rigid_body;
+        if (typeid(*level_body) == typeid(RigidBodyCircle)) {
+            btCollisionShape *sphere_shape = new btSphereShape(static_cast<RigidBodyCircle *>(level_body.get())->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
+            bt_rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
+        } else {
+            bt_rigid_body = new btRigidBody(mass, motion_state, default_sphere_shape, inertia);
+        }
+        bt_rigid_body->setUserIndex(level_body->id);
+        return bt_rigid_body;
     }
 
     // TODO: dtor

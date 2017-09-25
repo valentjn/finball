@@ -58,6 +58,8 @@ public:
     }
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output);
+
+	void step(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output);
 };
 
 #endif

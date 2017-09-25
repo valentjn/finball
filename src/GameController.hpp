@@ -14,6 +14,7 @@
 #include "RigidBody/RigidBodyPhysics.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "Timer.hpp"
 #include "UserInput/UserInput.hpp"
 #include "UserInput/UserInputOutput.hpp"
 #include "Visualization/Renderer.hpp"
@@ -42,7 +43,7 @@ public:
 
         steady_clock::time_point lastFrame = steady_clock::now();
 
-        while (gameLogicOutput.running) {
+        Timer timer([&]() {
             // 1. get user input (kinect)
             userInput.getInput(userInputOutput);
 
@@ -68,8 +69,9 @@ public:
                 Log::debug("FPS: %f", 1 / duration.count());
                 lastFrame = thisFrame;
             }
-            SDL_Delay(200);
-        }
+        });
+
+        timer.start(60, gameLogicOutput.running);
     }
 };
 

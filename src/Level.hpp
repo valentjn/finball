@@ -96,10 +96,10 @@ private:
         float leftX = width * 0.5f - FLIPPER_WIDTH - FLIPPER_GAP;
         float rightX = width * 0.5f + FLIPPER_WIDTH + FLIPPER_GAP;
         rigidBodies.push_back(make_unique<RigidBodyTriangle>(flipperLeftId, leftX, FLIPPER_Y, vec2(leftX + FLIPPER_WIDTH, FLIPPER_Y), vec2(leftX, 0), 0));
-        rigidBodies.push_back(make_unique<RigidBodyTriangle>(flipperRightId, rightX, FLIPPER_Y, vec2(rightX - FLIPPER_WIDTH, FLIPPER_Y), vec2(rightX, 0), 0));
+        rigidBodies.push_back(make_unique<RigidBodyTriangle>(flipperRightId, rightX, FLIPPER_Y, vec2(rightX, 0), vec2(rightX - FLIPPER_WIDTH, FLIPPER_Y), 0));
 
         vector<vec3> leftVerticies = {vec3(0,0,0), vec3(FLIPPER_WIDTH, 0, 0), vec3(0, -FLIPPER_Y, 0)};
-        vector<vec3> rightVerticies = {vec3(0,0,0), vec3(-FLIPPER_WIDTH, 0, 0), vec3(0, -FLIPPER_Y, 0)};
+        vector<vec3> rightVerticies = {vec3(0,0,0), vec3(0, -FLIPPER_Y, 0), vec3(-FLIPPER_WIDTH, 0), 0)};
         meshes[flipperLeftId] = make_unique<ColoredMesh>(leftVerticies, vec3(255, 255, 0)).get();
         meshes[flipperRightId] = make_unique<ColoredMesh>(rightVerticies, vec3(255, 255, 0)).get();
     }

@@ -131,6 +131,8 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
     // create a rectangle mesh to use in the first render pass where the fluid is visualized
     auto full_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
 	m_full_quad = std::make_unique<ColoredMesh>(full_quad, glm::vec3{});
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 Renderer::~Renderer() {

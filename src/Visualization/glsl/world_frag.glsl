@@ -5,6 +5,7 @@ uniform sampler2D tex;
 layout(location = 3) uniform int mode;
 
 in vec3 frag_color;
+in float frag_depth;
 
 layout(location = 0) out vec4 out_color;
 
@@ -13,4 +14,6 @@ void main() {
 	    out_color = vec4(frag_color, 1);
     else
         out_color = texture(tex, frag_color.xy);
+
+    gl_FragDepth = frag_depth;
 }

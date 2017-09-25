@@ -81,9 +81,15 @@ public:
 
 
         // visualise the flag field from rigidbody
+        static std::unique_ptr<Texture3F> ff_texture;
+        static std::unique_ptr<TexturedMesh> flag_field_mesh;
         const int ff_width = rigidBodyPhysicsOutput.grid_objects.width();
         const int ff_height = rigidBodyPhysicsOutput.grid_objects.height();
-        Texture3F ff_texture = Texture3F(glm::ivec2(ff_width, ff_height), false);
+        if (!flag_field_mesh) {
+            ff_texture = std::make_unique<Texture3F>(glm::ivec2(ff_width, ff_height), false);
+            const std::vector<glm::vec3> flag_field_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
+            flag_field_mesh = std::make_unique<TexturedMesh>(flag_field_quad, ff_texture.get());
+        }
         // fill the texture with data from the flag field
         Array2D<glm::vec3> ff_data = Array2D<glm::vec3>(ff_width, ff_height);
         for (int x = 0; x < ff_width; x++) {
@@ -104,20 +110,11 @@ public:
                 }
             }
         }
-        ff_texture.setData(ff_data);
+        ff_texture->setData(ff_data);
 
-        const std::vector<glm::vec3> flag_field_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
-        static std::unique_ptr<TexturedMesh> flag_field_mesh;
-        if (!flag_field_mesh) {
-            flag_field_mesh = std::make_unique<TexturedMesh>(flag_field_quad, &ff_texture);
-        }
         // create RenderObject
-//        const int ff_display_width = latticeBoltzmannOutput.velocity.width();
-//        const int ff_display_height = latticeBoltzmannOutput.velocity.height();
         RenderObject ff_render_object;
         ff_render_object.mesh = flag_field_mesh.get();
-//        ff_render_object.position = glm::vec3{ ff_display_width / 2, ff_display_height / 2, 0.1f};
-//        ff_render_object.scale = {ff_display_width / 2, ff_display_height / 2};
         ff_render_object.position = glm::vec3{0.75f, 0.75f, 0.0f};
         ff_render_object.scale = {0.25, 0.25};
         ff_render_object.rotation = 0;

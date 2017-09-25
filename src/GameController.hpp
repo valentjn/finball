@@ -68,6 +68,7 @@ public:
                 Log::debug("FPS: %f", 1 / duration.count());
                 lastFrame = thisFrame;
             }
+            SDL_Delay(200);
         }
     }
 };

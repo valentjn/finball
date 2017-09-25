@@ -6,10 +6,11 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include "Log.hpp"
 
-using namespace std;
+//using namespace std;
 
 class Highscores {
 public:
@@ -51,8 +52,16 @@ private:
 
         float score;
         string name;
-        while (file >> score >> name) {
-            highscores.push_back(Highscore(score, name));
+        string line;
+        while(std::getline(file,line)){
+			std::istringstream iss(line);
+			iss >> score;
+			if (iss >> name) {
+			} else {
+				name = "NONE";
+				Log::warn("irregular formatting in haiscore file");
+			}
+			highscores.push_back(Highscore(score, name));
         }
         sortHighscores(highscores);
     }

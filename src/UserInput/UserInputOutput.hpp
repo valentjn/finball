@@ -1,6 +1,7 @@
 #ifndef USER_INPUT_OUTPUT_HPP_
 #define USER_INPUT_OUTPUT_HPP_
 #include <iostream>
+#include <iomanip>
 
 struct UserInputOutput {
     double leftAngle[2];
@@ -22,8 +23,10 @@ struct UserInputOutput {
 			std::cout << (playerIsTracked[k]?"T":"")
 					  << (playerIsCalibrating[k]?"c":"")
 					  << (playerIsCalibrated[k]?"C":"")
-					  << " L: " << leftAngle[k] << " | " << leftVelocity[k]
-					  << " R: " << rightAngle[k] << " | " << rightVelocity[k]
+					  << " L: " << std::setw(15) << leftAngle[k]
+					  << " | " << std::setw(15) << leftVelocity[k]
+					  << " R: " << std::setw(15) << rightAngle[k]
+					  << " | " << std::setw(15) << rightVelocity[k]
 					  << " ||";
 		}
 		std::cout << std::endl;

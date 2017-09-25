@@ -69,7 +69,7 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) src/Log.cpp test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
+	$(CXX) src/Log.cpp src/LatticeBoltzmann/LatticeBoltzmann.cpp test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
 	build/test
 
 test_test: test_deps

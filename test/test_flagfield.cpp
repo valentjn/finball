@@ -38,15 +38,18 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
     }
     j=0;
     for (int i=0; i<width; i++) {
-        std::cout << flagfield.value(i,j) << " ";
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
     }
     int i=width-1;
     for (int j=0; j<height; j++) {
-        std::cout << flagfield.value(i,j) << " ";
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
     }
     i=0;
     for (int j=0; j<height; j++) {
-        std::cout << flagfield.value(i,j) << " ";
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
     }
     return true;
 }
@@ -77,6 +80,7 @@ TEST(RigidBodyTest, static64) {
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
+  EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
   Transform before = sut.getRigidBody(idx);
 
@@ -133,6 +137,8 @@ TEST(RigidBodyTest, gravity64) {
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
+  EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
+
   Transform before = sut.getRigidBody(idx);
 
   for (int i = 0; i < level.width ; ++i){
@@ -186,6 +192,7 @@ TEST(RigidBodyTest, stop64) {
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
+  EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
   Transform before = sut.getRigidBody(idx);
   printRBPosition(before);

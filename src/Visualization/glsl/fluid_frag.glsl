@@ -57,9 +57,10 @@ void main() {
     vec2 normalized_coords = gl_FragCoord.xy / (textureSize(tex_noise, 0) * 2);
     ivec2 vecs_res = textureSize(tex_vecs, 0);
     normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
-    out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA
-    
-    out_color = texture(tex_density, normalized_coords);
+    //out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA
+    float velocity_val = lic(normalized_coords);
+    float density_val = texture(tex_vecs, normalized_coords).z;    
+    out_color = vec4(1) * density_val;
     
     //out_color = normalized_coords.xxyy;
 }

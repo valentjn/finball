@@ -17,11 +17,10 @@ class RendererInput {
 public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
-    const Array2D<glm::vec2> *fluid_velocity;
-    const Array2D<float> *fluid_density;
+    Array2D<glm::vec3> fluid_input;
     TexturedMesh* fluid_mesh;
 
-    RendererInput() : fluid_velocity(nullptr), fluid_density(nullptr) {}
+    RendererInput() : fluid_mesh(nullptr) {}
 
     RendererInput(const GameLogicOutput &gameLogicOutput,
                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
@@ -76,8 +75,12 @@ public:
         }
 
         // handle lattice boltzmann output
-        fluid_velocity = &latticeBoltzmannOutput.velocity;
-        fluid_density = &latticeBoltzmannOutput.density;
+        assert(latticeBoltzmannOutput.velocity.width() == latticeBoltzmannOutput.density.width());
+        assert(latticeBoltzmannOutput.velocity.height() == latticeBoltzmannOutput.density.height());
+        fluid_input = Array2D<glm::vec3>{ latticeBoltzmannOutput.velocity.width(), latticeBoltzmannOutput.velocity.height() };
+        for (int x = 0; x < fluid_input.width(); ++x)
+            for (int y = 0; y < fluid_input.height(); ++y)
+                fluid_input.value(x,y) = glm::vec3{ latticeBoltzmannOutput.velocity.value(x,y), latticeBoltzmannOutput.density.value(x,y) };
         /* test input
         static Array2D<glm::vec2> test_fluid_velocity;
         if (test_fluid_velocity == Array2D<glm::vec2>{}) {

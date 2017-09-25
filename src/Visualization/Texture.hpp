@@ -11,7 +11,7 @@ protected:
     glm::ivec2 m_res;
     GLuint m_tex;
 
-    Texture(glm::ivec2 resolution);
+    Texture(glm::ivec2 resolution, bool linear_interpolation = true);
 
 public:
     glm::ivec2 size() const;
@@ -24,28 +24,28 @@ public:
 class Texture1F : public Texture
 {
 public:
-    Texture1F(glm::ivec2 resolution);
+    Texture1F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<float>& data);
 };
 
 class Texture2F : public Texture
 {
 public:
-    Texture2F(glm::ivec2 resolution);
+    Texture2F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec2>& data);
 };
 
 class Texture3F : public Texture
 {
 public:
-    Texture3F(glm::ivec2 resolution);
+    Texture3F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec3>& data);
 };
 
 class Texture4F : public Texture
 {
 public:
-    Texture4F(glm::ivec2 resolution);
+    Texture4F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec4>& data);
 };
 

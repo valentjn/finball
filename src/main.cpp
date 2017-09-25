@@ -2,7 +2,7 @@
 
 #include "GameController.hpp"
 #include "Log.hpp"
-#include "Menus/MainMenu.hpp"
+#include "Scenes/MainMenuScene.hpp"
 #include "Parameters.hpp"
 #include "SDL/SDLWindow.hpp"
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     // show main menu and obtain level from it
     std::unique_ptr<Level> level;
     {
-        MainMenu menu(window, highscores);
+        MainMenuScene menu(window, highscores);
         level = menu.show();
     }
 

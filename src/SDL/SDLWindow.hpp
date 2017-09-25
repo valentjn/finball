@@ -2,6 +2,7 @@
 #define SDL_WINDOW_HPP_
 
 #include <cstdint>
+#include <stdexcept>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

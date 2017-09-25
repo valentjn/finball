@@ -35,14 +35,14 @@ public:
         SDL_DestroyRenderer(renderer);
     }
 
-    Font loadFont(const char* path, int ptsize) {
-        Font font = TTF_OpenFont(path, ptsize);
+    Font loadFont(const std::string &path, int ptsize) {
+        Font font = TTF_OpenFont(path.c_str(), ptsize);
         fonts.push_back(font);
         return font;
     }
 
-    void addImage(const char* path) {
-        SDL_Surface *surface = IMG_Load(path);
+    void addImage(const std::string &path) {
+        SDL_Surface *surface = IMG_Load(path.c_str());
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
         SDL_RenderCopy(renderer, texture, NULL, NULL);

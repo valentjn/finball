@@ -247,6 +247,10 @@ public:
         else
             dynamics_world->setGravity(btVector3(0.,0.,0.));
     }
+
+    RigidBody getRigidBody(int idx){
+        return *(rigid_bodies[idx].get());
+    }
 };
 
 #endif

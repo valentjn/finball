@@ -36,7 +36,7 @@ public:
         Log::info("Saved haiscore: %f %s", score, name);
     }
 
-    vector<Highscore> &getHighscores() {
+    const vector<Highscore> &getHighscores() const {
         return highscores;
     }
 

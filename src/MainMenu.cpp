@@ -34,19 +34,13 @@ std::unique_ptr<Level> MainMenu::show() {
 }
 
 void MainMenu::setup() {
-    int windowWidth = window.getWidth();
-    int windowHeight = window.getHeight();
+    gameScreen.addBackgroundImage("data/background.jpg");
 
-    // Set background
-    renderer.addImage("data/background.jpg");
+    gameScreen.addTitle("FinBall");
+    gameScreen.addActionText("To start the game please do a HAI-five or press SPACE!");
+    gameScreen.addLeftText(getHighscoreText());
 
-    renderer.addText("FinBall", windowWidth * 0.5, windowHeight * 0.1, headerFont, colorLight, true);
-    renderer.addText("To start the game please do a HAI-five or press SPACE!",
-                     windowWidth * 0.5, windowHeight * 0.9, defaultFont, colorDark, true);
-
-    renderer.addText(getHighscoreText(), windowWidth * 0.1, windowHeight * 0.25, defaultFont, colorLight, false);
-
-    renderer.render();
+    gameScreen.render();
 }
 
 std::string MainMenu::getHighscoreText() {

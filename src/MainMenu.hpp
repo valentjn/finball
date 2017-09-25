@@ -2,6 +2,7 @@
 #define MAIN_MENU_HPP_
 
 #include <string>
+#include <vector>
 
 #include "Highscores.hpp"
 #include "Level.hpp"
@@ -10,30 +11,12 @@
 
 class MainMenu {
 private:
-    const SDLWindow &window;
-    SDLRenderer renderer;
-
-    SDLRenderer::Font headerFont;
-    SDLRenderer::Font defaultFont;
-
-    SDLRenderer::Color colorLight;
-    SDLRenderer::Color colorDark;
-
+    GameScreen gameScreen;
     Highscores &highscores;
 
 public:
     MainMenu(const SDLWindow &window, Highscores &highscores) :
-            window(window), renderer(window), highscores(highscores) {
-        int windowHeight = window.getHeight();
-        int headerFontSize = windowHeight * 0.12;
-        int defaultFontSize = windowHeight * 0.05;
-
-        headerFont = renderer.loadFont("data/OpenSans-Regular.ttf", headerFontSize);
-        defaultFont = renderer.loadFont("data/OpenSans-Regular.ttf", defaultFontSize);
-
-        colorLight = {255, 255, 255, 0};
-        colorDark = {50, 50, 50, 0};
-    }
+            gameScreen(window), highscores(highscores) {}
 
     std::unique_ptr<Level> show();
 

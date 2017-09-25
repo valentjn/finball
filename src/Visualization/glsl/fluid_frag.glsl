@@ -59,7 +59,7 @@ void main() {
     normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
     //out_color = vec4(0.2,0.8,1,1) * lic(normalized_coords);   // run lic; note the return value is of type vec4/RGBA
     float velocity_val = lic(normalized_coords);
-    float density_val = texture(tex_vecs, normalized_coords).z;
+    float density_val = 1.9 * texture(tex_vecs, normalized_coords).z;
     if (density_val < 1)
         out_color = vec4(0, 0, 1, 1) * (1 - density_val) + vec4(0, 1, 0, 1) * density_val;
     else {

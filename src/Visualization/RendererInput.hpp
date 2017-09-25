@@ -32,7 +32,9 @@ public:
         static std::unique_ptr<Mesh> dummy_mesh;
         if (!dummy_mesh) {
             auto square = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
-            dummy_mesh = std::make_unique<ColoredMesh>(square, glm::vec3{1, 0.3, 0.4});
+            dummy_mesh = std::make_unique<ColoredMesh>(
+                square,
+                std::vector<glm::vec3>{{1, 0, 0.4},{0.3, 1, 0.4},{1, 1, 0.4},{1, 0, 0.4},{1, 1, 0.4},{0, 0, 1}});
         }
 
         for (auto& gameLogicObject : world_objects) {

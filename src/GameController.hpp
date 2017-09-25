@@ -7,6 +7,7 @@
 #include "GameLogic/GameLogic.hpp"
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
+#include "Highscores.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmann.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
@@ -26,7 +27,11 @@ using namespace chrono;
 
 class GameController {
 
+    Highscores &highscores;
+
 public:
+    GameController(Highscores &highscores) : highscores(highscores) {}
+
     void startGame(SDLWindow &window, Level &level) {
         Renderer renderer(window);
         GameLogic gameLogic(level);
@@ -122,6 +127,8 @@ private:
                 sym = event.key.keysym.sym;
                 if (sym == SDLK_RETURN) {
                     quit = true;
+
+                    highscores.saveHighscore(highscore, name);
                     break;
                 }
 

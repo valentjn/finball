@@ -6,10 +6,9 @@
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "Highscores.hpp"
+#include "Level.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
-#include <Level.hpp>
 
 using namespace std;
 using namespace std::chrono;
@@ -20,12 +19,6 @@ private:
     RenderObject fluid_surface;
 
     steady_clock::time_point startTime;
-
-    void endGame(GameLogicOutput &output) {
-        output.running = false;
-        Highscores::saveHighscore(output.highscore);
-        return;
-    }
 
 public:
     GameLogic(const Level& level) {
@@ -45,14 +38,13 @@ public:
 
         for (RigidBody const *rigidBody : *input.rigidBodies) {
             if (rigidBody->id == 1 && rigidBody->position.y < 0) {
-                    endGame(output);
-                    return;
-                }
+                output.running = false;
+                return;
             }
         }
 
         if (input.quit) {
-            endGame(output);
+            output.running = false;
             return;
         }
 

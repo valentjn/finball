@@ -50,15 +50,12 @@ void MainMenu::setup() {
 }
 
 std::string MainMenu::getHighscoreText() {
-    std::vector<float> highscores;
-    Highscores::loadHighscores(highscores);
-
     std::stringstream stream;
     int counter = 1;
 
     stream << std::fixed << std::setprecision(2);
-    for (auto it = highscores.begin(); it != highscores.end() && counter <= 5; it++) {
-        stream << "(" << counter++ << ") " << *it << "\n";
+    for (const auto &highscore : highscores.getHighscores()) {
+        stream << "(" << counter++ << ") " << highscore.name << " " << highscore.score << "\n";
     }
     return stream.str();
 }

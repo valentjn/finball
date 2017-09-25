@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "Highscores.hpp"
 #include "Level.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
@@ -18,8 +19,11 @@ private:
     SDLRenderer::Color colorLight;
     SDLRenderer::Color colorDark;
 
+    Highscores &highscores;
+
 public:
-    MainMenu(const SDLWindow &window) : window(window), renderer(window) {
+    MainMenu(const SDLWindow &window, Highscores &highscores) :
+            window(window), renderer(window), highscores(highscores) {
         int windowHeight = window.getHeight();
         int headerFontSize = windowHeight * 0.12;
         int defaultFontSize = windowHeight * 0.05;

@@ -50,8 +50,8 @@ public:
             for (int x = 0; x < level.width; x++) {
                 // set initial values
                 for (int z = 0; z < 9; z++) {
-                    fi_New.value(x, y)[z] = w[z] * 0.1 / (0.1 + x);
-                    fi_Old.value(x, y)[z] = w[z] * 0.1 / (0.1 + x);
+                    fi_New.value(x, y)[z] = w[z] * 0.5;
+                    fi_Old.value(x, y)[z] = w[z] * 0.5;
                 }
             }
         }

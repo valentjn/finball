@@ -30,15 +30,6 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 	Stream(input);
 	HandleBoundaries(input);
 	Output(output);
-
-
-	// Pass some dummy values downstream until the real values work
-	// TODO remove
-	//for (int y = 0; y < level.height; y++) {
-	//for (int x = 0; x < level.width; x++) {
-	//output.velocity.value(x,y) = { (x + 0.0)/level.width , (y + 0.0)/level.height };
-	//}
-	//}
 }
 
 void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)
@@ -83,9 +74,8 @@ void LatticeBoltzmann::HandleBoundaries(const LatticeBoltzmannInput &input)
 				// inflow
 			else if (input.flagfield.value(x, y) == Level::INFLOW) {
 				for (int z = 0; z < 9; z++) {
-					// TODO adjust inflow values
-					fi_New.value(x, y)[z] = w[z] * 0.1;
-					fi_Old.value(x, y)[z] = w[z] * 0.1;
+					fi_New.value(x, y)[z] = w[z] * 1;
+					fi_Old.value(x, y)[z] = w[z] * 1;
 					if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
 						(y + cy[z]) < level.height &&
 						input.flagfield.value(x + cx[z], y + cy[z]) ==
@@ -97,15 +87,14 @@ void LatticeBoltzmann::HandleBoundaries(const LatticeBoltzmannInput &input)
 				// outflow
 			else if (input.flagfield.value(x, y) == Level::OUTFLOW) {
 				for (int z = 0; z < 9; z++) {
-					// TODO adjust outflow values
 					fi_New.value(x, y)[z] = 0;
 					fi_Old.value(x, y)[z] = 0;
-					if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
+					/*if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
 						(y + cy[z]) < level.height &&
 						input.flagfield.value(x + cx[z], y + cy[z]) ==
 						Level::FLUID) {
 						fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
-					}
+					}*/
 				}
 			}
 		}
@@ -164,12 +153,12 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 	}
 
 	// Set fi_old = fi_new
-	// TODO: Swap pointers instead of values
 	this->ReinitilizeFI(output);
 }
 
 void LatticeBoltzmann::ReinitilizeFI(LatticeBoltzmannOutput &output)
 {
+	// TODO: Swap pointers instead of values
 	for (int y = 0; y < level.height; y++) {
 		for (int x = 0; x < level.width; x++) {
 			for (int z = 0; z < 9; ++z) {
@@ -197,7 +186,6 @@ void LatticeBoltzmann::HandleCollisions(const LatticeBoltzmannInput &input)
 					  fi_Old.value(x, y)[3] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[5] +
 					  fi_Old.value(x, y)[6] + fi_Old.value(x, y)[7] + fi_Old.value(x, y)[8];
 
-				// TODO later          density->get(x, y, vector::x) = rho ;
 				const float rhoinv = 1.0 / rho;
 
 				velx =
@@ -205,24 +193,19 @@ void LatticeBoltzmann::HandleCollisions(const LatticeBoltzmannInput &input)
 						 (fi_Old.value(x, y)[6] + fi_Old.value(x, y)[3] + fi_Old.value(x, y)[7])) *
 						rhoinv;
 
-				// TODO later   velocity->get(x, y, vector::x) = velx ;
 				vely =
 						((fi_Old.value(x, y)[6] + fi_Old.value(x, y)[2] + fi_Old.value(x, y)[5]) -
 						 (fi_Old.value(x, y)[7] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[8])) *
 						rhoinv;
 
-				// TODO later              velocity->get(x, y, vector::y) = vely ;
-
 				const float velxx = velx * velx;
 				const float velyy = vely * vely;
 
-				// TODO need to set omega
-				float omega = 1.0;
+				float omega = 0.6;
 				// For the center
 				float feqC = w[0] * rho * (1.0 - 3.0 * (velxx + velyy) * 0.5);
 				fi_Old.value(x, y)[0] += omega * (feqC - fi_Old.value(x, y)[0]);
 
-				// TODO later what is ax velocity of obsatcle
 				float ax = 0;
 				float ay = 0;
 				// For the east distribution function

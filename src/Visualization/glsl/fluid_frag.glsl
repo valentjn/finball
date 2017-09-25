@@ -191,10 +191,10 @@ void main() {
 
 	vec2 veloc = getVeloc(normalized_coords);
 
-	float noise_scale = 2;
-	float tscale = 3;
+	float noise_scale = 1.75;
+	float tscale = 2.5;
 
-	float prev_out_wave = texture(tex_waves, normalized_coords);
+	float prev_out_wave = texture(tex_waves, normalized_coords).x;
 
 	if (int(gl_FragCoord.x) == 0)
 		out_wave = noise2D(vec2(noise_scale * normalized_coords.y, t * tscale));
@@ -204,11 +204,12 @@ void main() {
 		out_wave = noise2D(vec2(noise_scale * (4 - normalized_coords.x), t * tscale));
 	else if (int(gl_FragCoord.y) == rend_res.y - 1)
 		out_wave = noise2D(vec2(noise_scale * (1 + normalized_coords.x), t * tscale));
-	else
+	else {
 		out_wave = texture(tex_waves, normalized_coords - 25 * veloc / (vecs_res + 1)).x;
-	
-	out_wave = 0.2 * out_wave + 0.8 * prev_out_wave;
+		out_wave = 0.9 * out_wave + 0.1 * prev_out_wave;
+	}
 
 	out_color *= 0.5 + 0.8 * out_wave;
+	out_color = vec3(out_wave);
 }
 

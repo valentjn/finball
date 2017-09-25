@@ -90,6 +90,14 @@ public:
     Level(const Level &) = delete;
     Level &operator=(const Level &) = delete;
 
+    void setBallPosition(float xpos, float ypos){
+        for (const auto &rb : rigidBodies) {
+            if (rb->id == Level::BALL_ID) {
+                rb->position = {xpos, ypos};
+            }
+        }
+    }
+
 private:
     void createFlippers() {
         float leftX = width * 0.5f - FLIPPER_WIDTH - FLIPPER_GAP;

@@ -59,7 +59,6 @@ public:
             renderObject.position = glm::vec3(rigidBody->position, 0);
             renderObject.scale = { rigidBody->radius, rigidBody->radius };
             renderObject.rotation = rigidBody->angle;
-            std::cout << rigidBody->angle << " " << rigidBody->id << "\n";
 			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = mesh;
 

@@ -1,39 +1,17 @@
 #include <iomanip>
 #include <sstream>
 
+#include <SDL2/SDL.h>
+
 #include "GameController.hpp"
 #include "Highscores.hpp"
 #include "Level.hpp"
-#include "MainMenu.hpp"
+#include "Menus/MainMenu.hpp"
+#include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
 
 std::unique_ptr<Level> MainMenu::show() {
-    setup();
-
-    // Flag for quitting the program
-    bool quit = false;
-    SDL_Event event;
-
-    while (!quit) {
-        SDL_WaitEvent(&event);
-
-        switch (event.type) {
-        case SDL_KEYDOWN:
-            if (event.key.keysym.sym == SDLK_SPACE) {
-                quit = true;
-            }
-            break;
-        case SDL_QUIT: // User hits the "x" in the corner of the window
-            exit(0);
-            break;
-        }
-    }
-
-    return std::make_unique<Level>("data/testLevel.txt");
-}
-
-void MainMenu::setup() {
     gameScreen.addBackgroundImage("data/background.jpg");
 
     gameScreen.addTitle("FinBall");
@@ -41,6 +19,10 @@ void MainMenu::setup() {
     gameScreen.addLeftText(getHighscoreText());
 
     gameScreen.render();
+
+    listen();
+
+    return std::make_unique<Level>("data/testLevel.txt");
 }
 
 std::string MainMenu::getHighscoreText() {
@@ -52,4 +34,21 @@ std::string MainMenu::getHighscoreText() {
         stream << "(" << counter++ << ") " << highscore.name << " " << highscore.score << "\n";
     }
     return stream.str();
+}
+
+void MainMenu::listen() {
+    // Flag for quitting the program
+    bool running = true;
+
+    SDLEvents events;
+    events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
+        if (event.key.keysym.sym == SDLK_SPACE) {
+            running = false;
+        }
+    });
+    events.setListener(SDL_QUIT, [&](SDL_Event &event) {
+        exit(0);
+    });
+
+    events.listen(running);
 }

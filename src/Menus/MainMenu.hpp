@@ -21,7 +21,7 @@ public:
     std::unique_ptr<Level> show();
 
 private:
-    void setup();
+    void listen();
 
     std::string getHighscoreText();
 };

@@ -2,7 +2,7 @@
 
 #include "GameController.hpp"
 #include "Log.hpp"
-#include "MainMenu.hpp"
+#include "Menus/MainMenu.hpp"
 #include "Parameters.hpp"
 #include "SDL/SDLWindow.hpp"
 

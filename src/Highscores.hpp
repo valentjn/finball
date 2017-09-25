@@ -4,6 +4,7 @@
 #define HIGHSCORE_CUTOFF 5
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <string>
 

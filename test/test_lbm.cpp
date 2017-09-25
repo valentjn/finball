@@ -4,6 +4,9 @@
 #include "gtest/gtest.h"
 #include <cmath>
 
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
+
 void printFlagField(Array2D<Level::CellType> &flagfield) {
 
   std::cout << "FLAGS:" << std::endl << std::endl;
@@ -116,8 +119,9 @@ bool isSmooth(Array2D<float> &rho, float threshold) {
 
 
 TEST(LBMTest, CollideStep1x1) {
-
-  Level level("test/level5x5.txt");
+  LevelLoader levelLoader("test/level5x5.txt");
+  Level level;
+  levelLoader.load(level);
   printFlagField(level.matrix);
 
   LatticeBoltzmannInput input(level);
@@ -135,8 +139,10 @@ TEST(LBMTest, CollideStep1x1) {
 }
 
 TEST(LBMTest, EquilibriumTrue) {
+  LevelLoader levelLoader("test/level5x5.txt");
+  Level level;
+  levelLoader.load(level);
 
-  Level level("test/level5x5.txt");
   LatticeBoltzmannInput input(level);
   LatticeBoltzmannOutput output(level);
   LatticeBoltzmann sut(level);
@@ -160,6 +166,3 @@ TEST(LBMTest, EquilibriumTrue) {
   //printFIs(output.afterstream);
   EXPECT_EQ(5,level.width);
 }
-
-
-

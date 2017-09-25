@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 
 #include "Array2D.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Transform.hpp"
 
 class RigidBodyPhysicsOutput {

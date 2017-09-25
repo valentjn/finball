@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Highscores.hpp"
-#include "Level.hpp"
 #include "Scenes/MenuRenderer.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
@@ -19,7 +18,7 @@ public:
     MainMenuScene(const SDLWindow &window, Highscores &highscores) :
             menuRenderer(window), highscores(highscores) {}
 
-    std::unique_ptr<Level> show();
+    void show();
 
 private:
     void listen();

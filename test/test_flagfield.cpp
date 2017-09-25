@@ -4,7 +4,8 @@
 
 #include "test_lbm.hpp"
 
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
 
 //set density to 1 and velocity to 0
@@ -61,8 +62,11 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
 TEST(RigidBodyTest, static64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
   level.setBallPosition(level.width/2, level.height/2);
+
+  levelLoader.load(level);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -98,7 +102,7 @@ TEST(RigidBodyTest, static64) {
 		}
       }
   }
-  
+
   EXPECT_FALSE(changed);
   if(changed){
       printFlagField(init_flagfield);
@@ -116,8 +120,11 @@ TEST(RigidBodyTest, static64) {
 TEST(RigidBodyTest, gravity64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
-  level.setBallPosition(level.width/2, level.height/2);
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
+  level.setBallPosition(level.width/2, level.height/2);  
+
+  levelLoader.load(level);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -170,8 +177,11 @@ TEST(RigidBodyTest, gravity64) {
 TEST(RigidBodyTest, stop64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
   level.setBallPosition(level.width/4, level.height*0.9);
+
+  levelLoader.load(level);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -213,7 +223,7 @@ TEST(RigidBodyTest, stop64) {
   EXPECT_TRUE(changed);
   EXPECT_FLOAT_EQ(before.position.x, after.position.x);
   EXPECT_LE(48, after.position.y);
-  if(! changed)
+  //if(! changed)
   {
     printFlagField(init_flagfield);
     printFlagField(output.grid_objects);

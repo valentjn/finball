@@ -9,7 +9,7 @@
 #include "LatticeBoltzmannInput.hpp"
 #include "../Level.hpp"
 #include "../Array2D.hpp"
-
+#include <omp.h>
 
 using namespace glm;
 
@@ -31,9 +31,6 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 
 	HandleCollisions(input);
 
-	// output fi prestreaming
-	outputFiPrestream(output);
-
 	// set f_i in obstacles to 0
 	initFiObstacles(input);
 
@@ -51,17 +48,6 @@ void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)
 					fi_Old.value(x, y)[i] = 0.0;
 					fi_New.value(x, y)[i] = 0.0;
 				}
-			}
-		}
-	}
-}
-
-void LatticeBoltzmann::outputFiPrestream(LatticeBoltzmannOutput &output)
-{
-	for (int y = 0; y < level.height; ++y) {
-		for (int x = 0; x < level.width; ++x) {
-			for (int z = 0; z < 9; ++z) {
-				output.prestream.value(x, y)[z] = fi_Old.value(x, y)[z];
 			}
 		}
 	}
@@ -138,27 +124,16 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 	// Calculate macroscopic quantities for the output
 	for (int y = 0; y < this->level.height; y++) {
 		for (int x = 0; x < this->level.width; x++) {
-			output.density.value(x, y) = 0;
+			float& density = output.density.value(x, y);
+			density = 0;
+			const FICell& fi = fi_New.value(x,y);
 			for (int i = 0; i < 9; i++) {
-				output.density.value(x, y) += this->fi_New.value(x, y)[i]; // density
+				density += fi[i]; // density
 			}
-			output.velocity.value(x, y)[0] = this->fi_New.value(x, y)[1] - this->fi_New.value(x, y)[3] +
-											 this->fi_New.value(x, y)[5] - this->fi_New.value(x, y)[6] -
-											 this->fi_New.value(x, y)[7] +
-											 this->fi_New.value(x, y)[8]; // x Velocity
-			output.velocity.value(x, y)[1] = this->fi_New.value(x, y)[2] - this->fi_New.value(x, y)[4] +
-											 this->fi_New.value(x, y)[5] + this->fi_New.value(x, y)[6] -
-											 this->fi_New.value(x, y)[7] -
-											 this->fi_New.value(x, y)[8]; // y Velocity
-		}
-	}
+			glm::vec2& velocity = output.velocity.value(x, y);
+			velocity[0] = fi[1] - fi[3] + fi[5] - fi[6] - fi[7] + fi[8]; // x Velocity
+			velocity[1] = fi[2] - fi[4] + fi[5] + fi[6] - fi[7] - fi[8]; // y Velocity
 
-	// output fi afterstreaming
-	for (int y = 0; y < this->level.height; ++y) {
-		for (int x = 0; x < this->level.width; ++x) {
-			for (int z = 0; z < 9; ++z) {
-				output.afterstream.value(x, y)[z] = this->fi_New.value(x, y)[z];
-			}
 		}
 	}
 
@@ -168,16 +143,9 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 
 void LatticeBoltzmann::ReinitilizeFI(LatticeBoltzmannOutput &output)
 {
-	// TODO: Swap pointers instead of values
-	for (int y = 0; y < level.height; y++) {
-		for (int x = 0; x < level.width; x++) {
-			for (int z = 0; z < 9; ++z) {
-				output.prestream.value(x, y)[z] = fi_Old.value(x, y)[z];
-				output.afterstream.value(x, y)[z] = fi_New.value(x, y)[z];
-				fi_Old.value(x, y)[z] = fi_New.value(x, y)[z];
-			}
-		}
-	}
+	output.prestream = fi_Old;
+	output.afterstream = fi_New;
+	fi_Old = fi_New;
 }
 
 void LatticeBoltzmann::HandleCollisions(const LatticeBoltzmannInput &input)

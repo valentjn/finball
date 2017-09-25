@@ -142,7 +142,6 @@ public:
     }
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
-        printf("%d\n", ball_id);
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
         output.rigid_bodies.clear(); // currently not needed as we get a new output each time
@@ -152,6 +151,7 @@ public:
         for (int y = 0; y < GRID_HEIGHT; ++y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 grid_ball.value(x, y) = Level::CellType::FLUID;
+				grid_obj.value(x, y) = grid_static_objects_flow.value(x, y);
                 // grid_pedals.value(x, y) = false; // TODO
                 grid_velocities.value(x, y) = glm::vec2{0., 0.};
             }
@@ -230,7 +230,7 @@ public:
 
         // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
         //     for (int j = 0; j < GRID_WIDTH; ++j) {
-        //         printf("%2d", grid_ball.value(j, i));
+        //         printf("%2d", grid_obj.value(j, i));
         //     }
         //     printf("\n");
         // }

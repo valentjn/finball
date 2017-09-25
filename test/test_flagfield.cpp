@@ -11,7 +11,7 @@ TEST(RigidBodyTest, static64) {
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<RigidBody>();
-  level.rigidBodies.push_back(RigidBody(8., 8., false));
+  level.rigidBodies.push_back(RigidBody(666, level.width/2, level.height/2, false));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -49,9 +49,6 @@ TEST(RigidBodyTest, static64) {
         EXPECT_EQ(init_flagfield.value(i,j),output.grid_objects.value(i,j));
       }
   }
-
-  printFlagField(init_flagfield);
-  std::cout << std::endl;
   printFlagField(output.grid_objects);
 }
 
@@ -63,7 +60,7 @@ TEST(RigidBodyTest, gravity64) {
 
   Level level("data/testLevel.txt");
   level.rigidBodies = vector<RigidBody>();
-  level.rigidBodies.push_back(RigidBody(8., 8., false));
+  level.rigidBodies.push_back(RigidBody(666, level.width/2, level.height/2, false));
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;

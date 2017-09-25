@@ -1,6 +1,8 @@
-#pragma once
+
+#include "test_lbm.hpp"
+
 #include "gtest/gtest.h"
-#include "../src/LatticeBoltzmann/LatticeBoltzmann.hpp"
+
 
 void printFlagField(Array2D<Level::CellType> &flagfield) {
 

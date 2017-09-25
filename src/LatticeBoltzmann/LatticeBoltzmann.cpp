@@ -15,8 +15,7 @@ using namespace glm;
 
 void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
-	for(int i = 0; i < 2; i++)
-	{
+	for (int i = 0; i < 2; i++) {
 		step(input, output);
 	}
 
@@ -55,41 +54,46 @@ void LatticeBoltzmann::HandleBoundaries(const LatticeBoltzmannInput &input)
 {
 	for (int y = 0; y < level.height; ++y) {
 		for (int x = 0; x < level.width; ++x) {
-			// Stream back the velocities streamed into obstacles.
-			if (input.flagfield.value(x, y) == Level::OBSTACLE) {
-				for (int z = 1; z < 9; ++z) {
-					if (fi_New.value(x, y)[z] != 0.0) {
+			switch (input.flagfield.value(x, y)) {
+				case Level::OBSTACLE:
+					for (int z = 1; z < 9; ++z) {
+						if (fi_New.value(x, y)[z] == 0.0) {
+							break;
+						}
+
 						fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
 								fi_New.value(x, y)[z];
 						fi_New.value(x, y)[z] = 0.0;
 					}
-				}
-			}
-				// inflow
-			else if (input.flagfield.value(x, y) == Level::INFLOW) {
-				for (int z = 0; z < 9; z++) {
-					fi_New.value(x, y)[z] = w[z] * 1;
-					fi_Old.value(x, y)[z] = w[z] * 1;
-					if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
-						(y + cy[z]) < level.height &&
-						input.flagfield.value(x + cx[z], y + cy[z]) ==
-						Level::FLUID) {
-						fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
+					break;
+				case Level::INFLOW:
+					for (int z = 0; z < 9; z++) {
+						fi_New.value(x, y)[z] = w[z] * 1;
+						fi_Old.value(x, y)[z] = w[z] * 1;
+
+						bool condition = 0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
+										 (y + cy[z]) < level.height &&
+										 input.flagfield.value(x + cx[z], y + cy[z]) ==
+										 Level::FLUID;
+						if (condition) {
+							fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
+						}
 					}
-				}
-			}
-				// outflow
-			else if (input.flagfield.value(x, y) == Level::OUTFLOW) {
-				for (int z = 0; z < 9; z++) {
-					fi_New.value(x, y)[z] = 0;
-					fi_Old.value(x, y)[z] = 0;
-					/*if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
-						(y + cy[z]) < level.height &&
-						input.flagfield.value(x + cx[z], y + cy[z]) ==
-						Level::FLUID) {
-						fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
-					}*/
-				}
+					break;
+				case Level::OUTFLOW:
+					for (int z = 0; z < 9; z++) {
+						fi_New.value(x, y)[z] = 0;
+						fi_Old.value(x, y)[z] = 0;
+						/*if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
+							(y + cy[z]) < level.height &&
+							input.flagfield.value(x + cx[z], y + cy[z]) ==
+							Level::FLUID) {
+							fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
+						}*/
+					}
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -122,13 +126,13 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 	// Calculate macroscopic quantities for the output
 	for (int y = 0; y < this->level.height; y++) {
 		for (int x = 0; x < this->level.width; x++) {
-			float& density = output.density.value(x, y);
+			float &density = output.density.value(x, y);
 			density = 0;
-			const FICell& fi = fi_New.value(x,y);
+			const FICell &fi = fi_New.value(x, y);
 			for (int i = 0; i < 9; i++) {
 				density += fi[i]; // density
 			}
-			glm::vec2& velocity = output.velocity.value(x, y);
+			glm::vec2 &velocity = output.velocity.value(x, y);
 			velocity[0] = fi[1] - fi[3] + fi[5] - fi[6] - fi[7] + fi[8]; // x Velocity
 			velocity[1] = fi[2] - fi[4] + fi[5] + fi[6] - fi[7] - fi[8]; // y Velocity
 

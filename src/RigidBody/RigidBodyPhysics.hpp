@@ -170,8 +170,8 @@ public:
                 RigidBody *rigid_body = rigid_bodies[id].get();
 
                 // TODO: SCALE WITH DISTANCE_GRID_CELLS_INV
-                rigid_body->position.x = origin.getX();
-                rigid_body->position.y = origin.getY();
+                rigid_body->position.x = origin.getX() * DISTANCE_GRID_CELLS_INV;
+                rigid_body->position.y = origin.getY() * DISTANCE_GRID_CELLS_INV;
                 // TODO: check that this behaves correctly
                 rigid_body->angle = transform.getRotation().getAngle();
                 output.rigid_bodies.push_back(rigid_body);
@@ -189,7 +189,7 @@ public:
                             // printf("-------\n");
                             // float length = (pos - rigid_body->position).length();
                             // printf("%f\n", length);
-                            if (glm::distance(pos, rigid_body->position) <= BALL_RADIUS) {
+                            if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <= BALL_RADIUS) {
                                 // printf("ASDSADAd\n");
                                 grid_ball.value(x, y) = Level::CellType::OBSTACLE;
                                 grid_vel.value(x, y) = glm::vec2(1.0, 2.0); // TODO

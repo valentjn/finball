@@ -49,7 +49,8 @@ public:
         fluid_mesh = gameLogicOutput.fluid_mesh;
 
         // handle rigid body physics output
-		for (const RigidBody* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
+        // TODO: rename to transform
+		for (const Transform* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
             const Mesh* mesh = m_rigid_body_meshes[rigidBody->id].get();
             if (!mesh) { // check if the mesh wasn't already in the map
 				//Log::info(
@@ -59,8 +60,9 @@ public:
             }
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody->position, 0);
-            renderObject.scale = { rigidBody->radius, rigidBody->radius };
-            renderObject.rotation = rigidBody->angle;
+            // TODO: fix this for the new RigidBody creation architecture
+            // renderObject.scale = { rigidBody->radius, rigidBody->radius };
+            renderObject.rotation = rigidBody->rotation;
 			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = mesh;
 

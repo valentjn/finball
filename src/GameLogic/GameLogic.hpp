@@ -36,7 +36,7 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.highscore = duration.count();
 
-        for (RigidBody const *rigidBody : *input.rigidBodies) {
+        for (Transform const *rigidBody : *input.rigidBodies) {
             if (rigidBody->id == 1 && rigidBody->position.y < 0) {
                 output.running = false;
                 return;

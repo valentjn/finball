@@ -6,6 +6,7 @@
 using namespace glm;
 
 struct RigidBody {
+public:
     int id;
     vec2 position;
     int mass;

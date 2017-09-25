@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     // run the game
-    GameController gameController(highscores);
+    GameController gameController(highscores, parameters.frameRate);
     gameController.startGame(window, *level);
 
     return 0;

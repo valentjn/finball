@@ -56,49 +56,29 @@ public:
 
         Timer timer([&]() {
             // 1. get user input (kinect)
-        	auto time2 = std::chrono::steady_clock::now();
-
-        	userInput.getInput(userInputOutput);
-
-            auto time1 = std::chrono::steady_clock::now();
-            auto inpTime = time1 - time2;
+            userInput.getInput(userInputOutput);
 
             // 2. do calculations (rigid body, LBM)
             rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
             rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
-            time2=std::chrono::steady_clock::now();
-			auto rbTime = time2 - time1;
-
             latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
             latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
-			time1=std::chrono::steady_clock::now();
-			auto lbTime = time1 - time2;
-
-			gameLogicInput =
+            gameLogicInput =
                 GameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             gameLogic.update(gameLogicInput, gameLogicOutput);
 
-            time2=std::chrono::steady_clock::now();
-			auto glTime = time2 - time1;
-
-			// 3. draw visualization
+            // 3. draw visualization
             rendererInput =
                 RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
             renderer.update(rendererInput);
-
-			time1=std::chrono::steady_clock::now();
-			auto visuTime = time1 - time2;
 
             if (Log::logLevel >= Log::DEBUG) {
                 steady_clock::time_point thisFrame = steady_clock::now();
                 duration<float> duration = thisFrame - lastFrame;
                 Log::debug("FPS: %f", 1 / duration.count());
                 lastFrame = thisFrame;
-                auto gesT = inpTime + rbTime + lbTime + glTime + visuTime;
-				Log::debug("Time ratio(%): inp %f, rb %f, lb %f, gl %f, visu %f", inpTime*100./gesT,
-						rbTime*100./gesT, lbTime*100./gesT, glTime*100./gesT, visuTime*100./gesT);
             }
         });
 

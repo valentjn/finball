@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "test_lbm.cpp"
+#include "test_lbm.hpp"
 
 #include "RigidBody/RigidBodyPhysics.hpp"
 

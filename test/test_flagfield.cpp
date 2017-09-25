@@ -43,13 +43,21 @@ TEST(RigidBodyTest, static64) {
   //std::cout << output.density.value(0,0) << std::endl;
   //std::cout << output.velocity.value(0,0)[0] << std::endl;
   //std::cout << output.velocity.value(0,0)[1] << std::endl;
+  bool changed = true;
   for (int i = 0; i<level.width ; ++i){
 
       for (int j = 0; j<level.height ; ++j){
-        EXPECT_EQ(init_flagfield.value(i,j),output.grid_objects.value(i,j));
+        if (init_flagfield.value(i,j) != output.grid_objects.value(i,j)) {
+			changed = false;
+			break;
+		}
       }
   }
-  printFlagField(output.grid_objects);
+  
+  EXPECT_TRUE(changed);
+  if(! changed){
+    printFlagField(output.grid_objects);
+  }
 }
 
 
@@ -98,6 +106,7 @@ TEST(RigidBodyTest, gravity64) {
       for (int j = 0; j<level.height ; ++j){
         if(init_flagfield.value(i,j) != output.grid_objects.value(i,j)){
             changed = true;
+			break;
         }
       }
   }

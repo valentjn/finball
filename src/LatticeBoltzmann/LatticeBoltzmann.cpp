@@ -15,7 +15,10 @@ using namespace glm;
 
 void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
-	for (int i = 0; i < 2; i++) {
+	// Check flag field
+	assert(isBoundaryValid(input.flagfield));
+	
+	for (int i = 0; i < 5; i++) {
 		step(input, output);
 	}
 
@@ -24,9 +27,6 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 
 void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
-	// Check flag field
-	assert(isBoundaryValid(input.flagfield));
-
 	handleCollisions(input);
 
 	// set f_i in obstacles to 0
@@ -62,13 +62,11 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 			switch (input.flagfield.value(x, y)) {
 				case Level::OBSTACLE:
 					for (int z = 1; z < 9; ++z) {
-						if (fi_New.value(x, y)[z] == 0.0) {
-							break;
-						}
-
+						if (fi_New.value(x, y)[z] != 0.0) {
 						fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
 								fi_New.value(x, y)[z];
 						fi_New.value(x, y)[z] = 0.0;
+						}
 					}
 					break;
 				case Level::INFLOW:
@@ -89,12 +87,6 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 					for (int z = 0; z < 9; z++) {
 						fi_New.value(x, y)[z] = 0;
 						fi_Old.value(x, y)[z] = 0;
-						/*if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
-							(y + cy[z]) < level.height &&
-							input.flagfield.value(x + cx[z], y + cy[z]) ==
-							Level::FLUID) {
-							fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
-						}*/
 					}
 					break;
 				default:
@@ -133,7 +125,7 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 		for (int x = 0; x < this->level.width; x++) {
 			float &density = output.density.value(x, y);
 			density = 0;
-			const FICell &fi = fi_New.value(x, y);
+			const FICell &fi = fi_Old.value(x, y);
 			for (int i = 0; i < 9; i++) {
 				density += fi[i]; // density
 			}

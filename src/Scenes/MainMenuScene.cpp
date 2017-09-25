@@ -6,26 +6,26 @@
 #include "GameController.hpp"
 #include "Highscores.hpp"
 #include "Level.hpp"
-#include "Menus/MainMenu.hpp"
+#include "Scenes/MainMenuScene.hpp"
 #include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
 
-std::unique_ptr<Level> MainMenu::show() {
-    gameScreen.addBackgroundImage("data/background.jpg");
+std::unique_ptr<Level> MainMenuScene::show() {
+    menuRenderer.addBackgroundImage("data/background.jpg");
 
-    gameScreen.addTitle("FinBall");
-    gameScreen.addActionText("To start the game please do a HAI-five or press SPACE!");
-    gameScreen.addLeftText(getHighscoreText());
+    menuRenderer.addTitle("FinBall");
+    menuRenderer.addActionText("To start the game please do a HAI-five or press SPACE!");
+    menuRenderer.addLeftText(getHighscoreText());
 
-    gameScreen.render();
+    menuRenderer.render();
 
     listen();
 
     return std::make_unique<Level>("data/testLevel.txt");
 }
 
-std::string MainMenu::getHighscoreText() {
+std::string MainMenuScene::getHighscoreText() {
     std::stringstream stream;
     int counter = 1;
 
@@ -36,7 +36,7 @@ std::string MainMenu::getHighscoreText() {
     return stream.str();
 }
 
-void MainMenu::listen() {
+void MainMenuScene::listen() {
     // Flag for quitting the program
     bool running = true;
 

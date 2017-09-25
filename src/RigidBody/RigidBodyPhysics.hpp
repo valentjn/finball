@@ -214,13 +214,13 @@ public:
         for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 // TODO: grid_pedals
-                if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW  ) {
+                /*if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW  ) {
                     grid_obj.value(x, y) = Level::CellType::INFLOW;
                 } else if (grid_static_objects_flow.value(x, y) == Level::CellType::OUTFLOW  ) {
                     grid_obj.value(x, y) = Level::CellType::OUTFLOW;
                 } else if (grid_static_objects_flow.value(x, y) == Level::CellType::OBSTACLE) {
                     grid_obj.value(x, y) = Level::CellType::OBSTACLE;
-                }
+                }*/
 
                 if (grid_ball.value(x, y) == Level::CellType::OBSTACLE) {
                     grid_obj.value(x, y) = Level::CellType::OBSTACLE;

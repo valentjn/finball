@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <glm/glm.hpp>
 
 #include "Array2D.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
@@ -10,6 +11,7 @@
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "Visualization/RenderObject.hpp"
 #include "Visualization/Mesh.hpp"
+#include "Texture.hpp"
 
 class RendererInput {
     std::unordered_map<int, std::unique_ptr<Mesh>> m_rigid_body_meshes;
@@ -76,6 +78,48 @@ public:
             }*/
             world_objects.push_back(renderObject);
         }
+
+
+        // visualise the flag field from rigidbody
+        static std::unique_ptr<Texture3F> ff_texture;
+        static std::unique_ptr<TexturedMesh> flag_field_mesh;
+        const int ff_width = rigidBodyPhysicsOutput.grid_objects.width();
+        const int ff_height = rigidBodyPhysicsOutput.grid_objects.height();
+        if (!flag_field_mesh) {
+            ff_texture = std::make_unique<Texture3F>(glm::ivec2(ff_width, ff_height), false);
+            const std::vector<glm::vec3> flag_field_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
+            flag_field_mesh = std::make_unique<TexturedMesh>(flag_field_quad, ff_texture.get());
+        }
+        // fill the texture with data from the flag field
+        Array2D<glm::vec3> ff_data = Array2D<glm::vec3>(ff_width, ff_height);
+        for (int y = 0; y < ff_height; y++) {
+            for (int x = 0; x < ff_width; x++) {
+                switch (rigidBodyPhysicsOutput.grid_objects.value(x, y)) {
+                    case Level::CellType::FLUID:
+                        ff_data.value(x, y) = glm::vec3{0.0f, 0.0f, 1.0f}; // blue
+                        break;
+                    case Level::CellType::OBSTACLE:
+                        ff_data.value(x, y) = glm::vec3{0.56f, 0.37f, 0.2f}; // brown
+                        break;
+                    case Level::CellType::INFLOW:
+                        ff_data.value(x, y) = glm::vec3{ 0.0f, 1.0f, 0.0f }; // green
+                        break;
+                    case Level::CellType::OUTFLOW:
+                        ff_data.value(x, y) = glm::vec3{ 1.0f, 0.0f, 0.0f }; // red
+                        break;
+                }
+            }
+        }
+        ff_texture->setData(ff_data);
+
+        // create RenderObject
+        RenderObject ff_render_object;
+        ff_render_object.mesh = flag_field_mesh.get();
+        ff_render_object.position = glm::vec3{0.75f, 0.75f, 0.0f};
+        ff_render_object.scale = {0.25, 0.25};
+        ff_render_object.rotation = 0;
+        ui_objects.push_back(ff_render_object);
+
 
         // handle lattice boltzmann output
         assert(latticeBoltzmannOutput.velocity.width() == latticeBoltzmannOutput.density.width());

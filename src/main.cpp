@@ -20,8 +20,11 @@ int main(int argc, char *argv[]) {
     window.setIcon("data/haicon.png");
 
     // show main menu and obtain level from it
-    MainMenu menu(window);
-    std::unique_ptr<Level> level = menu.show();
+    std::unique_ptr<Level> level;
+    {
+        MainMenu menu(window);
+        level = menu.show();
+    }
 
     // run the game
     GameController gameController;

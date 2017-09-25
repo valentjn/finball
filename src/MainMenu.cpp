@@ -16,17 +16,17 @@ std::unique_ptr<Level> MainMenu::show() {
     SDL_Event event;
 
     while (!quit) {
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                    quit = true;
-                }
-                break;
-            case SDL_QUIT: // User hits the "x" in the corner of the window
-                exit(0);
-                break;
+        SDL_WaitEvent(&event);
+
+        switch (event.type) {
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_SPACE) {
+                quit = true;
             }
+            break;
+        case SDL_QUIT: // User hits the "x" in the corner of the window
+            exit(0);
+            break;
         }
     }
 

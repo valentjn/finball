@@ -36,7 +36,7 @@ public:
         highscores.push_back(Highscore(score, name));
         sortHighscores(highscores);
         saveHighscores(highscores);
-        Log::info("Saved haiscore: %f %s", score, name);
+        Log::info("Saved haiscore: %f %s", score, name.c_str());
     }
 
     const vector<Highscore> &getHighscores() const {

@@ -29,14 +29,16 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
-	HandleCollisions(input);
+	handleCollisions(input);
 
 	// set f_i in obstacles to 0
 	initFiObstacles(input);
 
-	Stream(input);
-	HandleBoundaries(input);
+	stream(input);
+	handleBoundaries(input);
 	
+	reinitilizeFI(output);
+
 }
 
 void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)
@@ -53,8 +55,9 @@ void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)
 	}
 }
 
-void LatticeBoltzmann::HandleBoundaries(const LatticeBoltzmannInput &input)
+void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 {
+
 	for (int y = 0; y < level.height; ++y) {
 		for (int x = 0; x < level.width; ++x) {
 			// Stream back the velocities streamed into obstacles.
@@ -83,8 +86,8 @@ void LatticeBoltzmann::HandleBoundaries(const LatticeBoltzmannInput &input)
 				// outflow
 			else if (input.flagfield.value(x, y) == Level::OUTFLOW) {
 				for (int z = 0; z < 9; z++) {
-					fi_New.value(x, y)[z] = 0;
-					fi_Old.value(x, y)[z] = 0;
+					fi_New.value(x, y)[z] = 0.;
+					fi_Old.value(x, y)[z] = 0.;
 					/*if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
 						(y + cy[z]) < level.height &&
 						input.flagfield.value(x + cx[z], y + cy[z]) ==
@@ -97,7 +100,7 @@ void LatticeBoltzmann::HandleBoundaries(const LatticeBoltzmannInput &input)
 	}
 }
 
-void LatticeBoltzmann::Stream(const LatticeBoltzmannInput &input)
+void LatticeBoltzmann::stream(const LatticeBoltzmannInput &input)
 {
 	for (int y = 1; y < this->level.height - 1; ++y) {
 		for (int x = 1; x < this->level.width - 1; ++x) {
@@ -130,6 +133,7 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 			for (int i = 0; i < 9; i++) {
 				density += fi[i]; // density
 			}
+
 			glm::vec2& velocity = output.velocity.value(x, y);
 			velocity[0] = fi[1] - fi[3] + fi[5] - fi[6] - fi[7] + fi[8]; // x Velocity
 			velocity[1] = fi[2] - fi[4] + fi[5] + fi[6] - fi[7] - fi[8]; // y Velocity
@@ -138,17 +142,17 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 	}
 
 	// Set fi_old = fi_new
-	this->ReinitilizeFI(output);
+	this->reinitilizeFI(output);
 }
 
-void LatticeBoltzmann::ReinitilizeFI(LatticeBoltzmannOutput &output)
+void LatticeBoltzmann::reinitilizeFI(LatticeBoltzmannOutput &output)
 {
 	output.prestream = fi_Old;
 	output.afterstream = fi_New;
 	fi_Old = fi_New;
 }
 
-void LatticeBoltzmann::HandleCollisions(const LatticeBoltzmannInput &input)
+void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 {
 	for (int y = 1; y < level.height - 1; ++y) {
 		for (int x = 1; x < level.width - 1; ++x) {
@@ -163,6 +167,10 @@ void LatticeBoltzmann::HandleCollisions(const LatticeBoltzmannInput &input)
 				rho = fi_Old.value(x, y)[0] + fi_Old.value(x, y)[1] + fi_Old.value(x, y)[2] +
 					  fi_Old.value(x, y)[3] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[5] +
 					  fi_Old.value(x, y)[6] + fi_Old.value(x, y)[7] + fi_Old.value(x, y)[8];
+
+				if (rho == 0.) {
+					rho = 1.;
+				}
 
 				const float rhoinv = 1.0 / rho;
 

@@ -10,11 +10,9 @@ struct RigidBody {
     float angle;
     float radius;
 
-	RigidBody(glm::vec2 pos, bool isFixed) :
-			id(0), position(pos), isFixed(isFixed), angle(0.f), radius(1.f) {
-	}
-    RigidBody(float x, float y, bool isFixed) : RigidBody(glm::vec2(x, y), isFixed) {}
-    RigidBody(float x, float y) : RigidBody(x, y, true) {}
+    RigidBody(int id, float x, float y, bool isFixed) : id(id), position(x, y), isFixed(isFixed),
+        angle(0), radius(1.f) {}
+    RigidBody(int id, float x, float y) : RigidBody(id, x, y, true) {}
     virtual ~RigidBody() {}
 };
 

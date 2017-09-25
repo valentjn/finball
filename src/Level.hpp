@@ -32,16 +32,17 @@ public:
         file >> width >> height;
 
         matrix = Array2D<CellType>(width, height);
+        int rigidBodyId = 2;
         for (int y = height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < width; x++) {
                 if (file_line[x] == 'B') {
-                    rigidBodies.push_back(RigidBody(x, y, false));
+                    rigidBodies.push_back(RigidBody(1, x, y, false));
                 } else {
                     CellType cell = static_cast<CellType>(static_cast<int>(file_line[x]) - '0');
                     matrix.value(x, y) = cell;
                     if (cell == OBSTACLE) {
-                        rigidBodies.push_back(RigidBody(x, y));
+                        rigidBodies.push_back(RigidBody(rigidBodyId++, x, y));
                     }
                 }
             }

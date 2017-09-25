@@ -92,8 +92,8 @@ public:
         }
         // fill the texture with data from the flag field
         Array2D<glm::vec3> ff_data = Array2D<glm::vec3>(ff_width, ff_height);
-        for (int x = 0; x < ff_width; x++) {
-            for (int y = 0; y < ff_height; y++) {
+        for (int y = 0; y < ff_height; y++) {
+            for (int x = 0; x < ff_width; x++) {
                 switch (rigidBodyPhysicsOutput.grid_objects.value(x, y)) {
                     case Level::CellType::FLUID:
                         ff_data.value(x, y) = glm::vec3{0.0f, 0.0f, 1.0f}; // blue

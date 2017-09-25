@@ -1,6 +1,7 @@
 #include "UserInput.hpp"
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 #ifndef WITHOUT_KINECT_LIBRARIES
 
@@ -184,10 +185,10 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 				- leftElbowJoint.position.position.X;
 			double ldy = leftHandJoint.position.position.Y
 				- leftElbowJoint.position.position.Y;
-			double rdx = leftHandJoint.position.position.X
-				- leftElbowJoint.position.position.X;
-			double rdy = leftHandJoint.position.position.Y
-				- leftElbowJoint.position.position.Y;
+			double rdx = rightHandJoint.position.position.X
+				- rightElbowJoint.position.position.X;
+			double rdy = rightHandJoint.position.position.Y
+				- rightElbowJoint.position.position.Y;
 
 			userInputOutput.leftAngle[k] = std::atan2(ldy, ldx) - zero_angle[k];
 			userInputOutput.rightAngle[k] = std::atan2(rdy, rdx) + zero_angle[k];
@@ -213,8 +214,10 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 				userInputOutput.rightAngle[k] = -M_PI -min_angle[k];
 			}
 
+			double previousRightPsi = copysign(M_PI, previousRightAngles[k])
+				- previousRightAngles[k];
 			double ldAngle = userInputOutput.leftAngle[k] - previousLeftAngles[k];
-			double rdAngle = userInputOutput.rightAngle[k] - previousRightAngles[k];
+			double rdAngle = rightPsi - previousRightPsi;
 			userInputOutput.leftVelocity[k] = (1000000*ldAngle) / delta.count();
 			userInputOutput.rightVelocity[k] = (1000000*rdAngle) / delta.count();
 

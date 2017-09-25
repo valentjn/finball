@@ -34,13 +34,13 @@ private:
 
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
 
-	void HandleCollisions(const LatticeBoltzmannInput &input);
-	void ReinitilizeFI(LatticeBoltzmannOutput &output);
+	void handleCollisions(const LatticeBoltzmannInput &input);
+	void reinitilizeFI(LatticeBoltzmannOutput &output);
 	void Output(LatticeBoltzmannOutput &output);
-	void Stream(const LatticeBoltzmannInput &input);
-	void HandleBoundaries(const LatticeBoltzmannInput &input);
+	void stream(const LatticeBoltzmannInput &input);
+	void handleBoundaries(const LatticeBoltzmannInput &input);
 	void initFiObstacles(const LatticeBoltzmannInput &input);
-
+	float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
 
 public:
     LatticeBoltzmann(Level &level)

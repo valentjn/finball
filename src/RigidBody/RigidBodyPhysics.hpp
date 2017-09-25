@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <math.h>
 
 #include <btBulletDynamicsCommon.h>
 #include <glm/glm.hpp>
@@ -142,7 +143,6 @@ public:
     }
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
-        printf("%d\n", ball_id);
         auto &grid_obj = output.grid_objects;
         auto &grid_vel = output.grid_velocities;
         output.rigid_bodies.clear(); // currently not needed as we get a new output each time
@@ -152,6 +152,7 @@ public:
         for (int y = 0; y < GRID_HEIGHT; ++y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 grid_ball.value(x, y) = Level::CellType::FLUID;
+				grid_obj.value(x, y) = grid_static_objects_flow.value(x, y);
                 // grid_pedals.value(x, y) = false; // TODO
                 grid_velocities.value(x, y) = glm::vec2{0., 0.};
             }
@@ -177,7 +178,13 @@ public:
                 rigid_body->position.x = origin.getX() * DISTANCE_GRID_CELLS_INV;
                 rigid_body->position.y = origin.getY() * DISTANCE_GRID_CELLS_INV;
                 // TODO: check that this behaves correctly
-                rigid_body->angle = transform.getRotation().getAngle();
+				auto quaternion = transform.getRotation();
+				if (quaternion.getAxis().z() < 0.)
+				{
+					rigid_body->angle = 2*M_PI-quaternion.getAngle();
+				} else {
+					rigid_body->angle = quaternion.getAngle();
+				}
                 output.rigid_bodies.push_back(rigid_body);
 
                 // DetectionType detection_type =
@@ -214,13 +221,6 @@ public:
         for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 // TODO: grid_pedals
-                if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW  ) {
-                    grid_obj.value(x, y) = Level::CellType::INFLOW;
-                } else if (grid_static_objects_flow.value(x, y) == Level::CellType::OUTFLOW  ) {
-                    grid_obj.value(x, y) = Level::CellType::OUTFLOW;
-                } else if (grid_static_objects_flow.value(x, y) == Level::CellType::OBSTACLE) {
-                    grid_obj.value(x, y) = Level::CellType::OBSTACLE;
-                }
 
                 if (grid_ball.value(x, y) == Level::CellType::OBSTACLE) {
                     grid_obj.value(x, y) = Level::CellType::OBSTACLE;
@@ -230,7 +230,7 @@ public:
 
         // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
         //     for (int j = 0; j < GRID_WIDTH; ++j) {
-        //         printf("%2d", grid_ball.value(j, i));
+        //         printf("%2d", grid_obj.value(j, i));
         //     }
         //     printf("\n");
         // }

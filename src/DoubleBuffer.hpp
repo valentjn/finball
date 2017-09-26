@@ -1,6 +1,7 @@
 #ifndef DOUBLE_BUFFER_HPP_
 #define DOUBLE_BUFFER_HPP_
 
+#include <array>
 #include <mutex>
 
 using namespace std;
@@ -9,16 +10,15 @@ template <typename T>
 class DoubleBuffer {
 
 private:
-    T buffers[2];
+    array<T, 2> buffers;
     int writeBufferId = 0;
     std::mutex mtx;
 
 public:
     template<class... Args>
-    DoubleBuffer(Args&&... args) {
-        buffers[0] = T(forward<Args>(args)...);
-        buffers[1] = T(forward<Args>(args)...);
-    }
+    DoubleBuffer(Args&&... args)
+        : buffers({ T(forward<Args>(args)...), T(forward<Args>(args)...) })
+    {}
 
     void swap() {
         mtx.lock();

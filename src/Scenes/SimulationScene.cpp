@@ -51,6 +51,8 @@ float SimulationScene::simulation() {
 
     steady_clock::time_point lastFrame = steady_clock::now();
 
+    bool running = true;
+
     Timer timer([&]() {
         // 1. get user input (kinect)
         userInput.getInput(userInputOutput.writeBuffer());
@@ -69,6 +71,7 @@ float SimulationScene::simulation() {
         userInputOutput.unlock();
 
         gameLogic.update(gameLogicInput, gameLogicOutput.writeBuffer());
+        running = gameLogicOutput.writeBuffer().running;
         gameLogicOutput.swap();
 
         // 3. draw visualization
@@ -113,12 +116,12 @@ float SimulationScene::simulation() {
     context.music->play("data/GameTheme.mp3");
 
     std::thread simulationThread([&]() {
-        simulationTimer.start(1000 / context.parameters->simulationRate, gameLogicOutput.readBuffer().running);
+        simulationTimer.start(1000 / context.parameters->simulationRate, running);
     });
 
-    timer.start(1000 / context.parameters->frameRate, gameLogicOutput.readBuffer().running);
+    timer.start(1000 / context.parameters->frameRate, running);
 
     simulationThread.join();
 
-    return gameLogicOutput.score;
+    return gameLogicOutput.readBuffer().score;
 }

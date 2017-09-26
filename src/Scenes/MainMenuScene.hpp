@@ -19,7 +19,7 @@ public:
     MainMenuScene(const SDLWindow &window, Highscores &highscores) :
             menuRenderer(window), highscores(highscores) {}
 
-    std::unique_ptr<Level> show();
+    void show();
 
 private:
     void listen();

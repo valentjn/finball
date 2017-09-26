@@ -22,15 +22,16 @@ int main(int argc, char *argv[]) {
     Highscores highscores("haiscores.txt");
 
     // show main menu and obtain level from it
-    std::unique_ptr<Level> level;
     {
         MainMenuScene menu(window, highscores);
-        level = menu.show();
+        menu.show();
     }
+
+    Level level("data/" + parameters.level + ".txt");
 
     // run the game
     GameController gameController(highscores, parameters.frameRate);
-    gameController.startGame(window, *level);
+    gameController.startGame(window, level);
 
     return 0;
 }

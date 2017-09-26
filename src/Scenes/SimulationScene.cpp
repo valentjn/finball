@@ -37,6 +37,7 @@ float SimulationScene::simulation() {
     LevelLoader levelLoader("data/" + levelName);
     Level level;
     levelLoader.load(level);
+    renderer.setCameraTransformFromLevel(level);
 
     GameLogic gameLogic(level);
     UserInput userInput;

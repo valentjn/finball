@@ -71,8 +71,8 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 // TODO: dynamically set camera positon depending on level size
 Renderer::Renderer(const SDLWindow &window)
 	: m_camera_pos(32.f, -16.f, 64.f)
-	, m_ticks(0)
 	, m_camera_look_at(32, 24, 0)
+	, m_ticks(0)
 {
     m_window = window.getWindow();
     m_resolution = glm::ivec2(window.getWidth(), window.getHeight());

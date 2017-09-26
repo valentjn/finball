@@ -1,20 +1,13 @@
 CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
-COMMON_CFLAGS:= -pedantic \
-		       -Wall \
-		       -Wextra \
-		       -fmessage-length=0 \
-		       -Wno-unused-parameter \
-		       -fmessage-length=0 \
-		       -std=gnu++14 \
-			   -fopenmp \
-		       `pkg-config sdl2 --cflags` \
-		       `pkg-config bullet --cflags` \
-		       -I src \
-		       -I ext \
-		       -I/usr/local/include/opencv -I/usr/local/include
 
 ifdef kinect
 KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
+KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2 -D KINECT_LIBS
+endif
+
+ifdef opencv
+OPENCV_CFLAGS:= `pkg-config opencv --cflags`
+OPENCV_LDFLAGS:= `pkg-config opencv --libs` -D OPENCV_LIBS
 endif
 
 COMMON_CFLAGS:= -pedantic \
@@ -29,17 +22,11 @@ COMMON_CFLAGS:= -pedantic \
 		       `pkg-config bullet --cflags` \
 		       -I src \
 		       -I ext \
-		       -I/usr/local/include/opencv -I/usr/local/include
-               $(KINECT_FLAGS)
+		       $(KINECT_FLAGS) $(OPENCV_CFLAGS)
 
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
-
-ifdef kinect
-KINECT_FLAGS:= -lOpenNI -lXnVNite_1_5_2 -D KINECT_LIBS
-endif
-OPENCV_FLAGS:= `pkg-config opencv --cflags --libs` -D OPENCV_LIBS
 
 LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
@@ -47,15 +34,7 @@ LDFLAGS:= -lSDL2_image \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs` \
-          $(KINECT_FLAGS) $(OPENCV_FLAGS)
-
-LDFLAGS:= -lSDL2_image \
-			-lSDL2_ttf \
-			-lSDL2_mixer \
-			-lGL \
-			`pkg-config sdl2 --libs` \
-			`pkg-config bullet --libs` \
-			 $(KINECT_FLAGS) $(OPENCV_FLAGS)
+          $(KINECT_LDFLAGS) $(OPENCV_LDFLAGS)
 
 .PHONY: test_all
 

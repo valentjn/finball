@@ -18,8 +18,8 @@
 
 using namespace std;
 
-class SimulationScene : public Scene {
-
+class SimulationScene : public Scene
+{
 private:
     string levelName;
 
@@ -31,10 +31,5 @@ public:
 
     std::unique_ptr<Scene> show();
 }; 
-
-private:
-    float simulation();
-
-};
 
 #endif

@@ -4,7 +4,9 @@
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 #include <Array2D.hpp>
+#ifdef OPENCV_LIBS
 #include <opencv2/opencv.hpp>
+#endif
 
 class Texture
 {
@@ -41,7 +43,9 @@ class Texture3F : public Texture
 public:
     Texture3F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec3>& data);
+#ifdef OPENCV_LIBS
     void setData(const cv::Mat& data);
+#endif
 };
 
 class Texture4F : public Texture

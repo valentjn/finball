@@ -1,7 +1,10 @@
 #ifndef IMAGE_REC_LEVEL_PARSER_HPP_
 #define IMAGE_REC_LEVEL_PARSER_HPP_
+#define PI 3.1415926535f
+#define DEG2RAD PI / 180
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtc/constants.hpp>
 #include <iostream>
 #include <memory>
 

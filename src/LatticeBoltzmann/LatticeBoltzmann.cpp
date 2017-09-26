@@ -99,6 +99,7 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 							int neighbory = y + cy[opp[z]];
 							int neighbori = opp[z];
 
+							neighborFI = (neighborFI > 0.) ? neighborFI : 0.;
 							fi_New.value(neighborx, neighbory)[neighbori] = neighborFI;
 							assert(isSane(neighborFI,neighborx,neighbory,neighbori));
 

@@ -21,6 +21,11 @@ struct UserInputOutput {
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels
 
+    // increasing with duration of left / right arrow pressed
+    // equivalence: pressedL == leftAngle[0] and pressedR == rightAngle[0]+PI
+    double pressedL = 0;
+    double pressedR = 0;
+
     bool quit, start;
 
     UserInputOutput() : quit(false), start(false) {}

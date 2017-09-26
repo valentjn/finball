@@ -5,13 +5,13 @@
 
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
-#include "RigidBody/RigidBody.hpp"
+#include "RigidBody/Transform.hpp"
 #include "UserInput/UserInputOutput.hpp"
 
 class GameLogicInput {
 public:
     bool quit;
-    const std::vector<RigidBody*> *rigidBodies;
+    const std::vector<Transform*> *rigidBodies;
 
     GameLogicInput() {}
 

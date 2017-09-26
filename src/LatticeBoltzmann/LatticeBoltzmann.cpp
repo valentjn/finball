@@ -15,7 +15,11 @@ using namespace glm;
 
 void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
-	for (int i = 0; i < 2; i++) {
+	// Check flag field
+	assert(isBoundaryValid(input.flagfield));
+	
+	for (int i = 0; i < 5; i++) {
+
 		step(input, output);
 	}
 
@@ -24,24 +28,40 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 
 void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
-	// Check flag field
-	assert(isBoundaryValid(input.flagfield));
+
+	auto time1 = std::chrono::steady_clock::now();
 
 	handleCollisions(input);
+
+	auto time2 = std::chrono::steady_clock::now();
+	measuredTimes[0] += time2 - time1;
 
 	// set f_i in obstacles to 0
 	initFiObstacles(input);
 
+	time1 = std::chrono::steady_clock::now();
+	measuredTimes[1] += time1 - time2;
 
 	stream(input);
+
+	time2 = std::chrono::steady_clock::now();
+	measuredTimes[2] = time2 - time1;
+
 	handleBoundaries(input);
 	
-	reinitilizeFI(output);
+	time1 = std::chrono::steady_clock::now();
+	measuredTimes[3] = time1 - time2;
+
+	reinitializeFI(output);
+
+	time2 = std::chrono::steady_clock::now();
+	measuredTimes[4] = time2 - time1;
 
 }
 
 void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)
 {
+//#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < level.height; ++y) {
 		for (int x = 0; x < level.width; ++x) {
 			if (input.flagfield.value(x, y) == Level::OBSTACLE) {
@@ -62,13 +82,11 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 			switch (input.flagfield.value(x, y)) {
 				case Level::OBSTACLE:
 					for (int z = 1; z < 9; ++z) {
-						if (fi_New.value(x, y)[z] == 0.0) {
-							break;
-						}
-
+						if (fi_New.value(x, y)[z] != 0.0) {
 						fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
 								fi_New.value(x, y)[z];
 						fi_New.value(x, y)[z] = 0.0;
+						}
 					}
 					break;
 				case Level::INFLOW:
@@ -89,12 +107,6 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 					for (int z = 0; z < 9; z++) {
 						fi_New.value(x, y)[z] = 0;
 						fi_Old.value(x, y)[z] = 0;
-						/*if (0 <= (x + cx[z]) && (x + cx[z]) < level.width && 0 <= (y + cy[z]) &&
-							(y + cy[z]) < level.height &&
-							input.flagfield.value(x + cx[z], y + cy[z]) ==
-							Level::FLUID) {
-							fi_New.value(x + cx[z], y + cy[z])[z] = fi_New.value(x, y)[z];
-						}*/
 					}
 					break;
 				default:
@@ -129,11 +141,12 @@ void LatticeBoltzmann::stream(const LatticeBoltzmannInput &input)
 void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 {
 	// Calculate macroscopic quantities for the output
+//#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < this->level.height; y++) {
 		for (int x = 0; x < this->level.width; x++) {
 			float &density = output.density.value(x, y);
 			density = 0;
-			const FICell &fi = fi_New.value(x, y);
+			const FICell &fi = fi_Old.value(x, y);
 			for (int i = 0; i < 9; i++) {
 				density += fi[i]; // density
 			}
@@ -145,10 +158,13 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 	}
 
 	// Set fi_old = fi_new
-	this->reinitilizeFI(output);
+	this->reinitializeFI(output);
+
+	auto timeTot = measuredTimes[0] + measuredTimes[1] + measuredTimes[2] + measuredTimes[3] + measuredTimes[4];
+	Log::debug("time in LB[%]: coll %f, initfi %f, stream %f, boundaries %f, reinitfi %f", measuredTimes[0]*100./timeTot, measuredTimes[1]*100./timeTot, measuredTimes[2]*100./timeTot, measuredTimes[3]*100./timeTot, measuredTimes[4]*100./timeTot);
 }
 
-void LatticeBoltzmann::reinitilizeFI(LatticeBoltzmannOutput &output)
+void LatticeBoltzmann::reinitializeFI(LatticeBoltzmannOutput &output)
 {
 	output.prestream = fi_Old;
 	output.afterstream = fi_New;
@@ -164,6 +180,7 @@ float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int
 
 void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 {
+//#pragma omp parallel for schedule(static)
 	for (int y = 1; y < level.height - 1; ++y) {
 		for (int x = 1; x < level.width - 1; ++x) {
 			// check for boundary
@@ -173,10 +190,12 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 				float velx = 0.0;
 				float vely = 0.0;
 
+				FICell& cell = fi_Old.value(x, y);
+
 				// calculate density
-				rho = fi_Old.value(x, y)[0] + fi_Old.value(x, y)[1] + fi_Old.value(x, y)[2] +
-					  fi_Old.value(x, y)[3] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[5] +
-					  fi_Old.value(x, y)[6] + fi_Old.value(x, y)[7] + fi_Old.value(x, y)[8];
+				rho = cell[0] + cell[1] + cell[2] +
+					  cell[3] + cell[4] + cell[5] +
+					  cell[6] + cell[7] + cell[8];
 
 				if (rho == 0.) {
 					// this happens when a rigid body moves and an empty cell remains.
@@ -186,13 +205,13 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 				const float rhoinv = 1.0 / rho;
 
 				velx =
-						((fi_Old.value(x, y)[5] + fi_Old.value(x, y)[1] + fi_Old.value(x, y)[8]) -
-						 (fi_Old.value(x, y)[6] + fi_Old.value(x, y)[3] + fi_Old.value(x, y)[7])) *
+						((cell[5] + cell[1] + cell[8]) -
+						 (cell[6] + cell[3] + cell[7])) *
 						rhoinv;
 
 				vely =
-						((fi_Old.value(x, y)[6] + fi_Old.value(x, y)[2] + fi_Old.value(x, y)[5]) -
-						 (fi_Old.value(x, y)[7] + fi_Old.value(x, y)[4] + fi_Old.value(x, y)[8])) *
+						((cell[6] + cell[2] + cell[5]) -
+						 (cell[7] + cell[4] + cell[8])) *
 						rhoinv;
 
 				const float velxx = velx * velx;
@@ -201,61 +220,61 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 				float omega = 0.6;
 				// For the center
 				float feqC = w[0] * rho * (1.0 - 3.0 * (velxx + velyy) * 0.5);
-				fi_Old.value(x, y)[0] += omega * (feqC - fi_Old.value(x, y)[0]);
+				cell[0] += omega * (feqC - cell[0]);
 
 				float ax = 0;
 				float ay = 0;
 				// For the east distribution function
 				float feqE =
 						w[1] * rho * (1.0 + 3.0 * velx + 4.5 * velxx - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[1] +=
-						omega * (feqE - fi_Old.value(x, y)[1]) + 3.0 * w[1] * rho * ax;
+				cell[1] +=
+						omega * (feqE - cell[1]) + 3.0 * w[1] * rho * ax;
 
 				// for the North East Direction
 				float feqNE =
 						w[5] * rho * (1.0 + 3.0 * (velx + vely) +
 									  4.5 * (velx + vely) * (velx + vely) - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[5] +=
-						omega * (feqNE - fi_Old.value(x, y)[5]) + 3.0 * w[1] * rho * (ax + ay);
+				cell[5] +=
+						omega * (feqNE - cell[5]) + 3.0 * w[1] * rho * (ax + ay);
 
 				// For the north direction
 				float feqN =
 						w[2] * rho * (1.0 + 3.0 * vely + 4.5 * velyy - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[2] +=
-						omega * (feqN - fi_Old.value(x, y)[2]) + 3.0 * w[1] * rho * ay;
+				cell[2] +=
+						omega * (feqN - cell[2]) + 3.0 * w[1] * rho * ay;
 
 				// For the North west direction
 				float feqNW = w[6] * rho *
 							  (1.0 + 3.0 * (-velx + vely) +
 							   4.5 * (-velx + vely) * (-velx + vely) - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[6] +=
-						omega * (feqNW - fi_Old.value(x, y)[6]) + 3.0 * w[1] * rho * (-ax + ay);
+				cell[6] +=
+						omega * (feqNW - cell[6]) + 3.0 * w[1] * rho * (-ax + ay);
 
 				// for the west direction
 				float feqW =
 						w[3] * rho * (1.0 - 3.0 * velx + 4.5 * velxx - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[3] +=
-						omega * (feqW - fi_Old.value(x, y)[3]) + 3.0 * w[1] * rho * (-ax);
+				cell[3] +=
+						omega * (feqW - cell[3]) + 3.0 * w[1] * rho * (-ax);
 
 				// for the south west
 				float feqSW =
 						w[7] * rho * (1.0 - 3.0 * (velx + vely) +
 									  4.5 * (velx + vely) * (velx + vely) - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[7] +=
-						omega * (feqSW - fi_Old.value(x, y)[7]) + 3.0 * w[1] * rho * (-ax - ay);
+				cell[7] +=
+						omega * (feqSW - cell[7]) + 3.0 * w[1] * rho * (-ax - ay);
 
 				// for the South direction
 				float feqS =
 						w[4] * rho * (1.0 - 3.0 * vely + 4.5 * velyy - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[4] +=
-						omega * (feqS - fi_Old.value(x, y)[4]) + 3.0 * w[1] * rho * (-ay);
+				cell[4] +=
+						omega * (feqS - cell[4]) + 3.0 * w[1] * rho * (-ay);
 
 				// for the south east direction
 				float feqSE =
 						w[8] * rho * (1.0 + 3.0 * (velx - vely) +
 									  4.5 * (velx - vely) * (velx - vely) - 1.5 * (velxx + velyy));
-				fi_Old.value(x, y)[8] +=
-						omega * (feqSE - fi_Old.value(x, y)[8]) + 3.0 * w[1] * rho * (ax - ay);
+				cell[8] +=
+						omega * (feqSE - cell[8]) + 3.0 * w[1] * rho * (ax - ay);
 			}
 		}
 	}

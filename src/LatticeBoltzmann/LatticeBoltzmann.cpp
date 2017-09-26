@@ -19,7 +19,7 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
-	for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < iter; i++) {
 
 		step(input, output);
 	}
@@ -93,11 +93,11 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 
                                             fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
                                                          fi_New.value(x, y)[z] - 2 / (c*c) *
-                                                      density*w[z]*0.01*(input.velocities.value(x,y)[0]*cx[z] +
+                                                      density*w[z]/(4.*iter)*(input.velocities.value(x,y)[0]*cx[z] +
                                                     input.velocities.value(x,y)[1]*cy[z]);
-                                            /*if (input.velocities.value(x,y)[0] != 0 || input.velocities.value(x,y)[1] !=0){
+                                            if (input.velocities.value(x,y)[0] != 0 || input.velocities.value(x,y)[1] !=0){
                                                 std::cout << input.velocities.value(x,y)[0] << " " << input.velocities.value(x,y)[1] <<  std::endl;
-                                            }*/
+                                            }
                                             fi_New.value(x, y)[z] = 0.0;
                                             }
 					}

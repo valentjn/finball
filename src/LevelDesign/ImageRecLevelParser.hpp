@@ -2,6 +2,7 @@
 #define IMAGE_REC_LEVEL_PARSER_HPP_
 
 #include <glm/glm.hpp>
+#include "glm/gtc/constants.hpp"
 #include <iostream>
 #include <memory>
 
@@ -24,6 +25,7 @@ using namespace cv;
 class ImageRecLevelParser {
 private:
     string filePath;
+    const float DEG2RAD = glm::pi<float>() / 180.f;
 #ifdef OPENCV_LIBS
     const Vec3b COLOR_OBSTACLE = Vec3b(0, 0, 0);  // BLACK
     const Vec3b COLOR_INFLOW = Vec3b(255, 0, 0);  // BLUE

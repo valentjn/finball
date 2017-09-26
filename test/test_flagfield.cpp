@@ -38,15 +38,18 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
     }
     j=0;
     for (int i=0; i<width; i++) {
-        std::cout << flagfield.value(i,j) << " ";
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
     }
     int i=width-1;
     for (int j=0; j<height; j++) {
-        std::cout << flagfield.value(i,j) << " ";
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
     }
     i=0;
     for (int j=0; j<height; j++) {
-        std::cout << flagfield.value(i,j) << " ";
+        if( flagfield.value(i,j) == Level::CellType::FLUID)
+            return false;
     }
     return true;
 }
@@ -77,6 +80,7 @@ TEST(RigidBodyTest, static64) {
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
+  EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
   Transform before = sut.getRigidBody(idx);
 
@@ -133,6 +137,8 @@ TEST(RigidBodyTest, gravity64) {
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
+  EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
+
   Transform before = sut.getRigidBody(idx);
 
   for (int i = 0; i < level.width ; ++i){
@@ -152,7 +158,6 @@ TEST(RigidBodyTest, gravity64) {
       }
   }
 
-  //TODO make work!
   EXPECT_TRUE(changed);
   if(! changed){
     printFlagField(init_flagfield);
@@ -170,8 +175,11 @@ TEST(RigidBodyTest, stop64) {
   int idx = Level::BALL_ID;
 
   Level level("data/testLevel.txt");
-  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/4, level.height*0.9, false));
+  for (const auto &rb : level.rigidBodies) {
+    if (rb->id == Level::BALL_ID) {
+      rb->position = {level.width/4, level.height*0.9};
+    }
+  }
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -187,6 +195,7 @@ TEST(RigidBodyTest, stop64) {
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
+  EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
   Transform before = sut.getRigidBody(idx);
   printRBPosition(before);
@@ -209,8 +218,11 @@ TEST(RigidBodyTest, stop64) {
       }
   }
   // TODO
-  //EXPECT_TRUE(changed);
-  if(! changed){
+  EXPECT_TRUE(changed);
+  EXPECT_FLOAT_EQ(before.position.x, after.position.x);
+  EXPECT_LE(48, after.position.y);
+  //if(! changed)
+  {
     printFlagField(init_flagfield);
     printFlagField(output.grid_objects);
   }

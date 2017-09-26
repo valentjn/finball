@@ -8,24 +8,23 @@
 #include <LevelDesign/Level.hpp>
 #include <Parameters.hpp>
 
-class Scene
-{
+class Scene {
+
 public:
-	struct Params
-	{
-		SDLWindow* window;
-		SDLMusic* music;
-		Highscores* highscores;
-		const Parameters* cmd_params;
+	struct Context {
+		SDLWindow *window;
+		SDLMusic *music;
+		Highscores *highscores;
+		const Parameters *parameters;
 	};
 
-	Scene(Params scene_params) : m_params(scene_params) {}
+	Scene(Context context) : context(context) {}
 
 	virtual std::unique_ptr<Scene> show() = 0;
 	virtual ~Scene() = 0;
 
 protected:
-	Params m_params;
+	Context context;
 };
 
 inline Scene::~Scene() {}

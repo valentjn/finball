@@ -10,43 +10,46 @@
 #include "SDL/SDLEvents.hpp"
 
 std::unique_ptr<Scene> GameOverScene::show() {
-    MenuRenderer menuRenderer(*m_params.window);
+    render();
+
+    return std::make_unique<MainMenuScene>(context);
+}
+
+void GameOverScene::render() {
+    MenuRenderer menuRenderer(*context.window);
     menuRenderer.addBackgroundImage("data/background.jpg");
-
-
     menuRenderer.addActionText("This was HAIkel! Your HAIscore is " + std::to_string(score) + ".");
-    if(m_params.highscores->checkNewHighscore(score)){
+
+    bool newHighscore = context.highscores->checkNewHighscore(score);
+
+    if (newHighscore) {
     	menuRenderer.addTitle("New Highscore!!!");
         menuRenderer.addLeftText("Enter your name:\n__________________");
-		newHighscore = true;
-		m_params.music->play("data/WinningOutro.mp3", 1);
-	} else {
-		menuRenderer.addTitle("Game Over :(");
-		menuRenderer.addLeftText("Press any key to continue\n");
-		newHighscore = false;
-		m_params.music->play("data/SadGameOver.mp3", 1);
-	}
+        context.music->play("data/WinningOutro.mp3", 1);
+    } else {
+        menuRenderer.addTitle("Game Over :(");
+        menuRenderer.addLeftText("Press any key to continue\n");
+        context.music->play("data/SadGameOver.mp3", 1);
+    }
 
     menuRenderer.render();
 
-
-    listen(menuRenderer);
-
-    return std::make_unique<MainMenuScene>(m_params);
+    listen(menuRenderer, newHighscore);
 }
 
-void GameOverScene::listen(MenuRenderer &menuRenderer) {
+void GameOverScene::listen(MenuRenderer &menuRenderer, bool newHighscore) {
     // Flag for quitting the program
     std::string name = "";
 
     SDLEvents events;
     events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
-    	if(not newHighscore){
+        if (!newHighscore) {
     		return false;
-    	}
+        }
+
         SDL_Keycode sym = event.key.keysym.sym;
         if (sym == SDLK_RETURN) {
-            m_params.highscores->saveHighscore(score, name);
+            context.highscores->saveHighscore(score, name);
             return false;
         }
 

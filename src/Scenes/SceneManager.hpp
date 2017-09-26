@@ -6,16 +6,19 @@
 #include "SDL/SDLWindow.hpp"
 #include "Scenes/Scene.hpp"
 
+using namespace std;
+
 class SceneManager {
 private:
-    std::unique_ptr<Scene> currentScene;
+    unique_ptr<Scene> currentScene;
 
 public:
-    SceneManager(std::unique_ptr<Scene> scene) : currentScene(std::move(scene)) {}
+    SceneManager(unique_ptr<Scene> scene) : currentScene(move(scene)) {}
 
     void run() {
-        while (currentScene)
+        while (currentScene) {
             currentScene = currentScene->show();
+        }
     }
 
 };

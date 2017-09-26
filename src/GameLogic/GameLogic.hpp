@@ -38,7 +38,7 @@ public:
 
     void update(const GameLogicInput &input, GameLogicOutput &output) {
         duration<float> duration = steady_clock::now() - startTime;
-        output.highscore = duration.count();
+        output.score = duration.count();
 
         for (Transform const *rigidBody : *input.rigidBodies) {
             if (rigidBody->id == 1 && rigidBody->position.y < 0) {

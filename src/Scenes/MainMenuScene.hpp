@@ -11,15 +11,18 @@
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
 
+using namespace std;
+
 class MainMenuScene : public Scene {
 public:
-    std::unique_ptr<Scene> show();
+    unique_ptr<Scene> show();
 
-	MainMenuScene(Scene::Params scene_params) : Scene(scene_params) {}
+	MainMenuScene(Scene::Context context) : Scene(context) {}
 
 private:
+    void render();
     void listen();
-    std::string getHighscoreText();
+    string getHighscoreText();
 };
 
 #endif

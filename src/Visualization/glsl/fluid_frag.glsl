@@ -102,7 +102,7 @@ float noise2D(vec2 coords)
 }
 
 vec2 getVeloc(vec2 coords) {
-	return (texture(tex_vecs, coords).xy - 0.5) * 10;
+	return (texture(tex_vecs, coords).xy - 0.5) * 0.1;
 }
 
 // perfrom line integral convolution
@@ -137,27 +137,24 @@ float lic(vec2 normalized_coords)
 	return running_total / (lic_steps * 2);
 }
 
-void main() {
-    ivec2 vecs_res = textureSize(tex_vecs, 0);
-	ivec2 rend_res = textureSize(tex_noise, 0) * 2;
+void main()
+{
+    const float noise_scale = 2.5;
+	const float tscale = 8;
 
+	ivec2 vecs_res = textureSize(tex_vecs, 0);
+	ivec2 rend_res = textureSize(tex_noise, 0) * 2;
     vec2 normalized_coords = gl_FragCoord.xy / rend_res;
     normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
-    float velocity_val = lic(normalized_coords);
-    float density_val = 2 * texture(tex_vecs, normalized_coords).z;
+
+    /* float density_val = 2 * texture(tex_vecs, normalized_coords).z;
     if (density_val < 1)
-        out_color = 2 * vec3(0, 0, 1) * (1 - density_val) + vec3(0, 1, 0) * density_val;
-    else {
+		out_color = 2 * vec3(0, 0, 1) * (1 - density_val) + vec3(0, 1, 0) * density_val;
+	else {
         density_val -= 1;
         density_val = min(density_val, 1);
-        out_color = vec3(0, 1, 0) * (1 - density_val) + 2 * vec3(1, 0, 0) * density_val;
-    }
-    out_color *= velocity_val;
-
-	vec2 veloc = getVeloc(normalized_coords);
-
-	const float noise_scale = 2.5;
-	const float tscale = 4;
+		out_color = vec3(0, 1, 0) * (1 - density_val) + 2 * vec3(1, 0, 0) * density_val;
+	}*/
 
 	if (int(gl_FragCoord.x) <= 1)
 		out_wave = noise2D(vec2(noise_scale * normalized_coords.y, t * tscale));
@@ -168,12 +165,15 @@ void main() {
 	else if (int(gl_FragCoord.y) >= rend_res.y - 2)
 		out_wave = noise2D(vec2(noise_scale * (1 + normalized_coords.x), t * tscale));
 	else {
-		out_wave = texture(tex_waves, normalized_coords - 30 * veloc / (vecs_res + 1)).x;
-		out_color = velocity_val * vec3(0.4, 0.5, 1);
-		out_color *= 0.5 + 0.8 * out_wave;
-		out_color *= min(length(veloc) * 5, 1);
+		vec2 veloc = getVeloc(normalized_coords);
+		out_wave = texture(tex_waves, normalized_coords - 42 * veloc / (vecs_res + 1)).x;
+		float velocity_val = lic(normalized_coords);
+		velocity_val *= min(0.7 + 0.5 * out_wave, 1);
+		vec3 color = vec3(0.4, 0.5, 1);
+		float vec_mul = min(length(veloc) * 16, 1);
+		out_color = vec3(0.4, 0.5, 1);
+		out_color *= velocity_val * vec_mul + 0.7 - 0.7 * vec_mul;
 		return;
 	}
 	out_color = vec3(0);
 }
-

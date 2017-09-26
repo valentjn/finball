@@ -71,6 +71,15 @@ void Texture3F::setData(const Array2D<glm::vec3>& data)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_res.x, m_res.y, 0, GL_RGB, GL_FLOAT, data.getData());
 }
 
+void Texture3F::setData(const cv::Mat &data) {
+    assert(data.cols == m_res.x);
+    assert(data.rows == m_res.y);
+    bind(0);
+    // mirror the image around the x axis (OpenCV and OpenGL store images differently)
+    cv::flip(data, data, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_res.x, m_res.y, 0, GL_BGRA, GL_UNSIGNED_BYTE, data.data);
+}
+
 Texture4F::Texture4F(glm::ivec2 size, bool linear_interpolation)
     : Texture(size, linear_interpolation)
 {

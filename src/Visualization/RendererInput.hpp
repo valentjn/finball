@@ -63,7 +63,7 @@ public:
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody->position, 0);
             // TODO: fix this for the new RigidBody creation architecture
-            // renderObject.scale = { rigidBody->radius, rigidBody->radius };
+            renderObject.scale = {1.0f, 1.0f};
             renderObject.rotation = rigidBody->rotation;
 			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = mesh;
@@ -129,7 +129,7 @@ public:
         fluid_input = Array2D<glm::vec3>{ latticeBoltzmannOutput.velocity.width(), latticeBoltzmannOutput.velocity.height() };
         for (int x = 0; x < fluid_input.width(); ++x)
             for (int y = 0; y < fluid_input.height(); ++y)
-                fluid_input.value(x,y) = glm::vec3{ latticeBoltzmannOutput.velocity.value(x,y) * 0.1f + 0.5f, latticeBoltzmannOutput.density.value(x,y) };
+                fluid_input.value(x,y) = glm::vec3{ latticeBoltzmannOutput.velocity.value(x,y) * 0.1f + 0.5f, latticeBoltzmannOutput.density.value(x,y) * 0.5f };
         /* test input
         static Array2D<glm::vec2> test_fluid_velocity;
         if (test_fluid_velocity == Array2D<glm::vec2>{}) {

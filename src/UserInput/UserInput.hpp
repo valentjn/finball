@@ -27,6 +27,16 @@ typedef XnUserID user_id_t;
 #endif
 
 class UserInput {
+public:
+	enum InputSource {
+		CHOOSING,
+		FAKE,
+        KEYBOARD
+#ifndef WITHOUT_KINECT_LIBRARIES
+		, KINECT
+#endif
+	};
+	
 private:
 	static const int MAX_USERS = 4;
 	static const int PLAYERS = 2;
@@ -36,12 +46,6 @@ private:
     bool leftDifferenceTooBig[PLAYERS];
     bool rightDifferenceTooBig[PLAYERS];
 
-    enum InputSource {
-        KEYBOARD
-#ifndef WITHOUT_KINECT_LIBRARIES
-		, KINECT
-#endif
-	};
 	InputSource usedInputSource;
 
 #ifndef WITHOUT_KINECT_LIBRARIES
@@ -62,6 +66,7 @@ private:
 
 	bool initializeKinect();
 	void finalizeKinect();
+	void getKinectInput(UserInputOutput &userInputOutput, double delta);
 #endif
 
 	std::chrono::high_resolution_clock::time_point previous_time_point;
@@ -75,16 +80,26 @@ private:
 
 	double leftFinStartAngle = 0; // start angle of fins without input
 	double rightFinStartAngle = 3.141;
-	std::chrono::high_resolution_clock::time_point timeBef;
-	std::chrono::high_resolution_clock::time_point timeNow; // time of current angle and velocity
-	double a0 = 3.141; // set positive angular acceleration constant
+	bool leftPressed = false;
+	bool rightPressed = false;
+
+	double aal =0; 
+	double aar =0;// angular acceleration
+	double avl =0; // angular velocity
+	double avr =0;
+	double anl =leftFinStartAngle; // angle
+	double anr =rightFinStartAngle;
+
+	static constexpr const double a0 = 3.141; // set positive angular acceleration constant
 	
-	void getSDLInput(UserInputOutput& userInputOutput);
+	void getSDLInput(UserInputOutput& userInputOutput, double delta);
 
 public:
 	UserInput();
 	~UserInput();
     void getInput(UserInputOutput &userInputOutput);
+
+	InputSource getUsedInputSource() { return usedInputSource; }
 
 };
 

@@ -176,6 +176,8 @@ UserInput::UserInput(){
 		leftDifferenceTooBig[k] = false;
 		rightDifferenceTooBig[k] = false;
 	}
+	// TODO: parse from cli parameters
+	usedInputSource = CHOOSING;
 }
 
 #ifndef WITHOUT_KINECT_LIBRARIES
@@ -200,31 +202,14 @@ UserInput::~UserInput() {
 #endif
 }
 
-void UserInput::getSDLInput(UserInputOutput &userInputOutput) {
+void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
+	
 	SDL_Event event;
-
-	bool leftPressed = false;
-	bool rightPressed = false;
-
-	double aal =0; 
-	double aar =0;// angular acceleration
-	double avl =0; // angular velocity
-	double avr =0;
-	double anl =leftFinStartAngle; // angle
-	double anr =rightFinStartAngle;
-
-	long dt =0;
-	timeBef =std::chrono::high_resolution_clock::now();
-	timeNow =std::chrono::high_resolution_clock::now();
 
 	while (SDL_PollEvent(&event)) {
 
 		aal = -a0;
 		aar = a0;
-		if(!leftPressed && !rightPressed){
-			timeBef = timeNow;
-			timeNow = std::chrono::high_resolution_clock::now();	
-		}
 
 		switch (event.type) {
 			
@@ -285,14 +270,10 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput) {
 			avr=0;
 		}		
 
-		timeBef = timeNow;
-		timeNow = std::chrono::high_resolution_clock::now();
-		dt = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow-timeBef).count();	
-
-		avl = avl + (aal*dt/1000);
-		avr = avr + (aar*dt/1000);
-		anl = anl + (avl*dt/1000);
-		anr = anr + (avr*dt/1000);
+		avl = avl + (aal*delta);
+		avr = avr + (aar*delta);
+		anl = anl + (avl*delta);
+		anr = anr + (avr*delta);
 
 
 		if(anl >= max_angle[0]){
@@ -319,16 +300,10 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput) {
 	}
 }
 
-// process input
-void UserInput::getInput(UserInputOutput &userInputOutput) {
-	// get timing information
-	auto now = high_resolution_clock::now();
-	nanoseconds delta = duration_cast<nanoseconds>(now-previous_time_point);
-	
-	getSDLInput(userInputOutput);
-
 #ifndef WITHOUT_KINECT_LIBRARIES
-	if (!kinectIsInitialized) {
+void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
+	
+		if (!kinectIsInitialized) {
 		if(tryInitializingKinect) {
 			// try again to initialize the kinect
 			finalizeKinect();
@@ -441,9 +416,8 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 				double ldAngle
 					= userInputOutput.leftAngle[k] - previousLeftAngles[k];
 				double rdAngle = rightPsi - previousRightPsi;
-				userInputOutput.leftVelocity[k] = (1000000*ldAngle) / delta.count();
-				userInputOutput.rightVelocity[k]
-					= (1000000*rdAngle) / delta.count();
+				userInputOutput.leftVelocity[k] = ldAngle / delta;
+				userInputOutput.rightVelocity[k] = rdAngle / delta;
 
 				if(ldAngle < MIN_DIFFERENCE && ldAngle > -MIN_DIFFERENCE) {
 					userInputOutput.leftAngle[k] = previousLeftAngles[k];
@@ -464,7 +438,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 						ldAngle = userInputOutput.leftAngle[k]
 							- previousLeftAngles[k];
 						userInputOutput.leftVelocity[k]
-							= (1000000*ldAngle) / delta.count();
+							= ldAngle / delta;
 					} else {
 						userInputOutput.leftAngle[k] = previousLeftAngles[k];
 						userInputOutput.leftVelocity[k] = 0;
@@ -481,7 +455,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 						rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
 							- userInputOutput.rightAngle[k];
                         userInputOutput.rightVelocity[k]
-                            = (1000000*rdAngle) / delta.count();
+                            = rdAngle / delta;
                     } else {
                         userInputOutput.rightAngle[k] = previousRightAngles[k];
                         userInputOutput.rightVelocity[k] = 0;
@@ -502,8 +476,35 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			usedInputSource = KINECT;
 		}
 	}
-
+}
 #endif
+
+// process input
+void UserInput::getInput(UserInputOutput &userInputOutput) {
+	// get timing information
+	auto now = high_resolution_clock::now();
+	double delta = duration_cast<nanoseconds>(now-previous_time_point).count()
+		/ 1000000.0;
+
+	switch(usedInputSource){
+	case KEYBOARD:
+		getSDLInput(userInputOutput, delta);
+		break;
+#ifndef WITHOUT_KINECT_LIBRARIES
+	case KINECT:
+		getKinectInput(userInputOutput, delta);
+		break;
+#endif
+	case CHOOSING:
+		getSDLInput(userInputOutput, delta);
+		getKinectInput(userInputOutput, delta);
+		break;
+	case FAKE:
+		// TODO
+		break;
+	default:
+		Log::error("Unknown input source selected. Something went terribly wrong.");
+	}
 
 	previous_time_point = now;
 

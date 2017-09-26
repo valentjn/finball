@@ -15,12 +15,13 @@ public:
     int windowWidth = 800;
     int windowHeight = 600;
     int frameRate = 30;
-    string level = "testLevel.txt";
+    int simulationRate = 30;
+    string level = "testLevel2.txt";
     string userInputSource = "AUTO";
 
     Parameters(int argc, char *const argv[]) {
         int optchar;
-        const char *options = "v:fw:h:r:l:i:";
+        const char *options = "v:fw:h:r:s:l:i:";
 
         while ((optchar = getopt(argc, argv, options)) > 0) {
             switch (optchar) {
@@ -44,6 +45,10 @@ public:
                 frameRate = atoi(optarg);
                 break;
 
+            case 's':
+                simulationRate = atoi(optarg);
+                break;
+
             case 'l':
                 level = optarg;
                 break;
@@ -64,14 +69,14 @@ public:
      */
     void printHelp(char *const argv[]) {
         cout << "Parameters for " << argv[0] << endl;
-        cout << "	-v [level]		Verbosity level (default: 0)" << endl;
-        cout << "	-f              Enable fullscreen" << endl;
-        cout << "	-w [width]      Screen height (default: 800)" << endl;
-        cout << "	-h [height]     Screen width (default: 600)" << endl;
-        cout << "	-r [frameRate]  Max. frame rate (default: 30)" << endl;
-        cout << "	-l [name]       Name of the level (default: testLevel)" << endl;
-        cout << "	-i [source]     input source, one of:" << endl;
-        cout << "	                AUTO, CHOOSING, KEYBOARD";
+        cout << "	-v [level]           Verbosity level (default: 0)" << endl;
+        cout << "	-f                   Enable fullscreen" << endl;
+        cout << "	-w [width]           Screen height (default: 800)" << endl;
+        cout << "	-h [height]          Screen width (default: 600)" << endl;
+        cout << "	-r [frameRate]       Max. frame rate (default: 30)" << endl;
+        cout << "	-s [simulationRate]  Simulation rate (default: 30)" << endl;
+        cout << "	-l [name]            Name of the level (default: testLevel2.txt)" << endl;
+        cout << "	-i [source]          input source, one of AUTO, CHOOSING, KEYBOARD";
 #ifndef WITHOUT_KINECT_LIBRARIES
         cout << ", KINECT";
 #endif

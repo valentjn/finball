@@ -5,11 +5,13 @@
 #include "LevelDesign/Level.hpp"
 #include "Scenes/MenuRenderer.hpp"
 #include "Scenes/Scene.hpp"
+#include "SDL/SDLMusic.hpp"
 #include "SDL/SDLWindow.hpp"
 
 class GameOverScene : public Scene {
 private:
     const SDLWindow &window;
+    SDLMusic &music;
     Highscores &highscores;
     float score;
 
@@ -18,8 +20,8 @@ private:
     int frameRate;
 
 public:
-    GameOverScene(const SDLWindow &window, Highscores &highscores, float score, Level &level, int frameRate) :
-            window(window), highscores(highscores), score(score), level(level), frameRate(frameRate) {}
+    GameOverScene(const SDLWindow &window, SDLMusic &music, Highscores &highscores, float score, Level &level, int frameRate) :
+            window(window), music(music), highscores(highscores), score(score), level(level), frameRate(frameRate) {}
 
     std::unique_ptr<Scene> show();
 

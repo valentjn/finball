@@ -25,8 +25,6 @@ int main(int argc, char *argv[]) {
     window.setIcon("data/haicon.png");
 
     SDLMusic music;
-    // music.load("data/MainTheme.mp3");
-    // music.load("data/GameTheme.mp3");
 
     Highscores highscores("haiscores.txt");
 
@@ -36,7 +34,7 @@ int main(int argc, char *argv[]) {
 
     // show main menu and obtain level from it
 
-    SceneManager sceneManager(std::make_unique<MainMenuScene>(window, highscores, level, parameters.frameRate));
+    SceneManager sceneManager(std::make_unique<MainMenuScene>(window, music, highscores, level, parameters.frameRate));
     sceneManager.run();
 
     return 0;

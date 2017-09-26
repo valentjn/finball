@@ -7,12 +7,14 @@
 #include "Highscores.hpp"
 #include "LevelDesign/Level.hpp"
 #include "Scenes/Scene.hpp"
+#include "SDL/SDLMusic.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
 
 class MainMenuScene : public Scene {
 private:
     const SDLWindow &window;
+    SDLMusic &music;
     Highscores &highscores;
 
     // TODO refactor
@@ -20,8 +22,8 @@ private:
     int frameRate;
 
 public:
-    MainMenuScene(const SDLWindow &window, Highscores &highscores, Level &level, int frameRate) :
-            window(window), highscores(highscores), level(level), frameRate(frameRate) {}
+    MainMenuScene(const SDLWindow &window, SDLMusic &music, Highscores &highscores, Level &level, int frameRate) :
+            window(window), music(music), highscores(highscores), level(level), frameRate(frameRate) {}
 
     std::unique_ptr<Scene> show();
 

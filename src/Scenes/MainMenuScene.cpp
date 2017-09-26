@@ -23,9 +23,11 @@ std::unique_ptr<Scene> MainMenuScene::show() {
 
     menuRenderer.render();
 
+    music.load("data/MainTheme.mp3");
+
     listen();
 
-    return std::make_unique<SimulationScene>(window, level, highscores, frameRate);
+    return std::make_unique<SimulationScene>(window, music, level, highscores, frameRate);
 }
 
 std::string MainMenuScene::getHighscoreText() {

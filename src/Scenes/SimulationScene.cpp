@@ -75,7 +75,9 @@ std::unique_ptr<Scene> SimulationScene::show() {
         }
     });
 
+    music.load("data/GameTheme.mp3");
+
     timer.start(1000 / frameRate, gameLogicOutput.running);
 
-    return std::make_unique<GameOverScene>(window, highscores, gameLogicOutput.highscore, level, frameRate);
+    return std::make_unique<GameOverScene>(window, music, highscores, gameLogicOutput.highscore, level, frameRate);
 }

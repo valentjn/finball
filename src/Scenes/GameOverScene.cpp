@@ -21,7 +21,7 @@ std::unique_ptr<Scene> GameOverScene::show() {
 
     listen(menuRenderer);
 
-    return std::make_unique<MainMenuScene>(window, highscores, level, frameRate);
+    return std::make_unique<MainMenuScene>(window, music, highscores, level, frameRate);
 }
 
 void GameOverScene::listen(MenuRenderer &menuRenderer) {

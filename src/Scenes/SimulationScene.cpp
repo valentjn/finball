@@ -5,6 +5,7 @@
 #include <string>
 #include <thread>
 
+#include "DoubleBuffer.hpp"
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
 #include "Highscores.hpp"
@@ -43,29 +44,44 @@ float SimulationScene::simulation() {
     LatticeBoltzmann latticeBoltzmann(level);
     RigidBodyPhysics rigidBodyPhysics(level);
 
-    UserInputOutput userInputOutput;
-    LatticeBoltzmannOutput latticeBoltzmannOutput(level);
-    RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
-    GameLogicOutput gameLogicOutput;
+    DoubleBuffer<UserInputOutput> userInputOutput;
+    DoubleBuffer<LatticeBoltzmannOutput> latticeBoltzmannOutput(level);
+    DoubleBuffer<RigidBodyPhysicsOutput> rigidBodyPhysicsOutput(level);
+    DoubleBuffer<GameLogicOutput> gameLogicOutput;
 
     steady_clock::time_point lastFrame = steady_clock::now();
 
     Timer timer([&]() {
         // 1. get user input (kinect)
-        userInput.getInput(userInputOutput);
+        userInput.getInput(userInputOutput.writeBuffer());
+        userInputOutput.swap();
 
         // 2. do calculations (rigid body, LBM)
-        RigidBodyPhysicsInput rigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
-        rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
-        LatticeBoltzmannInput latticeBoltzmannInput(rigidBodyPhysicsOutput);
-        latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
+        userInputOutput.lock();
+        rigidBodyPhysicsOutput.lock();
+        latticeBoltzmannOutput.lock();
+        GameLogicInput gameLogicInput(userInputOutput.readBuffer(),
+                                      rigidBodyPhysicsOutput.readBuffer(),
+                                      latticeBoltzmannOutput.readBuffer());
+        latticeBoltzmannOutput.unlock();
+        rigidBodyPhysicsOutput.unlock();
+        userInputOutput.unlock();
 
-        GameLogicInput gameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
-        gameLogic.update(gameLogicInput, gameLogicOutput);
+        gameLogic.update(gameLogicInput, gameLogicOutput.writeBuffer());
+        gameLogicOutput.swap();
 
         // 3. draw visualization
-        RendererInput rendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
+        gameLogicOutput.lock();
+        rigidBodyPhysicsOutput.lock();
+        latticeBoltzmannOutput.lock();
+        RendererInput rendererInput(gameLogicOutput.readBuffer(),
+                                    rigidBodyPhysicsOutput.readBuffer(),
+                                    latticeBoltzmannOutput.readBuffer());
+        latticeBoltzmannOutput.unlock();
+        rigidBodyPhysicsOutput.unlock();
+        gameLogicOutput.unlock();
+
         renderer.update(rendererInput);
 
         if (Log::logLevel >= Log::DEBUG) {
@@ -77,16 +93,30 @@ float SimulationScene::simulation() {
     });
 
     Timer simulationTimer([&]() {
-        // TODO
+        userInputOutput.lock();
+        latticeBoltzmannOutput.lock();
+        RigidBodyPhysicsInput rigidBodyPhysicsInput(userInputOutput.readBuffer(), latticeBoltzmannOutput.readBuffer());
+        latticeBoltzmannOutput.unlock();
+        userInputOutput.unlock();
+
+        rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput.writeBuffer());
+        rigidBodyPhysicsOutput.swap();
+
+        rigidBodyPhysicsOutput.lock();
+        LatticeBoltzmannInput latticeBoltzmannInput(rigidBodyPhysicsOutput.readBuffer());
+        rigidBodyPhysicsOutput.unlock();
+
+        latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput.writeBuffer());
+        latticeBoltzmannOutput.swap();
     });
 
     context.music->play("data/GameTheme.mp3");
 
     std::thread simulationThread([&]() {
-        simulationTimer.start(1000 / context.parameters->simulationRate, gameLogicOutput.running);
+        simulationTimer.start(1000 / context.parameters->simulationRate, gameLogicOutput.readBuffer().running);
     });
 
-    timer.start(1000 / context.parameters->frameRate, gameLogicOutput.running);
+    timer.start(1000 / context.parameters->frameRate, gameLogicOutput.readBuffer().running);
 
     simulationThread.join();
 

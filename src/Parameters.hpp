@@ -77,7 +77,7 @@ public:
         cout << "	-s [simulationRate]  Simulation rate (default: 30)" << endl;
         cout << "	-l [name]            Name of the level (default: testLevel2.txt)" << endl;
         cout << "	-i [source]          input source, one of AUTO, CHOOSING, KEYBOARD";
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBRARIES
         cout << ", KINECT";
 #endif
         cout << endl;

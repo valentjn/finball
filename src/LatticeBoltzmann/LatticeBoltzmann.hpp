@@ -43,7 +43,7 @@ private:
 	void stream(const LatticeBoltzmannInput &input);
 	void handleBoundaries(const LatticeBoltzmannInput &input);
 	void initFiObstacles(const LatticeBoltzmannInput &input);
-	float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
+	inline float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
 
 public:
     LatticeBoltzmann(Level &level)

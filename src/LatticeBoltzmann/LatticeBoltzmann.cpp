@@ -46,17 +46,17 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 	stream(input);
 
 	time2 = std::chrono::steady_clock::now();
-	measuredTimes[2] = time2 - time1;
+	measuredTimes[2] += time2 - time1;
 
 	handleBoundaries(input);
 
 	time1 = std::chrono::steady_clock::now();
-	measuredTimes[3] = time1 - time2;
+	measuredTimes[3] += time1 - time2;
 
 	reinitializeFI(output);
 
 	time2 = std::chrono::steady_clock::now();
-	measuredTimes[4] = time2 - time1;
+	measuredTimes[4] += time2 - time1;
 
 }
 
@@ -181,7 +181,7 @@ float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int
 
 void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 {
-//#pragma omp parallel for schedule(static)
+//#pragma omp parallel for schedule(static) collapse(2) shared(input, fi_Old)
 	for (int y = 1; y < level.height - 1; ++y) {
 		for (int x = 1; x < level.width - 1; ++x) {
 			// check for boundary

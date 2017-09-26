@@ -319,9 +319,6 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
             initializeKinect();
         }
     } else {
-        // TODO: handle error codes
-        XnStatus errorCode = XN_STATUS_OK;
-
         context->WaitNoneUpdateAll();
 
         XnUInt16 tmpNUsers = MAX_USERS;

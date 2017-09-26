@@ -4,7 +4,7 @@
 #include <cmath>
 #include "../Log.hpp"
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 
 // headers for kinect
 #include <XnCppWrapper.h>
@@ -19,7 +19,7 @@ using namespace xn;
 using namespace std;
 using namespace std::chrono;
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 bool UserInput::initializeKinect() {
 	if(kinectIsInitialized) return true;
 
@@ -154,7 +154,7 @@ bool UserInput::initializeKinect() {
 UserInput::UserInput(InputSource mUsedInputSource){
 	previous_time_point = std::chrono::high_resolution_clock::now();
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 	kinectIsInitialized = false;
 	nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
 
@@ -180,7 +180,7 @@ UserInput::UserInput(InputSource mUsedInputSource){
 	usedInputSource = mUsedInputSource;
 }
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 void UserInput::finalizeKinect() {
 	// cleanup kinect context etc
     depthGenerator->Release();
@@ -197,13 +197,13 @@ void UserInput::finalizeKinect() {
 
 // finalization of user input facilities
 UserInput::~UserInput() {
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
     finalizeKinect();
 #endif
 }
 
 void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
-	
+
 	SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
@@ -212,7 +212,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 		aar = a0;
 
 		switch (event.type) {
-			
+
 		case SDL_QUIT:
 			userInputOutput.quit = true;
 			break;
@@ -242,7 +242,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 				if(usedInputSource == CHOOSING) {
 					usedInputSource = KEYBOARD;
 				}
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 				tryInitializingKinect = false;
 #endif
 				break;
@@ -273,7 +273,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 			aar = -a0;
 		} else {
 			avr=0;
-		}		
+		}
 
 		avl = avl + (aal*delta);
 		avr = avr + (aar*delta);
@@ -302,16 +302,16 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 			userInputOutput.leftAngle[0]=anl;
 			userInputOutput.rightAngle[0]=anr;
 			if(PLAYERS>=2) {
-				userInputOutput.leftVelocity[1]=avl;		
+				userInputOutput.leftVelocity[1]=avl;
 				userInputOutput.rightVelocity[1]=avr;
 			}
 		}
 	}
 }
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
-	
+
 		if (!kinectIsInitialized) {
 		if(tryInitializingKinect) {
 			// try again to initialize the kinect
@@ -510,7 +510,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 	case KEYBOARD:
 		getSDLInput(userInputOutput, delta);
 		break;
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 	case KINECT:
 		getSDLInput(userInputOutput, delta);
 		getKinectInput(userInputOutput, delta);
@@ -518,7 +518,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 #endif
 	case CHOOSING:
 		getSDLInput(userInputOutput, delta);
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 		getKinectInput(userInputOutput, delta);
 #endif
 		break;

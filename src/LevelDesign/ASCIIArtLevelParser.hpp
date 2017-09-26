@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <glm/glm.hpp>
-#include <stdexcept>
 #include <string>
 
 #include "Array2D.hpp"
@@ -22,12 +21,12 @@ private:
 public:
     ASCIIArtLevelParser(string filePath) : filePath(filePath) {}
 
-    void parse(Level &level) {
+    bool parse(Level &level) {
         fstream file;
         file.open(filePath, fstream::in);
         if (!file.is_open()) {
             Log::error("Failed to load level %s", filePath);
-            throw runtime_error("Failed to load level");
+            return false;
         }
 
         Mesh *meshRect = level.addUniqueMesh(make_unique<ColoredMesh>(
@@ -61,6 +60,7 @@ public:
 
         level.flipperLeftId = rigidBodyId++;
         level.flipperRightId = rigidBodyId++;
+        return true;
     }
 };
 

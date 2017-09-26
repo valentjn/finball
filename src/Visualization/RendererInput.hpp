@@ -14,28 +14,31 @@
 #include "Texture.hpp"
 
 class RendererInput {
+	std::unique_ptr<Texture3F> ff_texture;
+
 public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
     Array2D<glm::vec3> fluid_input;
     TexturedMesh* fluid_mesh;
+	std::unique_ptr<Mesh> dummy_mesh;
+	std::unique_ptr<TexturedMesh> ff_mesh;
 
-    RendererInput() : fluid_mesh(nullptr) {}
+    RendererInput() : fluid_mesh(nullptr)
+	{
+		auto square = Mesh::createRectangle({ -1.f, -1.f }, { 1.f, 1.f });
+		dummy_mesh = std::make_unique<ColoredMesh>(
+			square,
+			std::vector<glm::vec3>{ {1, 0, 0.4}, { 0.3, 1, 0.4 }, { 1, 1, 0.4 }, { 1, 0, 0.4 }, { 1, 1, 0.4 }, { 0, 0, 1 }});
+	}
 
-    RendererInput(const GameLogicOutput &gameLogicOutput,
-                  const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
-                  const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+    void process(
+		const GameLogicOutput &gameLogicOutput,
+		const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
+        const LatticeBoltzmannOutput &latticeBoltzmannOutput)
     {   // handle game logic output
-        world_objects.insert(world_objects.end(), gameLogicOutput.objectsToRender.begin(),
-                             gameLogicOutput.objectsToRender.end());
-
-        static std::unique_ptr<Mesh> dummy_mesh;
-        if (!dummy_mesh) {
-            auto square = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
-            dummy_mesh = std::make_unique<ColoredMesh>(
-                square,
-                std::vector<glm::vec3>{{1, 0, 0.4},{0.3, 1, 0.4},{1, 1, 0.4},{1, 0, 0.4},{1, 1, 0.4},{0, 0, 1}});
-        }
+        world_objects.assign(gameLogicOutput.objectsToRender.begin(), gameLogicOutput.objectsToRender.end());
+		ui_objects.clear();
 
         for (auto& gameLogicObject : world_objects) {
         	if (!gameLogicObject.mesh) {
@@ -71,8 +74,6 @@ public:
         }
 
         // visualise the flag field from rigidbody
-        static std::unique_ptr<Texture3F> ff_texture;
-        static std::unique_ptr<TexturedMesh> ff_mesh;
         const int ff_width = rigidBodyPhysicsOutput.grid_objects.width();
         const int ff_height = rigidBodyPhysicsOutput.grid_objects.height();
         if (!ff_mesh) {
@@ -106,7 +107,7 @@ public:
         RenderObject ff_render_object;
         ff_render_object.mesh = ff_mesh.get();
         ff_render_object.position = glm::vec3{0.75f, 0.75f, 0.0f};
-        ff_render_object.scale = {0.25, 0.25};
+        ff_render_object.scale = {0.25f, 0.25f};
         ff_render_object.rotation = 0;
         ui_objects.push_back(ff_render_object);
 
@@ -118,17 +119,6 @@ public:
         for (int x = 0; x < fluid_input.width(); ++x)
             for (int y = 0; y < fluid_input.height(); ++y)
                 fluid_input.value(x,y) = glm::vec3{ latticeBoltzmannOutput.velocity.value(x+1,y+1) * 10.f + 0.5f, latticeBoltzmannOutput.density.value(x+1,y+1) * 0.5f };
-        /* test input
-        static Array2D<glm::vec2> test_fluid_velocity;
-        if (test_fluid_velocity == Array2D<glm::vec2>{}) {
-            test_fluid_velocity = Array2D<glm::vec2>{ 42, 42 };
-            for (int i = 0; i < test_fluid_velocity.width(); ++i)
-                for (int j = 0; j < test_fluid_velocity.height(); ++j)
-                    test_fluid_velocity.value(i,j) = {
-                        static_cast<float>(i) / test_fluid_velocity.width(),
-                        static_cast<float>(j) / test_fluid_velocity.height() };
-        }
-        fluid_velocity = &test_fluid_velocity;*/
 
 
         Log::info("RendererInput: %d objects to render", world_objects.size());

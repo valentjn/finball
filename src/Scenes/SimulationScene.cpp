@@ -63,8 +63,7 @@ std::unique_ptr<Scene> SimulationScene::show() {
         gameLogic.update(gameLogicInput, gameLogicOutput);
 
         // 3. draw visualization
-        rendererInput =
-            RendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
+        rendererInput.process(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
         renderer.update(rendererInput);
 
         if (Log::logLevel >= Log::DEBUG) {

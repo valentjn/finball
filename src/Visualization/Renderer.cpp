@@ -69,7 +69,7 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // TODO: dynamically set camera positon depending on level size
-Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
+Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f), m_ticks(0) {
     m_window = window.getWindow();
     m_resolution = glm::ivec2(window.getWidth(), window.getHeight());
 
@@ -77,7 +77,7 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    m_glcontext = SDL_GL_CreateContext(m_window);
+	m_glcontext = SDL_GL_CreateContext(m_window);
     if (!m_glcontext) {
         auto error = SDL_GetError();
         Log::error("Failed to create SDL window: %s", error);
@@ -196,10 +196,9 @@ void Renderer::update(const RendererInput &input) {
 		m_tex_waves2->bind(2);
 
 	// set time
-	static unsigned int ticks = 0;
 	loc = glGetUniformLocation(m_shader_program_fluid, "t");
-	++ticks;
-	glUniform1ui(loc, static_cast<float>(ticks));
+	++m_ticks;
+	glUniform1ui(loc, static_cast<float>(m_ticks));
 
     // render fluid
 	m_full_quad->render(0);

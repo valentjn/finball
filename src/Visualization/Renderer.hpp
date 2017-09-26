@@ -41,6 +41,7 @@ private:
     SDL_GLContext m_glcontext;
 
     glm::vec3 m_camera_pos;
+	int m_ticks;
 
     const Array2D<glm::vec3> *m_fluid_vecs;
 

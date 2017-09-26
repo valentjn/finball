@@ -72,6 +72,15 @@ private:
 	float min_angle[PLAYERS];
 	float zero_angle[PLAYERS];
 
+
+	double leftFinStartAngle = 0; // start angle of fins without input
+	double rightFinStartAngle = 3.141;
+	std::chrono::high_resolution_clock::time_point timeBef;
+	std::chrono::high_resolution_clock::time_point timeNow; // time of current angle and velocity
+	double a0 = 3.141; // set positive angular acceleration constant
+	
+	void getSDLInput(UserInputOutput& userInputOutput);
+
 public:
 	UserInput();
 	~UserInput();

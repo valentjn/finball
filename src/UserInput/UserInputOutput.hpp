@@ -3,6 +3,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <chrono>
+
 struct UserInputOutput {
     double leftAngle[2];
     double rightAngle[2];
@@ -10,11 +12,6 @@ struct UserInputOutput {
     double rightVelocity[2];
 
     bool playerIsTracked[2];
-
-	double maxAngle = 1.571;
-	double stepSize = maxAngle/20; // increase of angle with every keydown event
-	bool fakedata = false;
-
 
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels

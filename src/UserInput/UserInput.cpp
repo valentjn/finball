@@ -200,50 +200,54 @@ UserInput::~UserInput() {
 #endif
 }
 
-// process input
-void UserInput::getInput(UserInputOutput &userInputOutput) {
-	// get timing information
-	auto now = high_resolution_clock::now();
-	nanoseconds delta = duration_cast<nanoseconds>(now-previous_time_point);
+void UserInput::getSDLInput(UserInputOutput &userInputOutput) {
+	SDL_Event event;
 
-	// SDL events
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_QUIT:
-            userInputOutput.quit = true;
-            break;
+	bool leftPressed = false;
+	bool rightPressed = false;
+
+	double aal =0; 
+	double aar =0;// angular acceleration
+	double avl =0; // angular velocity
+	double avr =0;
+	double anl =leftFinStartAngle; // angle
+	double anr =rightFinStartAngle;
+
+	long dt =0;
+	timeBef =std::chrono::high_resolution_clock::now();
+	timeNow =std::chrono::high_resolution_clock::now();
+
+	while (SDL_PollEvent(&event)) {
+
+		aal = -a0;
+		aar = a0;
+		if(!leftPressed && !rightPressed){
+			timeBef = timeNow;
+			timeNow = std::chrono::high_resolution_clock::now();	
+		}
+
+		switch (event.type) {
+			
+		case SDL_QUIT:
+			userInputOutput.quit = true;
+			break;
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym){
 			case SDLK_LEFT:
-				// 1 keypress is pi/40, velocity starts at pi/10
-				userInputOutput.pressedL
-					= userInputOutput.pressedL - userInputOutput.stepSize;
-				if (userInputOutput.pressedL >= -max_angle[0]) {
-					userInputOutput.leftAngle[0] = userInputOutput.pressedL;
-					userInputOutput.leftVelocity[0] = 4*userInputOutput.pressedL;
-				}
+				leftPressed = true;
 				break;
 			case SDLK_RIGHT:
-				// 1 keypress is pi/40, velocity starts at pi/10
-				userInputOutput.pressedR
-					= userInputOutput.pressedR + userInputOutput.stepSize;
-				if (userInputOutput.pressedR <= max_angle[0]) {
-					userInputOutput.rightAngle[0] = userInputOutput.pressedR-3.141;
-					userInputOutput.rightVelocity[0] = 4*userInputOutput.pressedR;
-				}
+				rightPressed = true;
 				break;
 			}
 			break;
 		case SDL_KEYUP:
 			switch (event.key.keysym.sym){
 			case SDLK_LEFT:
-				// reset pressedL for the next time
-				userInputOutput.pressedL = 0;
+				leftPressed = false;
 				break;
 			case SDLK_RIGHT:
-				// reset pressedR for the next time
-				userInputOutput.pressedR = 0;
+				rightPressed = false;
 				break;
 			case SDLK_SPACE:
 				userInputOutput.start = true;
@@ -266,8 +270,62 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			userInputOutput.mouseX = event.button.x;
 			userInputOutput.mouseY = event.button.y;
 			break;
-        }
-    }
+		}
+
+		// current v and angle:
+		if(leftPressed){
+			aal = a0;
+		} else {
+			avl =0;
+		}
+
+		if(rightPressed){
+			aar = -a0;
+		} else {
+			avr=0;
+		}		
+
+		timeBef = timeNow;
+		timeNow = std::chrono::high_resolution_clock::now();
+		dt = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow-timeBef).count();	
+
+		avl = avl + (aal*dt/1000);
+		avr = avr + (aar*dt/1000);
+		anl = anl + (avl*dt/1000);
+		anr = anr + (avr*dt/1000);
+
+
+		if(anl >= max_angle[0]){
+			anl = max_angle[0];
+			avl =0;
+		}
+		else if(anl <= min_angle[0]){
+			anl = min_angle[0];
+			avl =0;
+		}
+		if(anr <= M_PI-max_angle[0]){
+			anr = M_PI-max_angle[0];
+			avr =0;
+		}
+		else if(anr >= M_PI-min_angle[0]){
+			anr = M_PI-min_angle[0];
+			avr =0;
+		}
+
+		userInputOutput.leftAngle[0]=anl;
+		userInputOutput.rightAngle[0]=anr;
+		userInputOutput.leftVelocity[1]=avl;		
+		userInputOutput.rightVelocity[1]=avr;
+	}
+}
+
+// process input
+void UserInput::getInput(UserInputOutput &userInputOutput) {
+	// get timing information
+	auto now = high_resolution_clock::now();
+	nanoseconds delta = duration_cast<nanoseconds>(now-previous_time_point);
+	
+	getSDLInput(userInputOutput);
 
 #ifndef WITHOUT_KINECT_LIBRARIES
 	if (!kinectIsInitialized) {

@@ -4,7 +4,7 @@
 uniform sampler2D tex_vecs; // velocities texture
 uniform sampler2D tex_noise; // noise texture
 uniform sampler2D tex_waves; // density texture
-uniform float t;
+uniform uint t;
 
 layout(location = 0) out vec3 out_color;
 layout(location = 1) out float out_wave;
@@ -139,8 +139,8 @@ float lic(vec2 normalized_coords)
 
 void main()
 {
-    const float noise_scale = 2.5;
-	const float tscale = 8;
+    const float noise_scale = 2;
+	const float tscale = 0.1;
 
 	ivec2 vecs_res = textureSize(tex_vecs, 0);
 	ivec2 rend_res = textureSize(tex_noise, 0) * 2;
@@ -155,7 +155,9 @@ void main()
         density_val = min(density_val, 1);
 		out_color = vec3(0, 1, 0) * (1 - density_val) + 2 * vec3(1, 0, 0) * density_val;
 	}*/
-
+	
+	vec2 veloc = getVeloc(normalized_coords);
+	float velocity_val = lic(normalized_coords);
 	if (int(gl_FragCoord.x) <= 1)
 		out_wave = noise2D(vec2(noise_scale * normalized_coords.y, t * tscale));
 	else if (int(gl_FragCoord.x) >= rend_res.x - 2)
@@ -165,15 +167,13 @@ void main()
 	else if (int(gl_FragCoord.y) >= rend_res.y - 2)
 		out_wave = noise2D(vec2(noise_scale * (1 + normalized_coords.x), t * tscale));
 	else {
-		vec2 veloc = getVeloc(normalized_coords);
-		out_wave = texture(tex_waves, normalized_coords - 64 * veloc / (vecs_res + 1)).x;
-		float velocity_val = lic(normalized_coords);
-		velocity_val *= min(0.7 + 0.5 * out_wave, 1);
-		vec3 color = vec3(0.4, 0.5, 1);
-		float vec_mul = min(length(veloc) * 16, 1);
-		out_color = vec3(0.4, 0.5, 1);
-		out_color *= velocity_val * vec_mul + 0.7 - 0.7 * vec_mul;
-		return;
+		vec2 sample_coords = normalized_coords - 10 * veloc / vecs_res;
+		out_wave = texture(tex_waves, sample_coords).x;
+		velocity_val *= 1.0 + 0.4 * out_wave;
 	}
-	out_color = vec3(0);
+	float vec_mul = min(length(veloc) * 32, 1);
+	vec3 color = vec3(0.4, 0.5, 1);
+	vec3 color_calc = min(color * velocity_val, 1);
+	vec3 color_def = 0.5 * color;
+	out_color = color_calc * vec_mul + color_def * (1 - vec_mul);
 }

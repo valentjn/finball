@@ -1,8 +1,6 @@
 #ifndef USER_INPUT_HPP_
 #define USER_INPUT_HPP_
 
-#define PI 3.14159265
-
 #include <chrono>
 #include <string>
 
@@ -13,7 +11,7 @@
 // standard library includes
 #include <memory>
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 // forward declarations for kinect
 namespace xn {
 class Context;
@@ -33,11 +31,11 @@ public:
 		CHOOSING,
 		FAKE,
         KEYBOARD
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 		, KINECT
 #endif
 	};
-	
+
 private:
 	static const int MAX_USERS = 4;
 	static const int PLAYERS = 1;
@@ -50,7 +48,7 @@ private:
 
 	InputSource usedInputSource;
 
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
     std::unique_ptr<xn::Context> context;
     std::unique_ptr<xn::UserGenerator> userGenerator;
     std::unique_ptr<xn::DepthGenerator> depthGenerator;
@@ -85,7 +83,7 @@ private:
 	bool leftPressed = false;
 	bool rightPressed = false;
 
-	double aal =0; 
+	double aal =0;
 	double aar =0;// angular acceleration
 	double avl =0; // angular velocity
 	double avr =0;
@@ -93,7 +91,7 @@ private:
 	double anr =rightFinStartAngle;
 
 	static constexpr const double a0 = 3.141; // set positive angular acceleration constant
-	
+
 	void getSDLInput(UserInputOutput& userInputOutput, double delta);
 	void getFakeInput(UserInputOutput& userInputOutput, double delta);
 
@@ -105,7 +103,7 @@ private:
 		} else if(name == "KEYBOARD") {
 			return KEYBOARD;
 		}
-#ifndef WITHOUT_KINECT_LIBRARIES
+#ifdef KINECT_LIBS
 		else if(name == "KINECT") {
 			return KINECT;
 		}

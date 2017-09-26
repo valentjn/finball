@@ -12,18 +12,50 @@ COMMON_CFLAGS:= -pedantic \
 		       -I src \
 		       -I ext \
 		       -I/usr/local/include/opencv -I/usr/local/include
+
+ifdef kinect
 KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
+endif
+
+COMMON_CFLAGS:= -pedantic \
+		       -Wall \
+		       -Wextra \
+		       -fmessage-length=0 \
+		       -Wno-unused-parameter \
+		       -fmessage-length=0 \
+		       -std=gnu++14 \
+			   -fopenmp \
+		       `pkg-config sdl2 --cflags` \
+		       `pkg-config bullet --cflags` \
+		       -I src \
+		       -I ext \
+		       -I/usr/local/include/opencv -I/usr/local/include
+               $(KINECT_FLAGS)
+
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
+
+ifdef kinect
+KINECT_FLAGS:= -lOpenNI -lXnVNite_1_5_2 -D KINECT_LIBS
+endif
+OPENCV_FLAGS:= `pkg-config opencv --cflags --libs` -D OPENCV_LIBS
+
 LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
 		  -lSDL2_mixer \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs` \
-		  -L/usr/local/lib -lopencv_core -lopencv_imgcodecs
-KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2
+          $(KINECT_FLAGS) $(OPENCV_FLAGS)
+
+LDFLAGS:= -lSDL2_image \
+			-lSDL2_ttf \
+			-lSDL2_mixer \
+			-lGL \
+			`pkg-config sdl2 --libs` \
+			`pkg-config bullet --libs` \
+			 $(KINECT_FLAGS) $(OPENCV_FLAGS)
 
 .PHONY: test_all
 
@@ -45,27 +77,15 @@ install_icon:
 
 release:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
+	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
 
 optimal:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
+	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
 
 debug:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
-
-release-kinect:
-	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) $(KINECT_LDFLAGS)
-
-optimal-kinect:
-	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) $(KINECT_LDFLAGS)
-
-debug-kinect:
-	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_debug $(LDFLAGS) $(KINECT_LDFLAGS)
+	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
 run:
 	build/fa_2017_release ${args}

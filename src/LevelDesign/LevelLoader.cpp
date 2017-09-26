@@ -5,7 +5,7 @@
 #include "Visualization/Mesh.hpp"
 
 const int LevelLoader::FLIPPER_Y = 2;
-const int LevelLoader::FLIPPER_WIDTH = 4;
+const int LevelLoader::FLIPPER_WIDTH = 8;
 const int LevelLoader::FLIPPER_GAP = 2;
 
 void LevelLoader::createFlippers(Level &level) {
@@ -13,12 +13,12 @@ void LevelLoader::createFlippers(Level &level) {
     float rightX = level.width * 0.5f + FLIPPER_WIDTH + FLIPPER_GAP;
 
     auto rigidBodyLeft = make_unique<RigidBodyTriangle>(level.flipperLeftId, leftX, FLIPPER_Y,
-                                                        vec2(FLIPPER_WIDTH, 0),
+                                                        vec2(FLIPPER_WIDTH, -FLIPPER_Y),
                                                         vec2(0, -FLIPPER_Y),
                                                         0);
     auto rigidBodyRight = make_unique<RigidBodyTriangle>(level.flipperRightId, rightX, FLIPPER_Y,
                                                          vec2(0, -FLIPPER_Y),
-                                                         vec2(-FLIPPER_WIDTH, 0),
+                                                         vec2(-FLIPPER_WIDTH, -FLIPPER_Y),
                                                          0);
 
     level.setUniqueMesh(level.flipperLeftId, rigidBodyLeft->createColoredMesh(vec3(255, 255, 0)));

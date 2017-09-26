@@ -3,47 +3,53 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <thread>
 
-#include "GameLogic/GameLogic.hpp"
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
 #include "Highscores.hpp"
-#include "LatticeBoltzmann/LatticeBoltzmann.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Scenes/GameOverScene.hpp"
-#include "RigidBody/RigidBodyPhysics.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "Timer.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "SDL/SDLRenderer.hpp"
-#include "UserInput/UserInput.hpp"
 #include "UserInput/UserInputOutput.hpp"
-#include "Visualization/Renderer.hpp"
 #include "Visualization/RendererInput.hpp"
 #include "Timer.hpp"
 
 using namespace chrono;
 
 std::unique_ptr<Scene> SimulationScene::show() {
-	Renderer& renderer = *m_renderer;
-    GameLogic gameLogic(*m_level);
+    float score = simulation();
+
+    return std::make_unique<GameOverScene>(context, score);
+}
+
+float SimulationScene::simulation() {
+    // initialize renderer before level
+    Renderer renderer(*context.window);
+
+    LevelLoader levelLoader("data/" + levelName);
+    Level level;
+    levelLoader.load(level);
+    renderer.setCameraTransformFromLevel(level);
+
+    GameLogic gameLogic(level);
     UserInput userInput;
-    LatticeBoltzmann latticeBoltzmann(*m_level);
-    RigidBodyPhysics rigidBodyPhysics(*m_level);
+    LatticeBoltzmann latticeBoltzmann(level);
+    RigidBodyPhysics rigidBodyPhysics(level);
 
     UserInputOutput userInputOutput;
-    LatticeBoltzmannOutput latticeBoltzmannOutput(*m_level);
-    RigidBodyPhysicsOutput rigidBodyPhysicsOutput(*m_level);
+    LatticeBoltzmannOutput latticeBoltzmannOutput(level);
+    RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
     GameLogicOutput gameLogicOutput;
 
-    LatticeBoltzmannInput latticeBoltzmannInput(*m_level);
-    RigidBodyPhysicsInput rigidBodyPhysicsInput;
-    GameLogicInput gameLogicInput;
-    RendererInput rendererInput;
+	RendererInput rendererInput;
 
     steady_clock::time_point lastFrame = steady_clock::now();
 
@@ -52,14 +58,13 @@ std::unique_ptr<Scene> SimulationScene::show() {
         userInput.getInput(userInputOutput);
 
         // 2. do calculations (rigid body, LBM)
-        rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+        RigidBodyPhysicsInput rigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
         rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
-        latticeBoltzmannInput = LatticeBoltzmannInput(rigidBodyPhysicsOutput);
+        LatticeBoltzmannInput latticeBoltzmannInput(rigidBodyPhysicsOutput);
         latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
-        gameLogicInput =
-            GameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
+        GameLogicInput gameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
         gameLogic.update(gameLogicInput, gameLogicOutput);
 
         // 3. draw visualization
@@ -74,9 +79,19 @@ std::unique_ptr<Scene> SimulationScene::show() {
         }
     });
 
-    m_params.music->load("data/GameTheme.mp3");
+    Timer simulationTimer([&]() {
+        // TODO
+    });
 
-    timer.start(1000 / m_params.cmd_params->frameRate, gameLogicOutput.running);
+    context.music->play("data/GameTheme.mp3");
 
-    return std::make_unique<GameOverScene>(m_params, gameLogicOutput.highscore);
+    std::thread simulationThread([&]() {
+        simulationTimer.start(1000 / context.parameters->simulationRate, gameLogicOutput.running);
+    });
+
+    timer.start(1000 / context.parameters->frameRate, gameLogicOutput.running);
+
+    simulationThread.join();
+
+    return gameLogicOutput.score;
 }

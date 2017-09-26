@@ -8,12 +8,12 @@
 class GameLogicOutput {
 public:
     bool running;
-    float highscore;
+    float score;
     std::vector<RenderObject> objectsToRender;
     TexturedMesh* fluid_mesh;
 	const std::unordered_map<int, Mesh*>* rigid_body_meshes;
 
-    GameLogicOutput() : running(true), highscore(0) {}
+    GameLogicOutput() : running(true), score(0) {}
 };
 
 #endif

@@ -69,7 +69,11 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // TODO: dynamically set camera positon depending on level size
-Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f), m_ticks(0) {
+Renderer::Renderer(const SDLWindow &window)
+	: m_camera_pos(32.f, -16.f, 64.f)
+	, m_ticks(0)
+	, m_camera_look_at(32, 24, 0)
+{
     m_window = window.getWindow();
     m_resolution = glm::ivec2(window.getWidth(), window.getHeight());
 
@@ -210,9 +214,9 @@ void Renderer::update(const RendererInput &input) {
     input.fluid_mesh->setTexture(*m_tex_fluid_output);
 
     // update view matrix in shader_program_world
-    glm::mat4 view = glm::lookAt(m_camera_pos,                       // eye
-                                 glm::vec3{32, 24, 0}, // center
-                                 glm::vec3{0, 1, 0});                // up
+    glm::mat4 view = glm::lookAt(m_camera_pos,           // eye
+                                 m_camera_look_at,       // center
+                                 glm::vec3{0, 1, 0});    // up
     glUniformMatrix4fv(glGetUniformLocation(m_shader_program_world, "view"),
                        1,                     // matrix count
                        GL_FALSE,              // is not transposed
@@ -246,6 +250,16 @@ void Renderer::update(const RendererInput &input) {
     SDL_GL_SwapWindow(m_window);
 
 	m_inter_fb1 = !m_inter_fb1;
+}
+
+void Renderer::setCameraTransformFromLevel(Level &level) {
+    float fovBorder = 1.35f; // border around level in percent
+    float alpha = 0.24497866f; // angle at which the camera looks to the bottom of the board (in rad)
+    float beta = glm::pi<float>() * 0.25f / fovBorder; // fov in rad / borderFactor
+    float z = level.height / (tan(alpha + beta) - tan(alpha));
+    float y = z * tan(alpha);
+    m_camera_pos = glm::vec3{level.width * 0.5f, -y, z};
+    m_camera_look_at = glm::vec3{m_camera_pos.x, level.height * 0.375f, 0};
 }
 
 // renders an object to the screen (private method)

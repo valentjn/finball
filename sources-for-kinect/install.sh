@@ -14,7 +14,7 @@ sudo apt install git-core cmake freeglut3-dev pkg-config build-essential libxmu-
 # Extract the archives
 tar -xzvf OpenNI-Unstable-1.5.4.0.tar.gz
 tar -xzvf SensorKinect-0.93-5.1.2.1.tar.gz
-tar -xvjpf nite-bin-linux-x64-v1.5.2.21.tar.bz2
+cat nite-bin-linux-x64-v1.5.2.21.tar.bz2.part* | tar -xvjpf -
 
 # Install OpenNI
 cd OpenNI-Unstable-1.5.4.0/Platform/Linux/CreateRedist/

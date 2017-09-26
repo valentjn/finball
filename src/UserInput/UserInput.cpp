@@ -298,10 +298,12 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 			avr =0;
 		}
 
-		userInputOutput.leftAngle[0]=anl;
-		userInputOutput.rightAngle[0]=anr;
-		userInputOutput.leftVelocity[1]=avl;		
-		userInputOutput.rightVelocity[1]=avr;
+		if(usedInputSource == KEYBOARD) {
+			userInputOutput.leftAngle[0]=anl;
+			userInputOutput.rightAngle[0]=anr;
+			userInputOutput.leftVelocity[1]=avl;		
+			userInputOutput.rightVelocity[1]=avr;
+		}
 	}
 }
 
@@ -482,9 +484,9 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
 
 void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
 	static double t = 0;
-	t+=delta * M_PI;
+	t+=delta * FAKE_SPEED * M_PI;
 	if(t >= 2*M_PI) {
-		t -= M_PI;
+		t -= 2*M_PI;
 	}
 	double a = 0.5*(std::sin(t)+1);
 
@@ -508,6 +510,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 		break;
 #ifndef WITHOUT_KINECT_LIBRARIES
 	case KINECT:
+		getSDLInput(userInputOutput, delta);
 		getKinectInput(userInputOutput, delta);
 		break;
 #endif

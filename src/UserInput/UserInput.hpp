@@ -43,6 +43,7 @@ private:
 	static constexpr const double MIN_DIFFERENCE = 0.05;
     static constexpr const double MAX_DIFFERENCE = 0.2;
     static constexpr const double BIG_DIFFERENCE_EASING = 0.1;
+	static constexpr const double FAKE_SPEED = 0.001;
     bool leftDifferenceTooBig[PLAYERS];
     bool rightDifferenceTooBig[PLAYERS];
 

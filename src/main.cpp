@@ -7,6 +7,8 @@
 #include "Scenes/MainMenuScene.hpp"
 #include "Parameters.hpp"
 #include "SDL/SDLWindow.hpp"
+#include "SDL/SDLMusic.hpp"
+
 
 int main(int argc, char *argv[]) {
 
@@ -21,13 +23,19 @@ int main(int argc, char *argv[]) {
                      "Finball", parameters.fullscreen);
     window.setIcon("data/haicon.png");
 
+    SDLMusic music;
+
     Highscores highscores("haiscores.txt");
+
+    music.load("data/MainTheme.mp3");
 
     // show main menu and obtain level from it
     {
         MainMenuScene menu(window, highscores);
         menu.show();
     }
+
+    music.load("data/GameTheme.mp3");
 
     LevelLoader loader("data/" + parameters.level + ".txt");
     Level level;

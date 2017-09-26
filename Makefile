@@ -16,6 +16,7 @@ RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
 LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
+		  -lSDL2_mixer \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs`

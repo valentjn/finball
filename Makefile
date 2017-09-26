@@ -22,7 +22,7 @@ COMMON_CFLAGS:= -pedantic \
 		       `pkg-config bullet --cflags` \
 		       -I src \
 		       -I ext \
-		       $(KINECT_FLAGS) $(OPENCV_CFLAGS)
+		       $(KINECT_CFLAGS) $(OPENCV_CFLAGS)
 
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)

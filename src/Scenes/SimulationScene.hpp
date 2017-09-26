@@ -26,8 +26,9 @@ private:
     float simulation();
 
 public:
-    SimulationScene(Scene::Context context, string levelName) :
-            Scene(context), levelName(levelName) {}
+    SimulationScene(Scene::Context context, string levelName)
+		: Scene(context), levelName(levelName)
+	{}
 
     std::unique_ptr<Scene> show();
 }; 

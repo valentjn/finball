@@ -173,7 +173,7 @@ public:
         int id = bt_rigid_body->getUserIndex();
         Transform *rigid_body = rigid_bodies[id].get();
         if (bt_rigid_body && bt_rigid_body->getMotionState() && rigid_body->id == Level::BALL_ID) {
-            bt_rigid_body->applyCentralImpulse(btVector3(impulses[1].x, impulses[1].y, 0.0f));
+            bt_rigid_body->applyCentralImpulse(DISTANCE_GRID_CELLS*btVector3(impulses[1].x, impulses[1].y, 0.0f));
         }
     }
 

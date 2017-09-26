@@ -40,7 +40,7 @@ public:
 						nbhY = y + cy[i];
 						impulse.x = (-1.0f*cx[i])*(afterStream->value(nbhX,nbhY)[invI[i]]+preStream->value(nbhX,nbhY)[invI[i]]); // Needs inverse direction
 						impulse.y = (-1.0f*cy[i])*(afterStream->value(nbhX,nbhY)[invI[i]]+preStream->value(nbhX,nbhY)[invI[i]]); // Needs inverse direction
-						impulses[grid_ball.value(x,y)] += (grid_ball.value(x+cx[i],y+cy[i]) == Level::CellType::FLUID? 1.0f:0.0f)*impulse/4.0f; // If nbhr is fluid accumulate impulse
+						impulses[grid_ball.value(x,y)] += (grid_ball.value(x+cx[i],y+cy[i]) == Level::CellType::FLUID? 1.0f:0.0f)*impulse; // If nbhr is fluid accumulate impulse
 					}
 				}
 			}

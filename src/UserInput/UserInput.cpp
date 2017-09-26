@@ -156,7 +156,7 @@ UserInput::UserInput(InputSource mUsedInputSource){
 
 #ifndef WITHOUT_KINECT_LIBRARIES
 	kinectIsInitialized = false;
-	nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
+	nUsers = 0; nPlayers = 0; trackedUsers = 0;
 
 	for(int k = 0; k < PLAYERS; k++){
 		playerJoined[k] = false;
@@ -312,7 +312,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 #ifndef WITHOUT_KINECT_LIBRARIES
 void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
 	
-		if (!kinectIsInitialized) {
+	if (!kinectIsInitialized) {
 		if(tryInitializingKinect) {
 			// try again to initialize the kinect
 			finalizeKinect();

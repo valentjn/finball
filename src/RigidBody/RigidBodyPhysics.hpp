@@ -84,7 +84,7 @@ public:
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
     {
-        dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
+        dynamics_world->setGravity(btVector3(0.f, -10.f, 0.f));
 
         grid_static_objects_flow = level.matrix;
 
@@ -95,12 +95,36 @@ public:
 		addBoundaryRigidBodies();
     }
 
+    btHingeConstraint *hingeC;
+
     void addRigidBody(const unique_ptr<RigidBody> &level_body){
         btRigidBody* bt_rigid_body = createBtRigidBody(level_body);
 
         // Constrain to two dimensions
         bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
         bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
+
+        // if (level_body->id == level.flipperLeftId) {
+        //     bt_rigid_body->setCollisionFlags( bt_rigid_body->getCollisionFlags() |
+        //     btCollisionObject::CF_KINEMATIC_OBJECT);
+        //     bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
+        // }
+
+        if (level_body->id == level.flipperLeftId || level_body->id == level.flipperRightId) {
+            bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
+            //printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
+            // btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
+            // btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body, localPivot);
+            // TODO: LEAK
+            hingeC = new btHingeConstraint(*bt_rigid_body, btVector3(0, 0, 0), btVector3(0, 0, 1), true);
+            hingeC->setMotorTarget(2., 1.);
+            hingeC->enableMotor(true);
+            dynamics_world->addConstraint(hingeC, true);
+            // hingeC->enableAngularMotor(true, fDesiredAngularVel, m_fMuscleStrength);
+            // bt_rigid_body->setAngularVelocity(btVector3(0,0,3));
+            //very weak constraint for picking
+            // p2p->m_setting.m_tau = 0.001f; // TODO: ???
+        }
 
         auto rigid_body =
                 std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
@@ -194,7 +218,12 @@ public:
         transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
                                       level_body->position.y * DISTANCE_GRID_CELLS, 0.f));
         btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
-        btScalar mass = level_body->mass;
+        btScalar mass;
+        if (level_body->id == level.flipperLeftId || level_body->id == level.flipperRightId) {
+            mass = 1.0;
+        } else {
+            mass = level_body->mass;
+        }
         btVector3 inertia;
         collision_shape->calculateLocalInertia(mass, inertia);
 
@@ -295,6 +324,10 @@ public:
                 output_transform->rotation = quaternion.getAngle();
             }
 
+            if (bt_rigid_body->getUserIndex() == level.flipperLeftId) {
+                printf("%f\n", output_transform->rotation);
+            }
+
             output.rigid_bodies.push_back(output_transform);
 
             if (id == Level::BALL_ID) {
@@ -340,11 +373,50 @@ public:
         }
 
         // TODO: mesh tohether the individual flag fields
+        static float currentLeftAngle = -1.5;
+        static float currentRightAngle = -1.5;
         markRBAsObstacles(grid_obj);
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
             auto &obj = dynamics_world->getCollisionObjectArray()[j];
             btRigidBody *rigid_body = btRigidBody::upcast(obj);
             if (rigid_body && (obj->getUserIndex() == level.flipperLeftId || obj->getUserIndex() == level.flipperRightId)) {
+                                        // // printf("%f\n", input.angleFlipperLeft);
+                                        // btTransform transform = rigid_body->getCenterOfMassTransform();
+                                        // // btQuaternion quaternion = transform.getRotation();
+                                        // printf("--\n");
+                                        // printf("%f\n", input.angleFlipperLeft);
+                                        // // printf("%f\n", quaternion.getAngle());
+                                        // float angle;
+                                        // if (obj->getUserIndex() == level.flipperLeftId) {
+                                        //     // angle = input.angleFlipperLeft;
+                                        //     if (currentLeftAngle > input.angleFlipperLeft) {
+                                        //         // angle = input.angleFlipperLeft;
+                                        //         currentLeftAngle += 0.05;
+                                        //     } else {
+                                        //         currentLeftAngle -= 0.05;
+                                        //     }
+                                        //     angle = currentLeftAngle;
+                                        // } else {
+                                        //     if (currentRightAngle > input.angleFlipperRight) {
+                                        //         // angle = input.angleFlipperRight;
+                                        //         currentRightAngle += 0.05;
+                                        //     } else {
+                                        //         currentRightAngle -= 0.05;
+                                        //     }
+                                        //     angle = currentRightAngle;
+                                        // }
+                                        // btQuaternion quaternion;
+                                        // if (input.angleFlipperLeft < 0.) {
+                                        //     quaternion = btQuaternion(btVector3(0., 0., 1.), angle + 2. * M_PI);
+                                        // } else {
+                                        //     quaternion = btQuaternion(btVector3(0., 0., 1.), angle);
+                                        // }
+                                        // printf("%f\n", quaternion.getAngle());
+                                        // printf("--\n");
+                                        // transform.setRotation(quaternion);
+                                        // btMotionState* motion_state = rigid_body->getMotionState();
+                                        // motion_state->setWorldTransform(transform);
+                // rigid_body->proceedToTransform(transform);
                 grid_finFlag(grid_obj, grid_vel, rigid_body);
             } else {
                 std::runtime_error("Fin is not a btRigidBody!");
@@ -359,9 +431,6 @@ public:
         // }
         // printf("-----------\n");
 
-        // TODO: determine which cells are occupied by obj
-        // grid_obj.value(1, 3) = Level::CellType::FLUID;
-        // grid_vel.value(1, 3) = glm::vec2{1.0, 0.5};
     }
 
     void setGravity(bool on) {

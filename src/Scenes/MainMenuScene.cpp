@@ -29,18 +29,18 @@ std::unique_ptr<Scene> MainMenuScene::show() {
 
     // listen();
 
-    UserInput userInput;
+    auto userInput = std::make_unique<UserInput>();
     UserInputOutput userInputOutput;
 
     while (true) {
-        userInput.getInput(userInputOutput);
+        userInput->getInput(userInputOutput);
 
         if (userInputOutput.start) {
             break;
         }
     }
 
-    return std::make_unique<SimulationScene>(window, music, userInput, level, highscores, frameRate);
+    return std::make_unique<SimulationScene>(window, music, std::move(userInput), level, highscores, frameRate);
 }
 
 std::string MainMenuScene::getHighscoreText() {

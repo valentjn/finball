@@ -48,7 +48,7 @@ std::unique_ptr<Scene> SimulationScene::show() {
 
     Timer timer([&]() {
         // 1. get user input (kinect)
-        userInput.getInput(userInputOutput);
+        userInput->getInput(userInputOutput);
 
         // 2. do calculations (rigid body, LBM)
         rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);

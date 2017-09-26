@@ -25,16 +25,19 @@ int main(int argc, char *argv[]) {
     window.setIcon("data/haicon.png");
 
     SDLMusic music;
+
+    // load highscores
     Highscores highscores("haiscores.txt");
 
-    // show main menu and obtain level from it
+    Scene::Context sceneContext {
+        &window,
+        &music,
+        &highscores,
+        &parameters
+    };
 
-	Scene::Params scene_params;
-	scene_params.window = &window;
-	scene_params.music = &music;
-	scene_params.highscores = &highscores;
-	scene_params.cmd_params = &parameters;
+    SceneManager sceneManager(std::make_unique<MainMenuScene>(sceneContext));
+    sceneManager.run();
 
-    SceneManager(std::make_unique<MainMenuScene>(scene_params)).run();
     return 0;
 }

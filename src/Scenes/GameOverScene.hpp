@@ -13,12 +13,13 @@ private:
     float score;
 
 public:
-	GameOverScene(Scene::Params scene_params, float score) : Scene(scene_params), score(score) {}
-    
+	GameOverScene(Scene::Context context, float score) : Scene(context), score(score) {}
+
 	std::unique_ptr<Scene> show();
 
 private:
-    void listen(MenuRenderer &menuRenderer);
+    void render();
+    void listen(MenuRenderer &menuRenderer, bool newHighscore);
 };
 
 #endif

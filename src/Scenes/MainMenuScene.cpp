@@ -15,40 +15,26 @@
 #include "LevelDesign/LevelLoader.hpp"
 #include "LevelDesign/Level.hpp"
 
-std::unique_ptr<Scene> MainMenuScene::show() {
-	{
-		MenuRenderer menuRenderer(*m_params.window);
-		menuRenderer.addBackgroundImage("data/background.jpg");
-		menuRenderer.addTitle("FinBall");
-		menuRenderer.addActionText("To start the game please do a HAI-five or press SPACE!");
-		menuRenderer.addLeftText(getHighscoreText());
-		menuRenderer.render();
-		m_params.music->load("data/MainTheme.mp3");
+using namespace std;
 
-		listen();
-	}
+unique_ptr<Scene> MainMenuScene::show() {
+    render();
 
-	// initialize renderer
-	auto renderer = std::make_unique<Renderer>(*m_params.window);
-
-	// load level
-	LevelLoader loader("data/" + m_params.cmd_params->level + ".txt");
-	auto level = std::make_unique<Level>();
-	loader.load(*level);
-
-	// switch to simulation scene
-    return std::make_unique<SimulationScene>(m_params, std::move(renderer), std::move(level));
+    // switch to simulation scene
+    return std::make_unique<SimulationScene>(context, context.parameters->level);
 }
 
-std::string MainMenuScene::getHighscoreText() {
-    std::stringstream stream;
-    int counter = 1;
+void MainMenuScene::render() {
+    MenuRenderer menuRenderer(*context.window);
+    menuRenderer.addBackgroundImage("data/background.jpg");
+    menuRenderer.addTitle("FinBall");
+    menuRenderer.addActionText("To start the game please do a HAIfive or press SPACE!");
+    menuRenderer.addLeftText(getHighscoreText());
+    menuRenderer.render();
 
-    stream << std::fixed << std::setprecision(2);
-    for (const auto &highscore : m_params.highscores->getHighscores()) {
-        stream << "(" << counter++ << ") " << highscore.name << " " << highscore.score << "\n";
-    }
-    return stream.str();
+    context.music->play("data/MainTheme.mp3");
+
+    listen();
 }
 
 void MainMenuScene::listen() {
@@ -67,4 +53,16 @@ void MainMenuScene::listen() {
     });
 
     events.listen();
+}
+
+std::string MainMenuScene::getHighscoreText() {
+    std::stringstream stream;
+    int counter = 1;
+
+    stream << std::fixed << std::setprecision(2);
+    for (const auto &highscore : context.highscores->getHighscores()) {
+        stream << "(" << counter++ << ") " << highscore.name << " " << highscore.score << "\n";
+    }
+
+    return stream.str();
 }

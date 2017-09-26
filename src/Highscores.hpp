@@ -43,6 +43,19 @@ public:
         return highscores;
     }
 
+    bool checkNewHighscore(float score) {
+    	size_t i = 0;
+    	for(; i < HIGHSCORE_CUTOFF && i < highscores.size(); i++){
+    		if (score > highscores[i].score){
+    			return true;
+    		}
+    	}
+    	if(i < HIGHSCORE_CUTOFF){
+    		return true;
+    	}
+    	return false;
+    }
+
 private:
     void loadHighscores() {
         fstream file;

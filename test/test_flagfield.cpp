@@ -175,8 +175,11 @@ TEST(RigidBodyTest, stop64) {
   int idx = Level::BALL_ID;
 
   Level level("data/testLevel.txt");
-  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/4, level.height*0.9));
+  for (const auto &rb : level.rigidBodies) {
+    if (rb->id == Level::BALL_ID) {
+      rb->position = {level.width/4, level.height*0.9};
+    }
+  }
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;

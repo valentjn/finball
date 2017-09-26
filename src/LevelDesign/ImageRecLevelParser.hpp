@@ -6,7 +6,11 @@
 #include <glm/vec3.hpp>
 #include <iostream>
 #include <memory>
+
+#ifdef OPENCV_LIBS
 #include <opencv2/opencv.hpp>
+#endif
+
 #include <string>
 #include <vector>
 
@@ -14,20 +18,28 @@
 #include "Array2D.hpp"
 
 using namespace std;
+
+#ifdef OPENCV_LIBS
 using namespace cv;
+#endif
 
 class ImageRecLevelParser {
 private:
     string filePath;
+#ifdef OPENCV_LIBS
     const Vec3b COLOR_OBSTACLE = Vec3b(0, 0, 0);  // BLACK
     const Vec3b COLOR_INFLOW = Vec3b(255, 0, 0);  // BLUE
     const Vec3b COLOR_OUTFLOW = Vec3b(0, 0, 255); // RED
     const Vec3b COLOR_BALL = Vec3b(0, 255, 0); // GREEN
+#endif
 
 public:
     ImageRecLevelParser(string filePath) : filePath(filePath) {}
 
     bool parse(Level &level) {
+#ifndef OPENCV_LIBS
+        return false;
+#else
         Mat levelImg = imread(filePath);
         if (!levelImg.data) {
             return false;
@@ -117,6 +129,7 @@ private:
             return Level::OUTFLOW;
         }
         return Level::FLUID;
+#endif
     }
 };
 

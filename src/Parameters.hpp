@@ -16,10 +16,11 @@ public:
     int windowHeight = 600;
     int frameRate = 30;
     string level = "testLevel.txt";
+    string userInputSource = "AUTO";
 
     Parameters(int argc, char *const argv[]) {
         int optchar;
-        const char *options = "v:fw:h:r:l:";
+        const char *options = "v:fw:h:r:l:i:";
 
         while ((optchar = getopt(argc, argv, options)) > 0) {
             switch (optchar) {
@@ -47,6 +48,10 @@ public:
                 level = optarg;
                 break;
 
+            case 'i':
+                userInputSource = optarg;
+                break;
+
             default:
                 printHelp(argv);
                 break;
@@ -65,6 +70,12 @@ public:
         cout << "	-h [height]     Screen width (default: 600)" << endl;
         cout << "	-r [frameRate]  Max. frame rate (default: 30)" << endl;
         cout << "	-l [name]       Name of the level (default: testLevel)" << endl;
+        cout << "	-i [source]     input source, one of:" << endl;
+        cout << "	                AUTO, CHOOSING, KEYBOARD";
+#ifndef WITHOUT_KINECT_LIBRARIES
+        cout << ", KINECT";
+#endif
+        cout << endl;
         exit(EXIT_FAILURE);
     }
 };

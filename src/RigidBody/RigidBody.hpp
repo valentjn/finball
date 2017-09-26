@@ -33,7 +33,7 @@ struct RigidBodyRect : public RigidBody {
     unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 0)) {
         vec2 sizeHalf(width / 2, height / 2);
         return make_unique<ColoredMesh>(
-            Mesh::createRectangle(position - sizeHalf, position - sizeHalf),
+            Mesh::createRectangle(position - sizeHalf, position + sizeHalf),
             color
         );
     }

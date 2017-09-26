@@ -35,13 +35,14 @@ public:
     Level() {}
 
     void setUniqueMesh(int id, unique_ptr<Mesh> mesh) {
+		meshes[id] = mesh.get();
         unique_meshes.push_back(move(mesh));
-        meshes[id] = mesh.get();
     }
 
     Mesh *addUniqueMesh(unique_ptr<Mesh> mesh) {
+		auto ret = mesh.get();
         unique_meshes.push_back(move(mesh));
-        return mesh.get();
+        return ret;
     }
 };
 

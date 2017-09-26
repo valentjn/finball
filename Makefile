@@ -1,17 +1,18 @@
 CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
-COMMON_CFLAGS= -pedantic \
+COMMON_CFLAGS:= -pedantic \
 		       -Wall \
 		       -Wextra \
 		       -fmessage-length=0 \
 		       -Wno-unused-parameter \
 		       -fmessage-length=0 \
-		       -std=c++14 \
+		       -std=gnu++14 \
 			   -fopenmp \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       `pkg-config opencv --cflags` \
 		       -I src \
 		       -I ext
+KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
@@ -22,6 +23,7 @@ LDFLAGS:= -lSDL2_image \
 		  `pkg-config sdl2 --libs` \
 		  `pkg-config bullet --libs` \
 		  `pkg-config opencv --libs`
+KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2
 
 .PHONY: test_all
 
@@ -43,15 +45,27 @@ install_icon:
 
 release:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
 
 optimal:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
 
 debug:
 	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
+	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
+
+release-kinect:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) $(KINECT_LDFLAGS)
+
+optimal-kinect:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_release $(LDFLAGS) $(KINECT_LDFLAGS)
+
+debug-kinect:
+	mkdir -p ./build
+	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) $(KINECT_CFLAGS) -o build/fa_2017_debug $(LDFLAGS) $(KINECT_LDFLAGS)
 
 run:
 	build/fa_2017_release ${args}
@@ -73,12 +87,18 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
+	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
+	build/test
+test_all-kinect: test_deps
+	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) $(KINECT_CFLAGS) -o build/test $(LDFLAGS) $(KINECT_LDFLAGS)
 	build/test
 
 test_test: test_deps
 	$(CXX) test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
 	build/test_test
+
+make_level:
+	python3 ./LevelCreator/LevelCreator.py
 
 
 GTEST_DIR = ext/googletest/googletest/

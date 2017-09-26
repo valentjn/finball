@@ -23,6 +23,9 @@ void LevelLoader::createFlippers(Level &level) {
 
     level.setUniqueMesh(level.flipperLeftId, rigidBodyLeft->createColoredMesh(vec3(255, 255, 0)));
     level.setUniqueMesh(level.flipperRightId, rigidBodyRight->createColoredMesh(vec3(255, 255, 0)));
+
+    level.rigidBodies.push_back(std::move(rigidBodyLeft));
+    level.rigidBodies.push_back(std::move(rigidBodyRight));
 }
 
 void LevelLoader::debugPrint(Level &level) {

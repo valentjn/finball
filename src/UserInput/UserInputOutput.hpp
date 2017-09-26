@@ -11,8 +11,6 @@ struct UserInputOutput {
 
     bool playerIsTracked[2];
 
-	double pressedL = 0; // increasing with duration of left / right arrow pressed
-	double pressedR = 0;
 	double maxAngle = 1.571;
 	double stepSize = maxAngle/20; // increase of angle with every keydown event
 	bool fakedata = false;

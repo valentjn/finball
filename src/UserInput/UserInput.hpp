@@ -4,6 +4,7 @@
 #define PI 3.14159265
 
 #include <chrono>
+#include <string>
 
 #include <SDL2/SDL.h>
 
@@ -96,8 +97,25 @@ private:
 	void getSDLInput(UserInputOutput& userInputOutput, double delta);
 	void getFakeInput(UserInputOutput& userInputOutput, double delta);
 
+	InputSource getInputSourceFromName(std::string name) {
+		if(name == "CHOOSING" || name == "AUTO") {
+			return CHOOSING;
+		} else if(name == "FAKE") {
+			return FAKE;
+		} else if(name == "KEYBOARD") {
+			return KEYBOARD;
+		}
+#ifndef WITHOUT_KINECT_LIBRARIES
+		else if(name == "KINECT") {
+			return KINECT;
+		}
+#endif
+	}
+
 public:
 	UserInput(InputSource mUsedInputSource = CHOOSING);
+	UserInput(std::string mUsedInputSource)
+		: UserInput(getInputSourceFromName(mUsedInputSource)) {}
 	~UserInput();
     void getInput(UserInputOutput &userInputOutput);
 

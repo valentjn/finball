@@ -72,9 +72,9 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 
                                             fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
                                                          fi_New.value(x, y)[z];//-2/(c*c)*density*w[z]*(input.velocities.value(x,y)[0]*cx[z]+input.velocities.value(x,y)[1]*cy[z]);
-                                            if (input.velocities.value(x,y)[0] != 0 || input.velocities.value(x,y)[1] !=0){
+                                            /*if (input.velocities.value(x,y)[0] != 0 || input.velocities.value(x,y)[1] !=0){
                                                 std::cout << x + cx[opp[z]] << " " << y + cy[opp[z]] << " " << fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]]<< std::endl;
-                                            }
+                                            }*/
                                             fi_New.value(x, y)[z] = 0.0;
                                             }
 					}
@@ -160,7 +160,16 @@ void LatticeBoltzmann::reinitilizeFI(LatticeBoltzmannOutput &output)
 float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int x, int y) {
 	// this happens when a rigid body moves and an empty cell remains.
 	//TODO: reinitialize density and everything else to something proper!
-	float rho = 1.;
+        float rho = 0.;
+        for (int i = 1; i < 9; ++i){
+            for(int j = 0; j < 9; ++j){
+                rho+=fi_Old.value(x+cx[i],y+cy[i])[j];
+            }
+        }
+        rho /= 8.;
+        for(int j = 0; j < 9 ; ++j){
+            fi_Old.value(x,y)[j] = rho*w[j];
+        }
 	return rho;
 }
 

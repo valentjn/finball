@@ -41,7 +41,7 @@ std::unique_ptr<Scene> MainMenuScene::show() {
     auto user_input = std::make_unique<UserInput>();
     UserInputOutput userInputOutput;
     while (true) {
-        userInput->getInput(userInputOutput);
+        user_input->getInput(userInputOutput);
         if (userInputOutput.start)
 			break;
     }
@@ -51,7 +51,7 @@ std::unique_ptr<Scene> MainMenuScene::show() {
 		m_params,
 		std::move(renderer),
 		std::move(level),
-		std::move(user_input);
+		std::move(user_input));
 }
 
 std::string MainMenuScene::getHighscoreText() {

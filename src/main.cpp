@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     Highscores highscores("haiscores.txt");
 
-    LevelLoader loader("data/" + parameters.level + ".txt");
+    LevelLoader loader("data/" + parameters.level);
     Level level;
     loader.load(level);
 

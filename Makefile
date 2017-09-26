@@ -9,6 +9,7 @@ COMMON_CFLAGS= -pedantic \
 			   -fopenmp \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
+		       `pkg-config opencv --cflags` \
 		       -I src \
 		       -I ext
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
@@ -19,7 +20,8 @@ LDFLAGS:= -lSDL2_image \
 		  -lSDL2_mixer \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs`
+		  `pkg-config bullet --libs` \
+		  `pkg-config opencv --libs`
 
 .PHONY: test_all
 

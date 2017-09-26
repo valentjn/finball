@@ -15,7 +15,7 @@ public:
     int windowWidth = 800;
     int windowHeight = 600;
     int frameRate = 30;
-    string level = "testLevel";
+    string level = "testLevel.txt";
 
     Parameters(int argc, char *const argv[]) {
         int optchar;

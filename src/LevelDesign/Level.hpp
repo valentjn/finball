@@ -35,11 +35,8 @@ public:
     Level() {}
 
     void setUniqueMesh(int id, unique_ptr<Mesh> mesh) {
-        Log::debug("starting setUn");
         unique_meshes.push_back(move(mesh));
-        Log::debug("pushed to unique m");
         meshes[id] = mesh.get();
-        Log::debug("done");
     }
 
     Mesh *addUniqueMesh(unique_ptr<Mesh> mesh) {

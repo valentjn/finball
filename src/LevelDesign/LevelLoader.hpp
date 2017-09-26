@@ -3,10 +3,12 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include "LevelDesign/ASCIIArtLevelParser.hpp"
+#include "LevelDesign/ImageRecLevelParser.hpp"
 #include "LevelDesign/Level.hpp"
 
 using namespace std;
@@ -16,13 +18,17 @@ public:
     static const int FLIPPER_Y, FLIPPER_WIDTH, FLIPPER_GAP;
 
 private:
-    ASCIIArtLevelParser levelParser;
+    ASCIIArtLevelParser asciiParser;
+    ImageRecLevelParser imageParser;
 
 public:
-    LevelLoader(string filePath) : levelParser(filePath) {}
+    LevelLoader(string filePath) : asciiParser(filePath), imageParser(filePath) {}
 
     void load(Level &level) {
-        levelParser.parse(level);
+        if (!imageParser.parse(level) && !asciiParser.parse(level)) {
+            Log::error("Could not load level!");
+            throw runtime_error("Could not load level");
+        }
         createFlippers(level);
         debugPrint(level);
     }

@@ -10,7 +10,8 @@ COMMON_CFLAGS= -pedantic \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src \
-		       -I ext
+		       -I ext \
+		       -I/usr/local/include/opencv -I/usr/local/include
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
@@ -18,7 +19,8 @@ LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs`
+		  `pkg-config bullet --libs` \
+		  -L/usr/local/lib -lopencv_core -lopencv_imgcodecs
 
 .PHONY: test_all
 

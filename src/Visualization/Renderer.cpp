@@ -159,8 +159,8 @@ Renderer::~Renderer() {
 }
 
 void Renderer::update(const RendererInput &input) {
-    // clear the framebuffer to dark red
-    glClearColor(0.4f, 0.f, 0.f, 1.f);
+    // clear the framebuffer to black
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // setup for the rendering of the fluid

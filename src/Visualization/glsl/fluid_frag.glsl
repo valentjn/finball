@@ -145,7 +145,7 @@ void main()
 	ivec2 vecs_res = textureSize(tex_vecs, 0);
 	ivec2 rend_res = textureSize(tex_noise, 0) * 2;
     vec2 normalized_coords = gl_FragCoord.xy / rend_res;
-    normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
+    //normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
 
     /* float density_val = 2 * texture(tex_vecs, normalized_coords).z;
     if (density_val < 1)
@@ -166,7 +166,7 @@ void main()
 		out_wave = noise2D(vec2(noise_scale * (1 + normalized_coords.x), t * tscale));
 	else {
 		vec2 veloc = getVeloc(normalized_coords);
-		out_wave = texture(tex_waves, normalized_coords - 42 * veloc / (vecs_res + 1)).x;
+		out_wave = texture(tex_waves, normalized_coords - 64 * veloc / (vecs_res + 1)).x;
 		float velocity_val = lic(normalized_coords);
 		velocity_val *= min(0.7 + 0.5 * out_wave, 1);
 		vec3 color = vec3(0.4, 0.5, 1);

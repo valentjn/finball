@@ -85,7 +85,7 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
+	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
 	build/test
 
 test_test: test_deps

@@ -13,85 +13,116 @@ public:
 
         SDL_Event event;
 
+		bool leftPressed = false;
+	  	bool rightPressed = false;
+
+		double aal =0; 
+		double aar =0;// angular acceleration
+		double avl =0; // angular velocity
+		double avr =0;
+		double anl =UserInputOutput.leftFinStartAngle; // angle
+		double anr =UserInputOutput.rightFinStartAngle;
+
+	    long dt =0;
+		UserInputOutput.timeBef =std::chrono::high_resolution_clock::now();
+		UserInputOutput.timeNow =std::chrono::high_resolution_clock::now();
+
         while (SDL_PollEvent(&event)) {
+
+		aal = -UserInputOutput.a0;
+		aar = UserInputOutput.a0;
+		if(!leftPressed && !rightPressed){
+		UserInputOutput.timeBef = UserInputOutput.timeNow;
+		UserInputOutput.timeNow = std::chrono::high_resolution_clock::now();	
+		}
+
             switch (event.type) {
+			
             case SDL_QUIT:
-                userInputOutput.quit = true;
+                quit = true;
                 break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym){
 				case SDLK_LEFT:
-					// 1 keypress is pi/40, velocity starts at pi/10
-					userInputOutput.pressedL = userInputOutput.pressedL - stepSize;
-					if (userInputOutput.pressedL >= -maxAngle) {
-						userInputOutput.leftAngle[0] = userInputOutput.pressedL;
-						userInputOutput.leftVelocity[0] = 4*userInputOutput.pressedL;
-						}
+					leftPressed = true;
 					break;
 				case SDLK_RIGHT:
-					// 1 keypress is pi/40, velocity starts at pi/10
-					userInputOutput.pressedR = userInputOutput.pressedR + stepSize;
-					if (userInputOutput.pressedR <= maxAngle) {
-						userInputOutput.rightAngle[0] = userInputOutput.pressedR-3.141;
-						userInputOutput.rightVelocity[0] = 4*userInputOutput.pressedR;
-						}
+					rightPressed = true;
 					break;
 				}
 				break;
 			case SDL_KEYUP:
 				switch (event.key.keysym.sym){
 				case SDLK_LEFT:
-				// reset pressedL for the next time
-					userInputOutput.pressedL = 0;
+					leftPressed = false;
 					break;
 				case SDLK_RIGHT:
-				// reset pressedR for the next time
-					userInputOutput.pressedR = 0;
+					rightPressed = false;
 					break;
 				}
 				break;
 			case SDL_MOUSEMOTION:
-				userInputOutput.mouseX = event.motion.x;
-				userInputOutput.mouseY = event.motion.y;
+				UserInputOutput.mouseX = event.motion.x;
+				UserInputOutput.mouseY = event.motion.y;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				userInputOutput.mouseX = event.button.x;
-				userInputOutput.mouseY = event.button.y;
+				UserInputOutput.mouseX = event.button.x;
+				UserInputOutput.mouseY = event.button.y;
 				break;
 			case SDL_MOUSEBUTTONUP:
-				userInputOutput.mouseX = event.button.x;
-				userInputOutput.mouseY = event.button.y;
+				UserInputOutput.mouseX = event.button.x;
+				UserInputOutput.mouseY = event.button.y;
 				break;
             }
-        }
 
-		if(userInputOutput.fakedata){
-
-        auto time_p = std::chrono::high_resolution_clock::now();
-        long t = std::chrono::duration_cast<std::chrono::milliseconds>(time_p.time_since_epoch()).count();
-        long steps = 1000;
-
-        // generate fake data
-        userInputOutput.leftAngle[0] = (t%steps)*6.282/steps;
-        userInputOutput.rightAngle[0] = -(t%steps)*6.282/steps+3.141;
-        userInputOutput.leftAngle[1] = (t%steps)*6.282/steps;
-        userInputOutput.rightAngle[1] = -(t%steps)*6.282/steps-3.141;
-        userInputOutput.leftVelocity[0] = -6.282/(steps/1000.0);
-        userInputOutput.rightVelocity[0] = +6.282/(steps/1000.0);
-        userInputOutput.leftVelocity[1] = 6.282/(steps/1000.0);
-        userInputOutput.rightVelocity[1] = -6.282/(steps/1000.0);
-        userInputOutput.playerIsTracked[0] = true;
-        userInputOutput.playerIsTracked[1] = true;
-        userInputOutput.playerIsCalibrated[0] = true;
-        userInputOutput.playerIsCalibrated[1] = true;
-        userInputOutput.playerIsCalibrating[0] = false;
-        userInputOutput.playerIsCalibrating[1] = false;
-
+		// current v and angle:
+		if(leftPressed){
+		aal = UserInputOutput.a0;}
+		else if (!leftPressed){
+		avl =0;
 		}
 
-        userInputOutput.start = true;
+		if(rightPressed){
+		aar = -UserInputOutput.a0;}	
+		else if(!rightPressed){
+		avr=0;
+		}		
 
-    }
+		UserInputOutput.timeBef = UserInputOutput.timeNow;
+		UserInputOutput.timeNow = std::chrono::high_resolution_clock::now();
+		dt = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow-timeBef).count();	
+
+		avl = avl + (aal*dt/1000);
+		avr = avr + (aar*dt/1000);
+		anl = anl + (avl*dt/1000);
+		anr = anr + (avr*dt/1000);
+
+
+		if(anl >= UserInputOutput.maxAngle){
+		anl = UserInputOutput.maxAngle;
+		avl =0;
+		}
+		else if(anl <= UserInputOutput.minAngle){
+		anl =UserInputOutput. minAngle;
+		avl =0;
+		}
+		if(anr <= 3.141-UserInputOutput.maxAngle){
+		anr = 3.141-UserInputOutput.maxAngle;
+		avr =0;
+		}
+		else if(anr >= 3.141-UserInputOutput.minAngle){
+		anr = 3.141-UserInputOutput.minAngle;
+		avr =0;
+		}
+
+		UserInputOutput.leftAngle[0]=anl;
+		UserInputOutput.rightAngle[0]=anr;
+		UserInputOutput.leftVelocity[1]=avl;		
+		UserInputOutput.rightVelocity[1]=avr;
+	}
+        userInputOutput.start = true;
+}
+
 };
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef USER_INPUT_OUTPUT_HPP_
 #define USER_INPUT_OUTPUT_HPP_
 
+#include <chrono>
+
 struct UserInputOutput {
     double leftAngle[2];
     double rightAngle[2];
@@ -11,12 +13,13 @@ struct UserInputOutput {
     bool playerIsCalibrating[2];
     bool playerIsCalibrated[2];
 
-	double pressedL = 0; // increasing with duration of left / right arrow pressed
-	double pressedR = 0;
+	double leftFinStartAngle = 0; // start angle of fins without input
+	double rightFinStartAngle = 3.141;
 	double maxAngle = 1.571;
-	double stepSize = maxAngle/20; // increase of angle with every keydown event
-	bool fakedata = false;
-	
+	double minAngle =0; // or -0.xx for example
+	std::chrono::high_resolution_clock::time_point timeBef;
+	std::chrono::high_resolution_clock::time_point timeNow; // time of current angle and velocity
+	double a0 = 3.141; // set positive angular acceleration constant
 
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels

@@ -30,15 +30,10 @@ public:
             throw runtime_error("Failed to load level");
         }
 
-        unique_ptr<ColoredMesh> meshRect = make_unique<ColoredMesh>(
+        Mesh *meshRect = level.addUniqueMesh(make_unique<ColoredMesh>(
             Mesh::createRectangle(vec2(-0.5f, -0.5f), vec2(0.5f, 0.5f)),
             vec3(0, 0, 255)
-        );
-
-        unique_ptr<ColoredMesh> meshCircle = make_unique<ColoredMesh>(
-            Mesh::createCircle(vec2(0, 0), 2),
-            vec3(255, 0, 0)
-        );
+        ));
 
         string file_line;
         file >> level.width >> level.height;
@@ -49,13 +44,14 @@ public:
             file >> file_line;
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
-                    level.rigidBodies.push_back(make_unique<RigidBodyCircle>(Level::BALL_ID, x, y, 1));
-                    level.meshes[Level::BALL_ID] = meshCircle.get();
+                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y);
+                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(vec3(255, 0, 0)));
+                    level.rigidBodies.push_back(move(rigidBody));
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                     if (cell == Level::CellType::OBSTACLE) {
                         level.rigidBodies.push_back(make_unique<RigidBodyRect>(rigidBodyId, x, y, 1, 1, 0));
-                        level.meshes[rigidBodyId] = meshRect.get();
+                        level.meshes[rigidBodyId] = meshRect;
                         rigidBodyId++;
                     }
                     level.matrix.value(x, y) = cell;
@@ -66,7 +62,6 @@ public:
         level.flipperLeftId = rigidBodyId++;
         level.flipperRightId = rigidBodyId++;
     }
-
 };
 
 #endif

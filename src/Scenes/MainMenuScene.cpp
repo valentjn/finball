@@ -1,16 +1,20 @@
 #include <iomanip>
 #include <sstream>
 
+#include <memory>
 #include <SDL2/SDL.h>
 
-#include "GameController.hpp"
 #include "Highscores.hpp"
 #include "Scenes/MainMenuScene.hpp"
+#include "Scenes/MenuRenderer.hpp"
+#include "Scenes/Scene.hpp"
+#include "Scenes/SimulationScene.hpp"
 #include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
 
-void MainMenuScene::show() {
+std::unique_ptr<Scene> MainMenuScene::show() {
+    MenuRenderer menuRenderer(window);
     menuRenderer.addBackgroundImage("data/background.jpg");
 
     menuRenderer.addTitle("FinBall");
@@ -19,7 +23,11 @@ void MainMenuScene::show() {
 
     menuRenderer.render();
 
+    music.load("data/MainTheme.mp3");
+
     listen();
+
+    return std::make_unique<SimulationScene>(window, music, level, highscores, frameRate);
 }
 
 std::string MainMenuScene::getHighscoreText() {
@@ -35,17 +43,18 @@ std::string MainMenuScene::getHighscoreText() {
 
 void MainMenuScene::listen() {
     // Flag for quitting the program
-    bool running = true;
-
     SDLEvents events;
     events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
         if (event.key.keysym.sym == SDLK_SPACE) {
-            running = false;
+            return false;
         }
+
+        return true;
     });
     events.setListener(SDL_QUIT, [&](SDL_Event &event) {
         exit(0);
+        return false;
     });
 
-    events.listen(running);
+    events.listen();
 }

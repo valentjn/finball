@@ -2,14 +2,15 @@
 #include <iostream>
 
 #include <glm/vec3.hpp>
+#include <omp.h>
 
 #include "FICell.hpp"
 #include "LatticeBoltzmann.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "LatticeBoltzmannInput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
+#include "Log.hpp"
 #include "Array2D.hpp"
-#include <omp.h>
 
 using namespace glm;
 
@@ -17,7 +18,7 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 {
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
-	
+
 	for (int i = 0; i < 5; i++) {
 
 		step(input, output);
@@ -48,7 +49,7 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 	measuredTimes[2] = time2 - time1;
 
 	handleBoundaries(input);
-	
+
 	time1 = std::chrono::steady_clock::now();
 	measuredTimes[3] = time1 - time2;
 

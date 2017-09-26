@@ -1,6 +1,8 @@
 #include <memory>
 
 #include "GameController.hpp"
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 #include "Log.hpp"
 #include "Scenes/MainMenuScene.hpp"
 #include "Parameters.hpp"
@@ -27,7 +29,9 @@ int main(int argc, char *argv[]) {
         menu.show();
     }
 
-    Level level("data/" + parameters.level + ".txt");
+    LevelLoader loader("data/" + parameters.level + ".txt");
+    Level level;
+    loader.load(level);
 
     // run the game
     GameController gameController(highscores, parameters.frameRate);

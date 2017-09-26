@@ -4,7 +4,8 @@
 
 #include "test_lbm.hpp"
 
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
 
 //set density to 1 and velocity to 0
@@ -58,7 +59,9 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
 TEST(RigidBodyTest, static64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
+  levelLoader.load(level);
 
   level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
   level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
@@ -96,7 +99,7 @@ TEST(RigidBodyTest, static64) {
 		}
       }
   }
-  
+
   EXPECT_FALSE(changed);
   if(changed){
       printFlagField(init_flagfield);
@@ -114,7 +117,9 @@ TEST(RigidBodyTest, static64) {
 TEST(RigidBodyTest, gravity64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
+  levelLoader.load(level);
 
   level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
   level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
@@ -169,7 +174,10 @@ TEST(RigidBodyTest, gravity64) {
 TEST(RigidBodyTest, stop64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
+  levelLoader.load(level);
+
   level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
   level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/4, level.height*0.9, false));
 

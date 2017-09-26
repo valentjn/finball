@@ -10,7 +10,7 @@
 #include "LatticeBoltzmann/FICell.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "LatticeBoltzmannInput.hpp"
 

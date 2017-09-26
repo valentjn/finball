@@ -1,35 +1,39 @@
 #include "Scenes/GameOverScene.hpp"
 
+#include <memory>
 #include <SDL2/SDL.h>
 
 #include "Log.hpp"
+#include "Scenes/MainMenuScene.hpp"
+#include "Scenes/MenuRenderer.hpp"
+#include "Scenes/Scene.hpp"
 #include "SDL/SDLEvents.hpp"
 
-void GameOverScene::show(float highscore) {
+std::unique_ptr<Scene> GameOverScene::show() {
+    MenuRenderer menuRenderer(window);
     menuRenderer.addBackgroundImage("data/background.jpg");
 
     menuRenderer.addTitle("Game Over :(");
-    menuRenderer.addActionText("This was HAIkel! Your HAIscore is " + std::to_string(highscore) + ".");
+    menuRenderer.addActionText("This was HAIkel! Your HAIscore is " + std::to_string(score) + ".");
     menuRenderer.addLeftText("Enter your name:\n__________________");
 
     menuRenderer.render();
 
-    listen(highscore);
+    listen(menuRenderer);
+
+    return std::make_unique<MainMenuScene>(window, highscores, level, frameRate);
 }
 
-void GameOverScene::listen(float highscore) {
+void GameOverScene::listen(MenuRenderer &menuRenderer) {
     // Flag for quitting the program
-    bool running = true;
     std::string name = "";
 
     SDLEvents events;
     events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
         SDL_Keycode sym = event.key.keysym.sym;
         if (sym == SDLK_RETURN) {
-            running = false;
-
-            highscores.saveHighscore(highscore, name);
-            return;
+            highscores.saveHighscore(score, name);
+            return false;
         }
 
         char c = *SDL_GetKeyName(sym);
@@ -39,10 +43,13 @@ void GameOverScene::listen(float highscore) {
             menuRenderer.addLeftText("\n" + name);
             menuRenderer.render();
         }
+
+        return true;
     });
     events.setListener(SDL_QUIT, [&](SDL_Event &event) {
         exit(0);
+        return false;
     });
 
-    events.listen(running);
+    events.listen();
 }

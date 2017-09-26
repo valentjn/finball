@@ -1,9 +1,7 @@
 #ifndef IMAGE_REC_LEVEL_PARSER_HPP_
 #define IMAGE_REC_LEVEL_PARSER_HPP_
-#define PI 3.1415926535f
-#define DEG2RAD PI / 180
 
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <memory>
 
@@ -79,7 +77,7 @@ public:
             boxPoints2f.assignTo(boxPoints, CV_32S); // Convert Point2f to Point
 
             // Choose the one with the smaller area
-            if (radius * radius * PI <= rect.size.area()) {
+            if (radius * radius * glm::pi<float>() <= rect.size.area()) {
                 circle(levelImg, center, radius, Scalar(0, 0, 0), -1);
                 auto rigidBody = make_unique<RigidBodyCircle>(rigidBodyId, center.x, center.y, radius);
                 level.setUniqueMesh(rigidBodyId, rigidBody->createColoredMesh());

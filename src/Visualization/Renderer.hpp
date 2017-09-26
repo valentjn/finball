@@ -41,6 +41,7 @@ private:
     SDL_GLContext m_glcontext;
 
     glm::vec3 m_camera_pos;
+    glm::vec3 m_camera_look_at;
 
     const Array2D<glm::vec3> *m_fluid_vecs;
 
@@ -50,6 +51,7 @@ private:
 
 public:
     void update(const RendererInput &input);
+    void setCameraTransformFromLevel(Level &level);
 
     Renderer(const SDLWindow &window);
     ~Renderer();

@@ -1,8 +1,6 @@
 #ifndef USER_INPUT_HPP_
 #define USER_INPUT_HPP_
 
-#define PI 3.14159265
-
 #include <chrono>
 #include <string>
 

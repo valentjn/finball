@@ -2,6 +2,7 @@
 #define RIGID_BODY_PHYSICS_HPP_
 
 #include <btBulletDynamicsCommon.h>
+#include <bullet/BulletCollision/Gimpact/btTriangleShapeEx.h>
 #include <glm/glm.hpp>
 #include <math.h>
 #include <memory>
@@ -56,6 +57,7 @@ private:
     std::unique_ptr<btBroadphaseInterface> broadphase;
     std::unique_ptr<btConstraintSolver> solver;
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
+    std::unique_ptr<btCollisionShape> default_collision_shape;
 
     std::unordered_map<int, std::unique_ptr<Transform>> rigid_bodies;
     std::unordered_map<int, glm::vec2> impulses;
@@ -76,23 +78,23 @@ public:
           solver(std::make_unique<btSequentialImpulseConstraintSolver>()),
           dynamics_world(std::make_unique<btDiscreteDynamicsWorld>(
                              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())),
+          default_collision_shape(std::make_unique<btSphereShape>(DISTANCE_GRID_CELLS)),
           grid_static_objects_flow(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_ball(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
     {
         dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
-        btCollisionShape *default_sphere_shape = new btSphereShape(DISTANCE_GRID_CELLS);
 
         grid_static_objects_flow = level.matrix;
 
         for (const unique_ptr<RigidBody> &level_body : level.rigidBodies) {
-            initRigidBody(level_body, default_sphere_shape);
+            addRigidBody(level_body);
         }
     }
 
-    void initRigidBody(const unique_ptr<RigidBody> &level_body, btCollisionShape * default_sphere_shape){
-        btRigidBody* bt_rigid_body = createBtRigidBody(level_body, default_sphere_shape);
+    void addRigidBody(const unique_ptr<RigidBody> &level_body){
+        btRigidBody* bt_rigid_body = createBtRigidBody(level_body);
 
         // Constrain to two dimensions
         bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
@@ -112,7 +114,26 @@ public:
         }
     }
 
-    btRigidBody* createBtRigidBody(const unique_ptr<RigidBody> &level_body, btCollisionShape * default_sphere_shape){
+    btRigidBody* createBtRigidBody(const unique_ptr<RigidBody> &level_body) {
+        btCollisionShape *collision_shape;
+        if (typeid(*level_body) == typeid(RigidBodyCircle)) {
+            RigidBodyCircle *circle = static_cast<RigidBodyCircle *>(level_body.get());
+            collision_shape = new btSphereShape(circle->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
+        } else if (typeid(*level_body) == typeid(RigidBodyRect)) {
+            RigidBodyRect *rectangle = static_cast<RigidBodyRect *>(level_body.get());
+            collision_shape = new btBoxShape(btVector3(rectangle->width / 2., rectangle->height / 2., 0)); // these are half-extents!
+            collision_shape = default_collision_shape.get(); // FIXME: Memory leak
+        } else if (typeid(*level_body) == typeid(RigidBodyTriangle)) {
+            RigidBodyTriangle *triangle = static_cast<RigidBodyTriangle *>(level_body.get());
+            btVector3 p0 = btVector3(triangle->points[0].x * DISTANCE_GRID_CELLS, triangle->points[0].y * DISTANCE_GRID_CELLS, 0.);
+            btVector3 p1 = btVector3(triangle->points[1].x * DISTANCE_GRID_CELLS, triangle->points[1].y * DISTANCE_GRID_CELLS, 0.);
+            btVector3 p2 = btVector3(triangle->points[2].x * DISTANCE_GRID_CELLS, triangle->points[2].y * DISTANCE_GRID_CELLS, 0.);
+            collision_shape = new btTriangleShapeEx(p0, p1, p2); // FIXME: Memory leak
+        } else {
+            Log::error("RigidBody didn't have a specific shape! Creating a default sphere.");
+            collision_shape = default_collision_shape.get();
+        }
+
         btTransform transform;
         transform.setIdentity();
         transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
@@ -120,16 +141,9 @@ public:
         btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
         btScalar mass = level_body->mass;
         btVector3 inertia;
-        default_sphere_shape->calculateLocalInertia(mass, inertia);
+        collision_shape->calculateLocalInertia(mass, inertia);
 
-        // TODO: set correct collision shape based on RigidBody type
-        btRigidBody *bt_rigid_body;
-        if (typeid(*level_body) == typeid(RigidBodyCircle)) {
-            btCollisionShape *sphere_shape = new btSphereShape(static_cast<RigidBodyCircle *>(level_body.get())->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
-            bt_rigid_body = new btRigidBody(mass, motion_state, sphere_shape, inertia);
-        } else {
-            bt_rigid_body = new btRigidBody(mass, motion_state, default_sphere_shape, inertia);
-        }
+        btRigidBody *bt_rigid_body = new btRigidBody(mass, motion_state, collision_shape, inertia);
         bt_rigid_body->setUserIndex(level_body->id);
         return bt_rigid_body;
     }

@@ -2,14 +2,15 @@
 #include <iostream>
 
 #include <glm/vec3.hpp>
+#include <omp.h>
 
 #include "FICell.hpp"
 #include "LatticeBoltzmann.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "LatticeBoltzmannInput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
+#include "Log.hpp"
 #include "Array2D.hpp"
-#include <omp.h>
 
 using namespace glm;
 
@@ -17,8 +18,8 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 {
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
-	
-	for (int i = 0; i < 5; i++) {
+
+        for (int i = 0; i < iter; i++) {
 
 		step(input, output);
 	}
@@ -45,23 +46,23 @@ void LatticeBoltzmann::step(const LatticeBoltzmannInput &input, LatticeBoltzmann
 	stream(input);
 
 	time2 = std::chrono::steady_clock::now();
-	measuredTimes[2] = time2 - time1;
+	measuredTimes[2] += time2 - time1;
 
 	handleBoundaries(input);
-	
-	time1 = std::chrono::steady_clock::now();
-	measuredTimes[3] = time1 - time2;
 
-	reinitilizeFI(output);
+	time1 = std::chrono::steady_clock::now();
+	measuredTimes[3] += time1 - time2;
+
+	reinitializeFI(output);
 
 	time2 = std::chrono::steady_clock::now();
-	measuredTimes[4] = time2 - time1;
+	measuredTimes[4] += time2 - time1;
 
 }
 
 void LatticeBoltzmann::initFiObstacles(const LatticeBoltzmannInput &input)
 {
-#pragma omp parallel for schedule(dynamic)
+//#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < level.height; ++y) {
 		for (int x = 0; x < level.width; ++x) {
 			if (input.flagfield.value(x, y) == Level::OBSTACLE) {
@@ -82,11 +83,20 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 			switch (input.flagfield.value(x, y)) {
 				case Level::OBSTACLE:
 					for (int z = 1; z < 9; ++z) {
-						if (fi_New.value(x, y)[z] != 0.0) {
-						fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
-								fi_New.value(x, y)[z];
-						fi_New.value(x, y)[z] = 0.0;
-						}
+
+                                            if (fi_New.value(x, y)[z] != 0.0) {
+                                                constexpr static float c = 1. / 1.732050;
+                                                float density = 0.0f;
+                                                for (int i = 0; i < 9; i++) {
+                                                        density += fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[i]; // density
+                                                }
+
+                                            fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
+                                                         fi_New.value(x, y)[z] - 2 / (c*c) *
+                                                      density*w[z]/(4.*iter)*(input.velocities.value(x,y)[0]*cx[z] +
+                                                    input.velocities.value(x,y)[1]*cy[z]);
+                                            fi_New.value(x, y)[z] = 0.0;
+                                            }
 					}
 					break;
 				case Level::INFLOW:
@@ -141,7 +151,7 @@ void LatticeBoltzmann::stream(const LatticeBoltzmannInput &input)
 void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 {
 	// Calculate macroscopic quantities for the output
-#pragma omp parallel for schedule(dynamic)
+//#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < this->level.height; y++) {
 		for (int x = 0; x < this->level.width; x++) {
 			float &density = output.density.value(x, y);
@@ -158,10 +168,13 @@ void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 	}
 
 	// Set fi_old = fi_new
-	this->reinitilizeFI(output);
+	this->reinitializeFI(output);
+
+	auto timeTot = measuredTimes[0] + measuredTimes[1] + measuredTimes[2] + measuredTimes[3] + measuredTimes[4];
+	Log::debug("time in LB[%]: coll %f, initfi %f, stream %f, boundaries %f, reinitfi %f", measuredTimes[0]*100./timeTot, measuredTimes[1]*100./timeTot, measuredTimes[2]*100./timeTot, measuredTimes[3]*100./timeTot, measuredTimes[4]*100./timeTot);
 }
 
-void LatticeBoltzmann::reinitilizeFI(LatticeBoltzmannOutput &output)
+void LatticeBoltzmann::reinitializeFI(LatticeBoltzmannOutput &output)
 {
 	output.prestream = fi_Old;
 	output.afterstream = fi_New;
@@ -171,13 +184,30 @@ void LatticeBoltzmann::reinitilizeFI(LatticeBoltzmannOutput &output)
 float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int x, int y) {
 	// this happens when a rigid body moves and an empty cell remains.
 	//TODO: reinitialize density and everything else to something proper!
-	float rho = 1.;
+        float rho = 0.;
+        int count = 0;
+        for (int i = 1; i < 9; ++i){
+            for(int j = 0; j < 9; ++j){
+                if (input.flagfield.value(x,y) == Level::FLUID){
+                    rho+=fi_Old.value(x+cx[i],y+cy[i])[j];
+                    count++;
+                }
+            }
+        }
+        if (count > 0){
+            rho /= count;
+        } else {
+            rho = 0.1;
+        }
+        for(int j = 0; j < 9 ; ++j){
+            fi_Old.value(x,y)[j] = rho*w[j];
+        }
 	return rho;
 }
 
 void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 {
-#pragma omp parallel for schedule(dynamic)
+//#pragma omp parallel for schedule(static) collapse(2) shared(input, fi_Old)
 	for (int y = 1; y < level.height - 1; ++y) {
 		for (int x = 1; x < level.width - 1; ++x) {
 			// check for boundary

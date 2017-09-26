@@ -6,7 +6,7 @@
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
 

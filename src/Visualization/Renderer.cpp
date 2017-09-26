@@ -10,7 +10,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "Log.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
 

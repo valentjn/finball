@@ -11,7 +11,7 @@
 #include "LatticeBoltzmann/LatticeBoltzmann.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Scenes/GameOverScene.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"

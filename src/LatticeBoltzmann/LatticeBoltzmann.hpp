@@ -10,7 +10,7 @@
 #include "LatticeBoltzmann/FICell.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "LatticeBoltzmannInput.hpp"
 
@@ -34,16 +34,17 @@ private:
     const int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
     const int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
     const int opp[9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
+    const int iter = 15;
 
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
 
 	void handleCollisions(const LatticeBoltzmannInput &input);
-	void reinitilizeFI(LatticeBoltzmannOutput &output);
+	void reinitializeFI(LatticeBoltzmannOutput &output);
 	void Output(LatticeBoltzmannOutput &output);
 	void stream(const LatticeBoltzmannInput &input);
 	void handleBoundaries(const LatticeBoltzmannInput &input);
 	void initFiObstacles(const LatticeBoltzmannInput &input);
-	float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
+	inline float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
 
 public:
     LatticeBoltzmann(Level &level)
@@ -57,9 +58,9 @@ public:
                 }
             }
         }
-        for (int i=0; i<5; i++){
-			measuredTimes[i] = std::chrono::duration<float>(0.);
-        }
+			for (int i = 0; i < 5; i++) {
+				measuredTimes[i] = std::chrono::duration<float>(0.);
+			}
     }
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output);

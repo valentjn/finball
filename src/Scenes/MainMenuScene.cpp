@@ -5,13 +5,12 @@
 
 #include "GameController.hpp"
 #include "Highscores.hpp"
-#include "Level.hpp"
 #include "Scenes/MainMenuScene.hpp"
 #include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
 
-std::unique_ptr<Level> MainMenuScene::show() {
+void MainMenuScene::show() {
     menuRenderer.addBackgroundImage("data/background.jpg");
 
     menuRenderer.addTitle("FinBall");
@@ -21,8 +20,6 @@ std::unique_ptr<Level> MainMenuScene::show() {
     menuRenderer.render();
 
     listen();
-
-    return std::make_unique<Level>("data/testLevel.txt");
 }
 
 std::string MainMenuScene::getHighscoreText() {

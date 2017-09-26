@@ -6,6 +6,9 @@ uniform sampler2D tex_noise; // noise texture
 uniform sampler2D tex_waves; // density texture
 uniform float t;
 
+layout(location = 0) out vec3 out_color;
+layout(location = 1) out float out_wave;
+
 const int[] perm = int[256](
 	151, 160, 137, 91, 90, 15,
 	131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
@@ -32,15 +35,13 @@ float grad(int hash, float x)
 	int h = hash & 0x0F;			// Convert low 4 bits of hash code
 	float grad = 1.0 + (h & 7);		// Gradient value 1.0, 2.0, ..., 8.0
 	if ((h & 8) != 0) grad = -grad;	// Set a random sign for the gradient
-									//float grad = gradients1D[h];	// NOTE : Test of Gradient look-up table instead of the above
 	return (grad * x);				// Multiply the gradient with the distance
 }
 
-float grad(int hash, float x, float y)
+float grad(int hash, vec2 uv)
 {
 	int h = hash & 0x3F;		// Convert low 3 bits of hash code
-	vec2 uv = vec2(y, x);
-	if (h < 4) uv = uv.yx;
+	if (h >= 4) uv = uv.yx;
 	if ((h & 1) != 0) uv.x = -uv.x;
 	if ((h & 2) != 0) uv.y = -uv.y;
 	return dot(uv, vec2(1, 2));
@@ -48,13 +49,11 @@ float grad(int hash, float x, float y)
 
 float noise2D(vec2 coords)
 {
-	float n0, n1, n2;   // Noise contributions from the three corners
-
-						// Skewing/Unskewing factors for 2D
+	// Skewing/Unskewing factors for 2D
 	const float F2 = 0.366025403;  // F2 = (sqrt(3) - 1) / 2
 	const float G2 = 0.211324865;  // G2 = (3 - sqrt(3)) / 6   = F2 / (1 + 2 * K)
 
-									// Skew the input space to determine which simplex cell we're in
+	// Skew the input space to determine which simplex cell we're in
 	float s = (coords.x + coords.y) * F2;  // Hairy factor for 2D
 	vec2 coords_s = coords + s;
 	vec2 ij_f = floor(coords_s);
@@ -67,85 +66,61 @@ float noise2D(vec2 coords)
 
 	// For the 2D case, the simplex shape is an equilateral triangle.
 	// Determine which simplex we are in.
-	int i1, j1;  // Offsets for second (middle) corner of simplex in (i,j) coords
-	if (x0y0.x > x0y0.y) {   // lower triangle, XY order: (0,0)->(1,0)->(1,1)
-		i1 = 1;
-		j1 = 0;
-	}
-	else {   // upper triangle, YX order: (0,0)->(0,1)->(1,1)
-		i1 = 0;
-		j1 = 1;
-	}
+	ivec2 i1j1 = ivec2(0, 1);
+	if (x0y0.x > x0y0.y)
+		i1j1 = i1j1.yx;
 
-	// A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
-	// a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
-	// c = (3-sqrt(3))/6
-
-	vec2 x1y1 = x0y0 - ivec2(i1, j1) + G2;
+	vec2 x1y1 = x0y0 - i1j1 + G2;
 	vec2 x2y2 = x0y0 - 1.0 + 2.0 * G2;
 
-	// Calculate the contribution from the first corner
-	float t0 = 0.5f - dot(x0y0, x0y0);
-	if (t0 < 0.0) {
-		n0 = 0.0;
+	// Calculate the contributions
+	vec3 n;
+	n.x = dot(x0y0, x0y0);
+	n.y = dot(x1y1, x1y1);
+	n.z = dot(x2y2, x2y2);
+	n = 0.5 - n;
+	n = max(n, 0.0);
+	if (n.x != 0.0) {
+		n.x *= n.x;
+		n.x *= n.x;
+		n.x *= grad(hash(ij.x + hash(ij.y)), x0y0);
 	}
-	else {
-		t0 *= t0;
-		n0 = t0 * t0 * grad(hash(ij.x + hash(ij.y)), x0y0.x, x0y0.y);
+	if (n.y != 0.0) {
+		n.y *= n.y;
+		n.y *= n.y;
+		n.y *= grad(hash(ij.x + i1j1.x + hash(ij.y + i1j1.y)), x1y1);
 	}
-
-	// Calculate the contribution from the second corner
-	float t1 = 0.5 - dot(x1y1, x1y1);
-	if (t1 < 0.0) {
-		n1 = 0.0;
-	}
-	else {
-		t1 *= t1;
-		n1 = t1 * t1 * grad(hash(ij.x + i1 + hash(ij.y + j1)), x1y1.x, x1y1.y);
-	}
-
-	// Calculate the contribution from the third corner
-	float t2 = 0.5 - dot(x2y2, x2y2);
-	if (t2 < 0.0) {
-		n2 = 0.0;
-	}
-	else {
-		t2 *= t2;
-		n2 = t2 * t2 * grad(hash(ij.x + 1 + hash(ij.y + 1)), x2y2.x, x2y2.y);
+	if (n.z != 0.0) {
+		n.z *= n.z;
+		n.z *= n.z;
+		n.z *= grad(hash(ij.x + 1 + hash(ij.y + 1)), x2y2);
 	}
 
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
-	return 45.23065 * (n0 + n1 + n2);
+	return 45.23065 * dot(n, vec3(1));
 }
 
 vec2 getVeloc(vec2 coords) {
 	return (texture(tex_vecs, coords).xy - 0.5) * 10;
 }
 
-const int STEPS=20; // The number of adjacent locations in one direction to use for smearing
-const int velocity_scale=20;
-
 // perfrom line integral convolution
-float lic(vec2 normalized_coords) {
-	vec2 texel_size = 1.0 / textureSize(tex_noise, 0);
+float lic(vec2 normalized_coords)
+{
+	const int lic_steps = 20; // The number of adjacent locations in one direction to use for smearing
+	const int velocity_scale = 20;
 
-	vec2 v; // the vector field's x and y components
-	vec2 step_coords; // current step x,y coordinate
-	vec4 texture_value = vec4(0.0,0.0,0.0,0.0); // color value at the particular texture coordinate vec4/RGBA
+	vec2 texel_size = 1.0 / textureSize(tex_noise, 0);
 	float running_total = 0.0; // running total of grey-scale texture values
 
 	// Start at this fragment's location
-	step_coords = normalized_coords;
+	vec2 step_coords = normalized_coords;
 	
 	// step FORWARD along the vector field
-	for(int i=0; i < STEPS; i++) {
-		v = getVeloc(step_coords) * velocity_scale;
-
-		// use Euler's Method. Get the next approximate point along the curve
+	for (int i = 0; i < lic_steps; ++i) {
+		vec2 v = getVeloc(step_coords) * velocity_scale;
 		step_coords += v * texel_size;
-
-		// get the texture value at that point
 		running_total += texture(tex_noise, step_coords).x;
 	}
 
@@ -153,24 +128,14 @@ float lic(vec2 normalized_coords) {
 	step_coords = normalized_coords;
 
 	// step BACKWARD along the vector field
-	for(int i=0; i<STEPS; i++) {
-		v = getVeloc(step_coords) * velocity_scale;
-
-		// use Euler's Method. Get the next approximate point along the curve
+	for (int i = 0; i < lic_steps; ++i) {
+		vec2 v = getVeloc(step_coords) * velocity_scale;
 		step_coords -= v * texel_size;
-
-		// get the texture value at that point
 		running_total += texture(tex_noise, step_coords).x;
 	}
 
-	// average grayscale value of all samples along the curve, this is the final value for this pixel
-	float average_value = running_total / float(STEPS * 2);
-
-	return average_value;
+	return running_total / (lic_steps * 2);
 }
-
-layout(location = 0) out vec3 out_color;
-layout(location = 1) out float out_wave;
 
 void main() {
     ivec2 vecs_res = textureSize(tex_vecs, 0);
@@ -191,10 +156,8 @@ void main() {
 
 	vec2 veloc = getVeloc(normalized_coords);
 
-	float noise_scale = 2.5;
-	float tscale = 4;
-
-	float prev_out_wave = texture(tex_waves, normalized_coords).x;
+	const float noise_scale = 2.5;
+	const float tscale = 4;
 
 	if (int(gl_FragCoord.x) <= 1)
 		out_wave = noise2D(vec2(noise_scale * normalized_coords.y, t * tscale));
@@ -205,10 +168,12 @@ void main() {
 	else if (int(gl_FragCoord.y) >= rend_res.y - 2)
 		out_wave = noise2D(vec2(noise_scale * (1 + normalized_coords.x), t * tscale));
 	else {
-		out_wave = texture(tex_waves, normalized_coords - 20 * veloc / (vecs_res + 1)).x;
-		//out_wave = 0.9 * out_wave + 0.1 * prev_out_wave;
+		out_wave = texture(tex_waves, normalized_coords - 30 * veloc / (vecs_res + 1)).x;
+		out_color = velocity_val * vec3(0.4, 0.5, 1);
+		out_color *= 0.5 + 0.8 * out_wave;
+		out_color *= min(length(veloc) * 5, 1);
+		return;
 	}
-
-	out_color *= 0.5 + 0.8 * out_wave;
+	out_color = vec3(0);
 }
 

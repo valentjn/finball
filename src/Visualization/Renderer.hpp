@@ -17,8 +17,8 @@
 
 class Renderer {
 private:
-    constexpr static int m_fluid_width = 256;
-    constexpr static int m_fluid_height = 256;
+    constexpr static int m_fluid_width = 512;
+    constexpr static int m_fluid_height = 512;
 
     std::vector<RenderObject> m_world_objects;
     std::vector<RenderObject> m_ui_objects;

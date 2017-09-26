@@ -110,6 +110,7 @@ public:
         if (level_body->mass == 0.f) {
             // TODO: do this more accurately?
             // TODO: this only works for rectangles atm
+            // FIXME: take width and height into consideration
             grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
         }
     }
@@ -121,13 +122,13 @@ public:
             collision_shape = new btSphereShape(circle->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
         } else if (typeid(*level_body) == typeid(RigidBodyRect)) {
             RigidBodyRect *rectangle = static_cast<RigidBodyRect *>(level_body.get());
-            collision_shape = new btBoxShape(btVector3(rectangle->width / 2., rectangle->height / 2., 0)); // these are half-extents!
+            collision_shape = new btBoxShape(btVector3(rectangle->width / 2., rectangle->height / 2., 0) * DISTANCE_GRID_CELLS); // these are half-extents!
             collision_shape = default_collision_shape.get(); // FIXME: Memory leak
         } else if (typeid(*level_body) == typeid(RigidBodyTriangle)) {
             RigidBodyTriangle *triangle = static_cast<RigidBodyTriangle *>(level_body.get());
-            btVector3 p0 = btVector3(triangle->points[0].x * DISTANCE_GRID_CELLS, triangle->points[0].y * DISTANCE_GRID_CELLS, 0.);
-            btVector3 p1 = btVector3(triangle->points[1].x * DISTANCE_GRID_CELLS, triangle->points[1].y * DISTANCE_GRID_CELLS, 0.);
-            btVector3 p2 = btVector3(triangle->points[2].x * DISTANCE_GRID_CELLS, triangle->points[2].y * DISTANCE_GRID_CELLS, 0.);
+            btVector3 p0 = btVector3(triangle->points[0].x, triangle->points[0].y, 0.) * DISTANCE_GRID_CELLS;
+            btVector3 p1 = btVector3(triangle->points[1].x, triangle->points[1].y, 0.) * DISTANCE_GRID_CELLS;
+            btVector3 p2 = btVector3(triangle->points[2].x, triangle->points[2].y, 0.) * DISTANCE_GRID_CELLS;
             collision_shape = new btTriangleShapeEx(p0, p1, p2); // FIXME: Memory leak
         } else {
             Log::error("RigidBody didn't have a specific shape! Creating a default sphere.");
@@ -198,10 +199,6 @@ public:
         for (int y = 0; y < GRID_HEIGHT; ++y) {
             for (int x = 0; x < GRID_WIDTH; ++x) {
                 glm::vec2 pos = gridToBullet(x, y);
-                // printf("%f %f\n", pos.x, pos.y);
-                // printf("-------\n");
-                // float length = (pos - output_transform->position).length();
-                // printf("%f\n", length);
                 if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <= gridToBullet(static_cast<RigidBodyCircle *>(level.rigidBodies[id-1].get())->radius)) {
                     grid_ball.value(x, y) = Level::CellType::OBSTACLE;
                                                     // TODO: Proper scaling of velocity. Right now only scale the length.
@@ -286,9 +283,16 @@ public:
 
         // TODO: mesh tohether the individual flag fields
         markRBAsObstacles(grid_obj);
-        grid_finFlag(grid_obj, grid_vel, glm::vec2(10, 10), glm::vec2(13, 10), glm::vec2(10, 8));
+        for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
+            auto &obj = dynamics_world->getCollisionObjectArray()[j];
+            btRigidBody *rigid_body = btRigidBody::upcast(obj);
+            if (rigid_body && (obj->getUserIndex() == level.flipperLeftId || obj->getUserIndex() == level.flipperRightId)) {
+                grid_finFlag(grid_obj, grid_vel, rigid_body);
+            } else {
+                std::runtime_error("Fin is not a btRigidBody!");
+            }
+        }
 
-        // grid_finFlag(grid_obj, glm::vec2(0,0),
         // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
         //     for (int j = 0; j < GRID_WIDTH; ++j) {
         //         printf("%2d", grid_obj.value(j, i));
@@ -316,11 +320,30 @@ public:
         //create a new one
     }
 
-    void grid_finFlag(Array2D<Level::CellType> &grid_fin, Array2D<glm::vec2>& grid_vel, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3) {
+    void grid_finFlag(Array2D<Level::CellType> &grid_fin, Array2D<glm::vec2> &grid_vel, btRigidBody* rigid_body) {
+        btTransform transform;
+        rigid_body->getMotionState()->getWorldTransform(transform);
+        // TODO: use typeid to check that the shape is correct? (col_shape.getShapeType())
+        const btTriangleShapeEx* triangle_shape = static_cast<const btTriangleShapeEx*>(rigid_body->getCollisionShape());
+
+        const btVector3 &p1 = triangle_shape->getVertexPtr(0);
+        const btVector3 &p2 = triangle_shape->getVertexPtr(1);
+        const btVector3 &p3 = triangle_shape->getVertexPtr(2);
+
+        btVector3 p1_world = transform * p1;
+        btVector3 p2_world = transform * p2;
+        btVector3 p3_world = transform * p3;
+
+        glm::vec2 pos1 = {p1_world.x(), p1_world.y()};
+        glm::vec2 pos2 = {p2_world.x(), p2_world.y()};
+        glm::vec2 pos3 = {p3_world.x(), p3_world.y()};
+
+        // // Array2D<glm::vec2>& grid_vel, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3
         glm::vec2 norm1(-(pos1.y - pos2.y), pos1.x - pos2.x);
         glm::vec2 norm2(-(pos2.y - pos3.y), pos2.x - pos3.x);
         glm::vec2 norm3(-(pos3.y - pos1.y), pos3.x - pos1.x);
 
+        // TODO: only check in the AABB
         for (int i = 0; i< grid_fin.width(); i++){
             for (int j= 0 ; j <grid_fin.height(); j++){
                 glm::vec2 tempVec1 = gridToBullet(i, j) - pos1;
@@ -330,7 +353,7 @@ public:
                         (tempVec2.x * norm2.x + tempVec2.y * norm2.y >= 0) &&
                         (tempVec3.x * norm3.x + tempVec3.y * norm3.y >= 0)) {
                     grid_fin.value(i, j) = Level::CellType::OBSTACLE;
-                    grid_vel.value(i, j) = glm::vec2(-2. ,2.);
+                    grid_vel.value(i, j) = glm::vec2(0. ,0.); // TODO
                 }
             }
         }

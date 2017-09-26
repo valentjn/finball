@@ -1,4 +1,9 @@
 CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
+
+ifdef kinect
+KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
+endif
+
 COMMON_CFLAGS:= -pedantic \
 					 -Wall \
 					 -Wextra \
@@ -10,8 +15,8 @@ COMMON_CFLAGS:= -pedantic \
 					 `pkg-config sdl2 --cflags` \
 					 `pkg-config bullet --cflags` \
 					 -I src \
-					 -I ext
-KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
+					 -I ext \
+					 $(KINECT_CFLAGS)
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)

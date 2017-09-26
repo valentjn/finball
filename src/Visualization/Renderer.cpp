@@ -10,7 +10,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "Log.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
 
@@ -116,6 +116,9 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
             noise.value(i, j) = dist(engine);
     m_tex_noise = std::make_unique<Texture1F>(glm::ivec2{m_fluid_width / 2, m_fluid_height / 2});
     m_tex_noise->setData(noise);
+	m_tex_noise->bind(0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// create the waves texture
 	m_tex_waves1 = std::make_unique<Texture1F>(glm::ivec2{ m_fluid_width, m_fluid_height });
@@ -159,8 +162,8 @@ Renderer::~Renderer() {
 }
 
 void Renderer::update(const RendererInput &input) {
-    // clear the framebuffer to dark red
-    glClearColor(0.4f, 0.f, 0.f, 1.f);
+    // clear the framebuffer to black
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // setup for the rendering of the fluid
@@ -190,10 +193,10 @@ void Renderer::update(const RendererInput &input) {
 		m_tex_waves2->bind(2);
 
 	// set time
-	static auto t0 = std::chrono::steady_clock::now();
+	static unsigned int ticks = 0;
 	loc = glGetUniformLocation(m_shader_program_fluid, "t");
-	auto diff = std::chrono::steady_clock::now() - t0;
-	glUniform1f(loc, std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() / 1000.f);
+	++ticks;
+	glUniform1ui(loc, static_cast<float>(ticks));
 
     // render fluid
 	m_full_quad->render(0);

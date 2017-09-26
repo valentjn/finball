@@ -1,6 +1,8 @@
 #include <memory>
 
 #include "GameController.hpp"
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 #include "Log.hpp"
 #include "Scenes/MainMenuScene.hpp"
 #include "Parameters.hpp"
@@ -22,15 +24,18 @@ int main(int argc, char *argv[]) {
     Highscores highscores("haiscores.txt");
 
     // show main menu and obtain level from it
-    std::unique_ptr<Level> level;
     {
         MainMenuScene menu(window, highscores);
-        level = menu.show();
+        menu.show();
     }
+
+    LevelLoader loader("data/" + parameters.level + ".txt");
+    Level level;
+    loader.load(level);
 
     // run the game
     GameController gameController(highscores, parameters.frameRate);
-    gameController.startGame(window, *level);
+    gameController.startGame(window, level);
 
     return 0;
 }

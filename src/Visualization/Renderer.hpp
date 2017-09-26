@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include "Array2D.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Visualization/Mesh.hpp"
 #include "Visualization/RenderObject.hpp"
 #include "Visualization/RendererInput.hpp"

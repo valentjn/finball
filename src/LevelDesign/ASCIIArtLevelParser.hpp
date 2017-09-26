@@ -25,7 +25,7 @@ public:
         fstream file;
         file.open(filePath, fstream::in);
         if (!file.is_open()) {
-            Log::error("Failed to load level %s", filePath);
+            Log::error("Failed to load level %s", filePath.c_str());
             return false;
         }
 

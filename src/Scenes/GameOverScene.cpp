@@ -18,7 +18,7 @@ std::unique_ptr<Scene> GameOverScene::show() {
     menuRenderer.addLeftText("Enter your name:\n__________________");
 
     menuRenderer.render();
-    m_params.music->load("data/SadGameOver.mp3");
+    m_params.music->load("data/SadGameOver.mp3", 1);
 
     listen(menuRenderer);
 

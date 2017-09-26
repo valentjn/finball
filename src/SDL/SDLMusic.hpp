@@ -27,7 +27,7 @@ public:
 		Mix_FreeMusic( music );
 		Mix_CloseAudio();
 	}
-	void load(std::string file){
+	void load(std::string file, int repetitions=-1){
 		if(!initialized){
 			Log::warn("Music not initialized, can not load");
 		}
@@ -38,7 +38,7 @@ public:
 		if (music==nullptr){
 			Log::warn("could not load music %s", file);
 		}
-		if (Mix_PlayMusic(music, -1) == -1) {
+		if (Mix_PlayMusic(music, repetitions) == -1) {
 			Log::warn("could not start music");
 		}
 	}

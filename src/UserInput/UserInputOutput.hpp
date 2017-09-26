@@ -6,7 +6,7 @@
 #include <chrono>
 
 struct UserInputOutput {
-	static const int PLAYERS = 2;
+	static const int PLAYERS = 1;
 	
     double leftAngle[PLAYERS];
     double rightAngle[PLAYERS];

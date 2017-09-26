@@ -40,7 +40,7 @@ public:
 	
 private:
 	static const int MAX_USERS = 4;
-	static const int PLAYERS = 2;
+	static const int PLAYERS = 1;
 	static constexpr const double MIN_DIFFERENCE = 0.05;
     static constexpr const double MAX_DIFFERENCE = 0.2;
     static constexpr const double BIG_DIFFERENCE_EASING = 0.1;

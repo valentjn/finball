@@ -54,7 +54,7 @@ public:
             auto iter = (*gameLogicOutput.rigid_body_meshes).find(rigidBody->id);
 			const Mesh* mesh;
 			if (iter != gameLogicOutput.rigid_body_meshes->end()) { // check if the mesh is in the map
-				mesh = dummy_mesh.get();//iter->second;
+				mesh = iter->second;
 			}
 			else {
 				Log::info(
@@ -64,7 +64,7 @@ public:
             }
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody->position, 0);
-            renderObject.scale = {1.0f, 1.0f};
+            renderObject.scale = glm::vec2{ 1.0f };
             renderObject.rotation = rigidBody->rotation;
 			renderObject.mesh = mesh;
             world_objects.push_back(renderObject);

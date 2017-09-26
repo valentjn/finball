@@ -8,15 +8,14 @@
 
 class SceneManager {
 private:
-    std::unique_ptr<Scene> currentScene = nullptr;
+    std::unique_ptr<Scene> currentScene;
 
 public:
     SceneManager(std::unique_ptr<Scene> scene) : currentScene(std::move(scene)) {}
 
     void run() {
-        while (currentScene != nullptr) {
+        while (currentScene)
             currentScene = currentScene->show();
-        }
     }
 
 };

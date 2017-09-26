@@ -12,22 +12,32 @@
 #include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
+#include "LevelDesign/LevelLoader.hpp"
+#include "LevelDesign/Level.hpp"
 
 std::unique_ptr<Scene> MainMenuScene::show() {
-    MenuRenderer menuRenderer(window);
-    menuRenderer.addBackgroundImage("data/background.jpg");
+	{
+		MenuRenderer menuRenderer(*m_params.window);
+		menuRenderer.addBackgroundImage("data/background.jpg");
+		menuRenderer.addTitle("FinBall");
+		menuRenderer.addActionText("To start the game please do a HAI-five or press SPACE!");
+		menuRenderer.addLeftText(getHighscoreText());
+		menuRenderer.render();
+		m_params.music->load("data/MainTheme.mp3");
 
-    menuRenderer.addTitle("FinBall");
-    menuRenderer.addActionText("To start the game please do a HAI-five or press SPACE!");
-    menuRenderer.addLeftText(getHighscoreText());
+		listen();
+	}
 
-    menuRenderer.render();
+	// initialize renderer
+	auto renderer = std::make_unique<Renderer>(*m_params.window);
 
-    music.load("data/MainTheme.mp3");
+	// load level
+	LevelLoader loader("data/" + m_params.cmd_params->level + ".txt");
+	auto level = std::make_unique<Level>();
+	loader.load(*level);
 
-    listen();
-
-    return std::make_unique<SimulationScene>(window, music, level, highscores, frameRate);
+	// switch to simulation scene
+    return std::make_unique<SimulationScene>(m_params, std::move(renderer), std::move(level));
 }
 
 std::string MainMenuScene::getHighscoreText() {
@@ -35,7 +45,7 @@ std::string MainMenuScene::getHighscoreText() {
     int counter = 1;
 
     stream << std::fixed << std::setprecision(2);
-    for (const auto &highscore : highscores.getHighscores()) {
+    for (const auto &highscore : m_params.highscores->getHighscores()) {
         stream << "(" << counter++ << ") " << highscore.name << " " << highscore.score << "\n";
     }
     return stream.str();

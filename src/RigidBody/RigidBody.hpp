@@ -26,14 +26,14 @@ struct RigidBodyRect : public RigidBody {
     float width;
     float height;
 
-    RigidBodyRect(int id, float x, float y, int width, int height, float mass = 1.f,
+    RigidBodyRect(int id, float x, float y, float width, float height, float mass = 1.f,
                   float rotation = 0.f)
         : RigidBody(id, x, y, mass, rotation), width(width), height(height) {}
 
     unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 0)) {
-        vec2 sizeHalf(width / 2, height / 2);
+        vec2 sizeHalf(width / 2.f, height / 2.f);
         return make_unique<ColoredMesh>(
-            Mesh::createRectangle(position - sizeHalf, position + sizeHalf),
+            Mesh::createRectangle(-sizeHalf, sizeHalf),
             color
         );
     }

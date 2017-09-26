@@ -84,13 +84,15 @@ public:
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
     {
-        dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
+        dynamics_world->setGravity(btVector3(-10.f, 0.f, 0.f));
 
         grid_static_objects_flow = level.matrix;
 
         for (const unique_ptr<RigidBody> &level_body : level.rigidBodies) {
             addRigidBody(level_body);
         }
+
+		addBoundaryRigidBodies();
     }
 
     void addRigidBody(const unique_ptr<RigidBody> &level_body){
@@ -114,6 +116,58 @@ public:
             grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
         }
     }
+
+	// Add one rigid body that is invisible to user at an inflow cell
+	void createBoundaryRigidBody(btCollisionShape *collision_shape,
+		btDefaultMotionState *motion_state,	btRigidBody *bt_rigid_body,
+		btTransform& transform, const int x, const int y) {
+
+		btVector3 extents = DISTANCE_GRID_CELLS*btVector3(0.5f,0.5f,0.0f); // One grid cell
+		collision_shape = new btBoxShape(extents);
+		transform.setOrigin(DISTANCE_GRID_CELLS*btVector3(x,y,0.0f)); // grid center
+		motion_state = new btDefaultMotionState(transform);
+		bt_rigid_body = new btRigidBody(0.0f, motion_state, collision_shape, btVector3(0.0f,0.0f,0.0f));
+		bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
+		dynamics_world->addRigidBody(bt_rigid_body);
+	}
+
+	// TODO: Instead of multiple rigid bodies just make a longer rectangle
+	// Add rigid bodies invisible to the user at inflow cells
+	void addBoundaryRigidBodies() {
+		btCollisionShape *collision_shape;
+		btDefaultMotionState *motion_state;
+		btRigidBody *bt_rigid_body;
+		btTransform transform;
+		transform.setIdentity();
+		int x = 0, y = 0;
+		// Use two for loops as we only want to iterate over the wall
+		// Left and right walls
+		for (y = 0; y < grid_static_objects_flow.height(); ++y) {
+			// Left wall
+			x = 0;
+			if (grid_static_objects_flow.value(x,y) == Level::CellType::INFLOW) {
+				createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
+			}
+			// Right wall
+			x = grid_static_objects_flow.width()-1;
+			if (grid_static_objects_flow.value(x,y) == Level::CellType::INFLOW) {
+				createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
+			}
+		}
+		// Top and bottom
+		for (x = 0; x < grid_static_objects_flow.width(); ++x) {
+			// Bottom wall
+			y = 0;
+			if (grid_static_objects_flow.value(x,y) == Level::CellType::INFLOW) {
+				createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
+			}
+			// Top wall
+			y = grid_static_objects_flow.height()-1;
+			if (grid_static_objects_flow.value(x,y) == Level::CellType::INFLOW) {
+				createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
+			}
+		}
+	}
 
     btRigidBody* createBtRigidBody(const unique_ptr<RigidBody> &level_body) {
         btCollisionShape *collision_shape;
@@ -265,7 +319,9 @@ public:
         input.computeImpulses(grid_ball, impulses);
 
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
-            auto &obj = dynamics_world->getCollisionObjectArray()[j];
+			auto &obj = dynamics_world->getCollisionObjectArray()[j];
+			if (obj->getUserIndex() == -1) // Ignore the inflow boundary objects
+				continue;
             applyImpulses(obj);
         }
 
@@ -278,6 +334,8 @@ public:
 
         for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
             auto &obj = dynamics_world->getCollisionObjectArray()[j];
+			if (obj->getUserIndex() == -1) // Ignore the inflow boundary objects
+				continue;
             processRigidBody(obj, output, grid_vel);
         }
 

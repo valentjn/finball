@@ -30,16 +30,20 @@ class UserInput {
 private:
 	static const int MAX_USERS = 4;
 	static const int PLAYERS = 2;
-	static constexpr const double MIN_DIFFERENCE = 0.1;
+	static constexpr const double MIN_DIFFERENCE = 0.05;
+    static constexpr const double MAX_DIFFERENCE = 0.2;
+    static constexpr const double BIG_DIFFERENCE_EASING = 0.1;
+    bool leftDifferenceTooBig[PLAYERS];
+    bool rightDifferenceTooBig[PLAYERS];
 
-	enum InputSource {
-		KEYBOARD
+    enum InputSource {
+        KEYBOARD
 #ifndef WITHOUT_KINECT_LIBRARIES
 		, KINECT
 #endif
 	};
 	InputSource usedInputSource;
-	
+
 #ifndef WITHOUT_KINECT_LIBRARIES
     std::unique_ptr<xn::Context> context;
     std::unique_ptr<xn::UserGenerator> userGenerator;
@@ -47,7 +51,7 @@ private:
 
 	bool kinectIsInitialized = false;
 	bool tryInitializingKinect = true;
-	
+
 	user_id_t players[PLAYERS];
 	user_id_t users[MAX_USERS];
 	int playerIndices[PLAYERS];

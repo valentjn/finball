@@ -22,12 +22,12 @@ using namespace std::chrono;
 #ifndef WITHOUT_KINECT_LIBRARIES
 bool UserInput::initializeKinect() {
 	if(kinectIsInitialized) return true;
-	
+
     // init kinect context etc
     context = make_unique<Context>();
     userGenerator = make_unique<UserGenerator>();
     depthGenerator = make_unique<DepthGenerator>();
-	
+
 	// TODO: handle error codes
     XnStatus errorCode = XN_STATUS_OK;
 
@@ -157,7 +157,7 @@ UserInput::UserInput(){
 #ifndef WITHOUT_KINECT_LIBRARIES
 	kinectIsInitialized = false;
 	nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
-	
+
 	for(int k = 0; k < PLAYERS; k++){
 		playerJoined[k] = false;
 	}
@@ -173,12 +173,13 @@ UserInput::UserInput(){
 		max_angle[k] = 1.5;
 		min_angle[k] = -1.5;
 		zero_angle[k] = 0;
+		leftDifferenceTooBig[k] = false;
+		rightDifferenceTooBig[k] = false;
 	}
-	
 }
 
 #ifndef WITHOUT_KINECT_LIBRARIES
-void UserInput::finalizeKinect() {	
+void UserInput::finalizeKinect() {
 	// cleanup kinect context etc
     depthGenerator->Release();
     userGenerator->Release();
@@ -216,7 +217,8 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 			switch (event.key.keysym.sym){
 			case SDLK_LEFT:
 				// 1 keypress is pi/40, velocity starts at pi/10
-				userInputOutput.pressedL = userInputOutput.pressedL - userInputOutput.stepSize;
+				userInputOutput.pressedL
+					= userInputOutput.pressedL - userInputOutput.stepSize;
 				if (userInputOutput.pressedL >= -max_angle[0]) {
 					userInputOutput.leftAngle[0] = userInputOutput.pressedL;
 					userInputOutput.leftVelocity[0] = 4*userInputOutput.pressedL;
@@ -224,7 +226,8 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 				break;
 			case SDLK_RIGHT:
 				// 1 keypress is pi/40, velocity starts at pi/10
-				userInputOutput.pressedR = userInputOutput.pressedR + userInputOutput.stepSize;
+				userInputOutput.pressedR
+					= userInputOutput.pressedR + userInputOutput.stepSize;
 				if (userInputOutput.pressedR <= max_angle[0]) {
 					userInputOutput.rightAngle[0] = userInputOutput.pressedR-3.141;
 					userInputOutput.rightVelocity[0] = 4*userInputOutput.pressedR;
@@ -348,7 +351,8 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 					- rightElbowJoint.position.position.Y;
 
 				userInputOutput.leftAngle[k] = std::atan2(ldy, ldx) - zero_angle[k];
-				userInputOutput.rightAngle[k] = std::atan2(rdy, rdx) + zero_angle[k];
+				userInputOutput.rightAngle[k]
+					= std::atan2(rdy, rdx) + zero_angle[k];
 
 				if(userInputOutput.leftAngle[k] < -M_PI) {
 					userInputOutput.leftAngle[k] += 2*M_PI;
@@ -360,13 +364,13 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 					- userInputOutput.rightAngle[k];
 
 				if(userInputOutput.leftAngle[k] > max_angle[k]) {
-					userInputOutput.leftAngle[k] = max_angle[k]; 
+					userInputOutput.leftAngle[k] = max_angle[k];
 				} else if(userInputOutput.leftAngle[k] < min_angle[k]) {
 					userInputOutput.leftAngle[k] = min_angle[k];
 				}
 
 				if(rightPsi > max_angle[k]) {
-					userInputOutput.rightAngle[k] = M_PI - max_angle[k]; 
+					userInputOutput.rightAngle[k] = M_PI - max_angle[k];
 				} else if(rightPsi < min_angle[k]) {
 					userInputOutput.rightAngle[k] = -M_PI -min_angle[k];
 				}
@@ -376,12 +380,13 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 
 				double previousRightPsi = copysign(M_PI, previousRightAngles[k])
 					- previousRightAngles[k];
-				double ldAngle = userInputOutput.leftAngle[k] - previousLeftAngles[k];
+				double ldAngle
+					= userInputOutput.leftAngle[k] - previousLeftAngles[k];
 				double rdAngle = rightPsi - previousRightPsi;
 				userInputOutput.leftVelocity[k] = (1000000*ldAngle) / delta.count();
-				userInputOutput.rightVelocity[k] = (1000000*rdAngle) / delta.count();
+				userInputOutput.rightVelocity[k]
+					= (1000000*rdAngle) / delta.count();
 
-			
 				if(ldAngle < MIN_DIFFERENCE && ldAngle > -MIN_DIFFERENCE) {
 					userInputOutput.leftAngle[k] = previousLeftAngles[k];
 					userInputOutput.leftVelocity[k] = 0;
@@ -390,7 +395,42 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 					userInputOutput.rightAngle[k] = previousRightAngles[k];
 					userInputOutput.rightVelocity[k] = 0;
 				}
-			
+
+				// ease input when difference is big
+				if(ldAngle > MAX_DIFFERENCE && ldAngle < -MAX_DIFFERENCE) {
+					if(leftDifferenceTooBig[k]) {
+						userInputOutput.leftAngle[k]
+							= previousLeftAngles[k]
+							+ BIG_DIFFERENCE_EASING
+							* (userInputOutput.leftAngle[k]-previousLeftAngles[k]);
+						ldAngle = userInputOutput.leftAngle[k]
+							- previousLeftAngles[k];
+						userInputOutput.leftVelocity[k]
+							= (1000000*ldAngle) / delta.count();
+					} else {
+						userInputOutput.leftAngle[k] = previousLeftAngles[k];
+						userInputOutput.leftVelocity[k] = 0;
+						leftDifferenceTooBig[k] = true;
+					}
+				}
+				if(rdAngle > MAX_DIFFERENCE && rdAngle < -MAX_DIFFERENCE) {
+					if(rightDifferenceTooBig[k]) {
+						userInputOutput.rightAngle[k]
+							= previousRightAngles[k]
+							+ BIG_DIFFERENCE_EASING
+							* (userInputOutput.rightAngle[k]
+								-previousRightAngles[k]);
+						rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
+							- userInputOutput.rightAngle[k];
+                        userInputOutput.rightVelocity[k]
+                            = (1000000*rdAngle) / delta.count();
+                    } else {
+                        userInputOutput.rightAngle[k] = previousRightAngles[k];
+                        userInputOutput.rightVelocity[k] = 0;
+						rightDifferenceTooBig[k] = true;
+					}
+				}
+
 			}
 		}
 
@@ -406,7 +446,7 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 	}
 
 #endif
-	
+
 	previous_time_point = now;
-		
+
 }

@@ -14,7 +14,7 @@ struct UserInputOutput {
 	double maxAngle = 1.571;
 	double stepSize = maxAngle/20; // increase of angle with every keydown event
 	bool fakedata = false;
-	
+
 
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels

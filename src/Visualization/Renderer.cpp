@@ -4,12 +4,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <chrono>
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #include "Log.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
 
@@ -116,17 +117,35 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
     m_tex_noise = std::make_unique<Texture1F>(glm::ivec2{m_fluid_width / 2, m_fluid_height / 2});
     m_tex_noise->setData(noise);
 
+	// create the waves texture
+	m_tex_waves1 = std::make_unique<Texture1F>(glm::ivec2{ m_fluid_width, m_fluid_height });
+	m_tex_waves2 = std::make_unique<Texture1F>(glm::ivec2{ m_fluid_width, m_fluid_height });
+	m_tex_waves1->bind(0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	m_tex_waves2->bind(0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     // create lic output texture
     m_tex_fluid_output = std::make_unique<Texture3F>(glm::ivec2{ m_fluid_width, m_fluid_height });
-    glGenFramebuffers(1, &m_framebuffer_fluid_output);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_tex_fluid_output->texture(), 0);
-    GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
-    glDrawBuffers(1, &draw_buffer);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        Log::error("Failed to create framebuffer for fluid visualization.");
+
+	// create intermediate framebuffers
+    glGenFramebuffers(static_cast<GLsizei>(m_framebuffers_fluid_output.size()), m_framebuffers_fluid_output.data());
+	for (size_t i = 0; i < m_framebuffers_fluid_output.size(); ++i) {
+		glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers_fluid_output[i]);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_tex_fluid_output->texture(), 0);
+		if (i == 0)
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_tex_waves1->texture(), 0);
+		else
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_tex_waves2->texture(), 0);
+		std::array<GLenum, 2> draw_buffers{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(static_cast<GLsizei>(draw_buffers.size()), draw_buffers.data());
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			Log::error("Failed to create framebuffer for fluid visualization.");
+	}
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+	m_inter_fb1 = true;
 
     // create a rectangle mesh to use in the first render pass where the fluid is visualized
     auto full_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
@@ -147,7 +166,7 @@ void Renderer::update(const RendererInput &input) {
     // setup for the rendering of the fluid
     glViewport(0, 0, m_fluid_width, m_fluid_height);
     glUseProgram(m_shader_program_fluid);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers_fluid_output[m_inter_fb1 ? 1 : 0]);
 
     // bind & fill fluid input texture
     auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
@@ -161,6 +180,20 @@ void Renderer::update(const RendererInput &input) {
     loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
     glUniform1i(loc, 1);
     m_tex_noise->bind(1);
+
+	// bind waves texture
+	loc = glGetUniformLocation(m_shader_program_fluid, "tex_waves");
+	glUniform1i(loc, 2);
+	if (m_inter_fb1)
+		m_tex_waves1->bind(2);
+	else
+		m_tex_waves2->bind(2);
+
+	// set time
+	static auto t0 = std::chrono::steady_clock::now();
+	loc = glGetUniformLocation(m_shader_program_fluid, "t");
+	auto diff = std::chrono::steady_clock::now() - t0;
+	glUniform1f(loc, std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() / 1000.f);
 
     // render fluid
 	m_full_quad->render(0);
@@ -206,6 +239,8 @@ void Renderer::update(const RendererInput &input) {
 
     // Swap back and front buffer
     SDL_GL_SwapWindow(m_window);
+
+	m_inter_fb1 = !m_inter_fb1;
 }
 
 // renders an object to the screen (private method)

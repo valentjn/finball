@@ -4,12 +4,13 @@
 #include <memory>
 
 #include <glm/vec3.hpp>
+#include <chrono>
 
 #include "Array2D.hpp"
 #include "LatticeBoltzmann/FICell.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "LatticeBoltzmannOutput.hpp"
 #include "LatticeBoltzmannInput.hpp"
 
@@ -17,6 +18,8 @@ using namespace glm;
 
 class LatticeBoltzmann {
 private:
+	std::chrono::duration<float> measuredTimes[5];
+
     Level &level;
 
     // previous f_i field
@@ -35,7 +38,7 @@ private:
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
 
 	void handleCollisions(const LatticeBoltzmannInput &input);
-	void reinitilizeFI(LatticeBoltzmannOutput &output);
+	void reinitializeFI(LatticeBoltzmannOutput &output);
 	void Output(LatticeBoltzmannOutput &output);
 	void stream(const LatticeBoltzmannInput &input);
 	void handleBoundaries(const LatticeBoltzmannInput &input);
@@ -54,6 +57,9 @@ public:
                 }
             }
         }
+			for (int i = 0; i < 5; i++) {
+				measuredTimes[i] = std::chrono::duration<float>(0.);
+			}
     }
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output);

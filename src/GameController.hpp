@@ -11,9 +11,9 @@
 #include "LatticeBoltzmann/LatticeBoltzmann.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Log.hpp"
-#include "Menus/GameOverScreen.hpp"
+#include "Scenes/GameOverScene.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
@@ -84,8 +84,8 @@ public:
 
         timer.start(frameTime, gameLogicOutput.running);
 
-        GameOverScreen gameOverScreen(window, highscores);
-        gameOverScreen.show(gameLogicOutput.highscore);
+        GameOverScene gameOverScene(window, highscores);
+        gameOverScene.show(gameLogicOutput.highscore);
     }
 
 };

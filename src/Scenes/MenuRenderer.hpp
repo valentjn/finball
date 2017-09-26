@@ -1,5 +1,5 @@
-#ifndef GAME_SCREEN_HPP_
-#define GAME_SCREEN_HPP_
+#ifndef MENU_RENDERER_HPP_
+#define MENU_RENDERER_HPP_
 
 #include <string>
 
@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class GameScreen {
+class MenuRenderer {
 private:
     const SDLWindow &window;
     SDLRenderer renderer;
@@ -20,7 +20,7 @@ private:
     SDLRenderer::Color colorDark;
 
 public:
-    GameScreen(const SDLWindow &window) : window(window), renderer(window) {
+    MenuRenderer(const SDLWindow &window) : window(window), renderer(window) {
         int windowHeight = window.getHeight();
         int headerFontSize = windowHeight * 0.12;
         int defaultFontSize = windowHeight * 0.05;

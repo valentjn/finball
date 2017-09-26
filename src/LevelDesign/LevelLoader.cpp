@@ -12,13 +12,17 @@ void LevelLoader::createFlippers(Level &level) {
     float leftX = level.width * 0.5f - FLIPPER_WIDTH - FLIPPER_GAP;
     float rightX = level.width * 0.5f + FLIPPER_WIDTH + FLIPPER_GAP;
 
-    level.rigidBodies.push_back(make_unique<RigidBodyTriangle>(level.flipperLeftId, leftX, FLIPPER_Y, vec2(leftX + FLIPPER_WIDTH, FLIPPER_Y), vec2(leftX, 0), 0));
-    level.rigidBodies.push_back(make_unique<RigidBodyTriangle>(level.flipperRightId, rightX, FLIPPER_Y, vec2(rightX, 0), vec2(rightX - FLIPPER_WIDTH, FLIPPER_Y), 0));
+    auto rigidBodyLeft = make_unique<RigidBodyTriangle>(level.flipperLeftId, leftX, FLIPPER_Y,
+                                                        vec2(FLIPPER_WIDTH, 0),
+                                                        vec2(0, -FLIPPER_Y),
+                                                        0);
+    auto rigidBodyRight = make_unique<RigidBodyTriangle>(level.flipperRightId, rightX, FLIPPER_Y,
+                                                         vec2(0, -FLIPPER_Y),
+                                                         vec2(-FLIPPER_WIDTH, 0),
+                                                         0);
 
-    vector<vec3> leftVerticies = {vec3(0,0,0), vec3(FLIPPER_WIDTH, 0, 0), vec3(0, -FLIPPER_Y, 0)};
-    vector<vec3> rightVerticies = {vec3(0,0,0), vec3(0, -FLIPPER_Y, 0), vec3(-FLIPPER_WIDTH, 0, 0)};
-    level.meshes[level.flipperLeftId] = make_unique<ColoredMesh>(leftVerticies, vec3(255, 255, 0)).get();
-    level.meshes[level.flipperRightId] = make_unique<ColoredMesh>(rightVerticies, vec3(255, 255, 0)).get();
+    level.setUniqueMesh(level.flipperLeftId, rigidBodyLeft->createColoredMesh(vec3(255, 255, 0)));
+    level.setUniqueMesh(level.flipperRightId, rigidBodyRight->createColoredMesh(vec3(255, 255, 0)));
 }
 
 void LevelLoader::debugPrint(Level &level) {

@@ -66,19 +66,4 @@ std::string MainMenuScene::getHighscoreText() {
 }
 
 void MainMenuScene::listen() {
-    // Flag for quitting the program
-    SDLEvents events;
-    events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
-        if (event.key.keysym.sym == SDLK_SPACE) {
-            return false;
-        }
-
-        return true;
-    });
-    events.setListener(SDL_QUIT, [&](SDL_Event &event) {
-        exit(0);
-        return false;
-    });
-
-    events.listen();
 }

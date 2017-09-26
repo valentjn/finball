@@ -152,6 +152,7 @@ bool UserInput::initializeKinect() {
 
 // initialization of user input facilities
 UserInput::UserInput(InputSource mUsedInputSource){
+	Log::debug("Initializing user input...");
 	previous_time_point = std::chrono::high_resolution_clock::now();
 
 #ifndef WITHOUT_KINECT_LIBRARIES

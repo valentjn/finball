@@ -54,6 +54,14 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
     return true;
 }
 
+void setBallPosition(Level &level, int x, int y) {
+    for (const auto &rb : level.rigidBodies) {
+        if (rb->id == Level::BALL_ID) {
+            rb->position = {x, y};
+        }
+    }
+}
+
 
 // if the rigid body is in the middle in the beginning,
 // then nothing should move in the first few time steps
@@ -65,7 +73,7 @@ TEST(RigidBodyTest, static64) {
   Level level;
 
   levelLoader.load(level);
-  level.setBallPosition(level.width/2, level.height/2);
+  setBallPosition(level, level.width/2, level.height/2);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -123,7 +131,7 @@ TEST(RigidBodyTest, gravity64) {
   Level level;
 
   levelLoader.load(level);
-  level.setBallPosition(level.width/2, level.height/2);
+  setBallPosition(level, level.width / 2, level.height / 2);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -180,7 +188,7 @@ TEST(RigidBodyTest, stop64) {
   Level level;
 
   levelLoader.load(level);
-  level.setBallPosition(level.width/4, level.height*0.9);
+  setBallPosition(level, level.width/4, level.height*0.9);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;

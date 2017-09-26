@@ -34,14 +34,6 @@ public:
 
     Level() {}
 
-    void setBallPosition(float xpos, float ypos) {
-        for (const auto &rb : rigidBodies) {
-            if (rb->id == Level::BALL_ID) {
-                rb->position = {xpos, ypos};
-            }
-        }
-    }
-
     void setUniqueMesh(int id, unique_ptr<Mesh> mesh) {
         Log::debug("starting setUn");
         unique_meshes.push_back(move(mesh));

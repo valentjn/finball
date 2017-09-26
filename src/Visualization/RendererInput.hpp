@@ -14,8 +14,6 @@
 #include "Texture.hpp"
 
 class RendererInput {
-    std::unordered_map<int, std::unique_ptr<Mesh>> m_rigid_body_meshes;
-
 public:
     std::vector<RenderObject> world_objects;
     std::vector<RenderObject> ui_objects;
@@ -53,34 +51,24 @@ public:
         // handle rigid body physics output
         // TODO: rename to transform
 		for (const Transform* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
-            const Mesh* mesh = m_rigid_body_meshes[rigidBody->id].get();
-            if (!mesh) { // check if the mesh wasn't already in the map
-				//Log::info(
-                //    "WARNING: rigid body with id %d does not have a render mesh, rendering as circle",
-                //    rigidBody->id);
+            auto iter = (*gameLogicOutput.rigid_body_meshes).find(rigidBody->id);
+			const Mesh* mesh;
+			if (iter != gameLogicOutput.rigid_body_meshes->end()) { // check if the mesh is in the map
+				mesh = dummy_mesh.get();//iter->second;
+			}
+			else {
+				Log::info(
+                    "WARNING: rigid body with id %d does not have a render mesh, rendering as square",
+                    rigidBody->id);
                 mesh = dummy_mesh.get();
             }
             RenderObject renderObject;
             renderObject.position = glm::vec3(rigidBody->position, 0);
-            // TODO: fix this for the new RigidBody creation architecture
             renderObject.scale = {1.0f, 1.0f};
             renderObject.rotation = rigidBody->rotation;
-			assert(m_rigid_body_meshes.count(rigidBody->id)!=0);
 			renderObject.mesh = mesh;
-
-            /*switch (typeid(rigidBody)) {
-            case typeid(RigidRectangle):
-                const RigidRectangle& rect = static_cast<RigidRectangle>(rigidBody);
-                //
-                break;
-            case typeid(RigidCircle):
-                const RigidCircle& circle = static_cast<RigidCircle>(rigidBody);
-                //
-                break;
-            }*/
             world_objects.push_back(renderObject);
         }
-
 
         // visualise the flag field from rigidbody
         static std::unique_ptr<Texture3F> ff_texture;
@@ -121,7 +109,6 @@ public:
         ff_render_object.scale = {0.25, 0.25};
         ff_render_object.rotation = 0;
         ui_objects.push_back(ff_render_object);
-
 
         // handle lattice boltzmann output
         assert(latticeBoltzmannOutput.velocity.width() == latticeBoltzmannOutput.density.width());

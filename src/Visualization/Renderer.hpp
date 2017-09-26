@@ -30,7 +30,7 @@ private:
     std::unique_ptr<Texture3F> m_tex_fluid_input;
 	std::unique_ptr<Texture1F> m_tex_waves1;
 	std::unique_ptr<Texture1F> m_tex_waves2;
-    std::unique_ptr<Texture1F> m_tex_noise;
+    std::unique_ptr<Texture2F> m_tex_noise;
     std::unique_ptr<Texture3F> m_tex_fluid_output;
 
     std::array<GLuint, 2> m_framebuffers_fluid_output;

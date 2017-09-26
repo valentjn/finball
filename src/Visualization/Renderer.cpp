@@ -13,6 +13,7 @@
 #include "LevelDesign/Level.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
+#include "Visualization/SimplexNoise.hpp"
 
 // Compiles a shader
 GLuint createShader(const char *file_path, GLuint shader_type) {
@@ -108,13 +109,15 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
         "src/Visualization/glsl/fluid_frag.glsl");
 
     // create the noise texture
-    Array2D<float> noise(m_fluid_width / 2, m_fluid_height / 2);
+    Array2D<glm::vec2> noise(m_fluid_width / 2, m_fluid_height / 2);
     std::default_random_engine engine;
     std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
+	constexpr float noise_scale = 0.03f;
     for (int i = 0; i < noise.width(); ++i)
         for(int j = 0; j < noise.height(); ++j)
-            noise.value(i, j) = dist(engine);
-    m_tex_noise = std::make_unique<Texture1F>(glm::ivec2{m_fluid_width / 2, m_fluid_height / 2});
+			noise.value(i, j) =
+				glm::vec2{ dist(engine), simplex::noise2D(i * noise_scale, j * noise_scale) * 0.5f + 0.5f };
+    m_tex_noise = std::make_unique<Texture2F>(glm::ivec2{ noise.width(), noise.height() });
     m_tex_noise->setData(noise);
 	m_tex_noise->bind(0);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

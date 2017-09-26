@@ -11,6 +11,7 @@ public:
     float highscore;
     std::vector<RenderObject> objectsToRender;
     TexturedMesh* fluid_mesh;
+	const std::unordered_map<int, Mesh*>* rigid_body_meshes;
 
     GameLogicOutput() : running(true), highscore(0) {}
 };

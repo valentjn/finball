@@ -8,7 +8,7 @@
 
 class SDLEvents {
 public:
-    typedef std::function<void(SDL_Event&)> listener;
+    typedef std::function<bool(SDL_Event&)> listener;
 
 private:
     std::unordered_map<int, listener> listeners;
@@ -18,8 +18,9 @@ public:
         listeners[event] = listener;
     }
 
-    void listen(const bool &running) {
+    void listen() {
         SDL_Event event;
+        bool running = true;
 
         while (running) {
             SDL_WaitEvent(&event);
@@ -27,7 +28,7 @@ public:
             auto listener = listeners.find(event.type);
 
             if (listener != listeners.end()) {
-                listener->second(event);
+                running = listener->second(event);
             }
         }
     }

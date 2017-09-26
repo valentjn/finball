@@ -72,13 +72,13 @@ public:
 
         // visualise the flag field from rigidbody
         static std::unique_ptr<Texture3F> ff_texture;
-        static std::unique_ptr<TexturedMesh> flag_field_mesh;
+        static std::unique_ptr<TexturedMesh> ff_mesh;
         const int ff_width = rigidBodyPhysicsOutput.grid_objects.width();
         const int ff_height = rigidBodyPhysicsOutput.grid_objects.height();
-        if (!flag_field_mesh) {
+        if (!ff_mesh) {
             ff_texture = std::make_unique<Texture3F>(glm::ivec2(ff_width, ff_height), false);
             const std::vector<glm::vec3> flag_field_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
-            flag_field_mesh = std::make_unique<TexturedMesh>(flag_field_quad, ff_texture.get());
+            ff_mesh = std::make_unique<TexturedMesh>(flag_field_quad, ff_texture.get());
         }
         // fill the texture with data from the flag field
         Array2D<glm::vec3> ff_data = Array2D<glm::vec3>(ff_width, ff_height);
@@ -104,7 +104,7 @@ public:
 
         // create RenderObject
         RenderObject ff_render_object;
-        ff_render_object.mesh = flag_field_mesh.get();
+        ff_render_object.mesh = ff_mesh.get();
         ff_render_object.position = glm::vec3{0.75f, 0.75f, 0.0f};
         ff_render_object.scale = {0.25, 0.25};
         ff_render_object.rotation = 0;

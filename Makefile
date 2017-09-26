@@ -10,7 +10,8 @@ COMMON_CFLAGS:= -pedantic \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src \
-		       -I ext
+		       -I ext \
+		       -I/usr/local/include/opencv -I/usr/local/include
 KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
@@ -20,7 +21,8 @@ LDFLAGS:= -lSDL2_image \
 		  -lSDL2_mixer \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs`
+		  `pkg-config bullet --libs` \
+		  -L/usr/local/lib -lopencv_core -lopencv_imgcodecs
 KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2
 
 .PHONY: test_all

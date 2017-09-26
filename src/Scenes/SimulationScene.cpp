@@ -55,7 +55,7 @@ std::unique_ptr<Scene> SimulationScene::show() {
         rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
         rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
-        latticeBoltzmannInput = LatticeBoltzmannInput(userInputOutput, rigidBodyPhysicsOutput);
+        latticeBoltzmannInput = LatticeBoltzmannInput(rigidBodyPhysicsOutput);
         latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
         gameLogicInput =

@@ -24,9 +24,7 @@ public:
         flagfield(level.matrix)
     {}
 
-	// TODO: const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput
-    LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) :
+    LatticeBoltzmannInput(const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) :
         velocities(rigidBodyPhysicsOutput.grid_velocities),
         flagfield(rigidBodyPhysicsOutput.grid_objects)
     {}

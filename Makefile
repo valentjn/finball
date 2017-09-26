@@ -92,6 +92,9 @@ test_test: test_deps
 	$(CXX) test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
 	build/test_test
 
+make_level:
+	python3 ./LevelCreator/LevelCreator.py
+
 
 GTEST_DIR = ext/googletest/googletest/
 GTEST_BUILD_CFLAGS = -I $(GTEST_DIR)/include/ -I $(GTEST_DIR) -pthread

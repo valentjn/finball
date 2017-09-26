@@ -18,7 +18,7 @@ private:
 
 public:
     SDLWindow(int width, int height, const char* title, bool fullscreen) {
-        handleError(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) != 0, "Failed to initialize SDL", SDL_GetError());
+        handleError(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0, "Failed to initialize SDL", SDL_GetError());
         handleError(TTF_Init() != 0, "Failed to initialize TTF", TTF_GetError());
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");

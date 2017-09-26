@@ -23,7 +23,7 @@ std::unique_ptr<Scene> MainMenuScene::show() {
 		menuRenderer.addActionText("To start the game please do a HAI-five or press SPACE!");
 		menuRenderer.addLeftText(getHighscoreText());
 		menuRenderer.render();
-		m_params.music->load("data/MainTheme.mp3");
+		m_params.music->play("data/MainTheme.mp3");
 
 		listen();
 	}

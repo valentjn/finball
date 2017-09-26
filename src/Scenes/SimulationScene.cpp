@@ -75,7 +75,7 @@ std::unique_ptr<Scene> SimulationScene::show() {
         }
     });
 
-    m_params.music->load("data/GameTheme.mp3");
+    m_params.music->play("data/GameTheme.mp3");
 
     timer.start(1000 / m_params.cmd_params->frameRate, gameLogicOutput.running);
 

@@ -128,8 +128,8 @@ public:
         assert(latticeBoltzmannOutput.velocity.height() == latticeBoltzmannOutput.density.height());
         fluid_input = Array2D<glm::vec3>{
 			latticeBoltzmannOutput.velocity.width() - 2, latticeBoltzmannOutput.velocity.height() - 2 };
-        for (int x = 0; x < fluid_input.width() - 2; ++x)
-            for (int y = 0; y < fluid_input.height() - 2; ++y)
+        for (int x = 0; x < fluid_input.width(); ++x)
+            for (int y = 0; y < fluid_input.height(); ++y)
                 fluid_input.value(x,y) = glm::vec3{ latticeBoltzmannOutput.velocity.value(x+1,y+1) * 10.f + 0.5f, latticeBoltzmannOutput.density.value(x+1,y+1) * 0.5f };
         /* test input
         static Array2D<glm::vec2> test_fluid_velocity;

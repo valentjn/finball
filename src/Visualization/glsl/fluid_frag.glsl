@@ -143,7 +143,7 @@ void main()
 	const float tscale = 0.1;
 
 	ivec2 vecs_res = textureSize(tex_vecs, 0);
-	ivec2 rend_res = textureSize(tex_noise, 0) * 2;
+	ivec2 rend_res = textureSize(tex_waves, 0);
     vec2 normalized_coords = gl_FragCoord.xy / rend_res;
     //normalized_coords = (normalized_coords * vecs_res + 0.5) / (vecs_res + 1);
 
@@ -158,13 +158,13 @@ void main()
 	
 	vec2 veloc = getVeloc(normalized_coords);
 	float velocity_val = lic(normalized_coords);
-	if (int(gl_FragCoord.x) <= 1)
+	if (int(gl_FragCoord.x) <= 0)
 		out_wave = noise2D(vec2(noise_scale * normalized_coords.y, t * tscale));
-	else if (int(gl_FragCoord.x) >= rend_res.x - 2)
+	else if (int(gl_FragCoord.x) >= rend_res.x - 1)
 		out_wave = noise2D(vec2(noise_scale * (3 - normalized_coords.y), t * tscale));
-	else if (int(gl_FragCoord.y) <= 1)
+	else if (int(gl_FragCoord.y) <= 0)
 		out_wave = noise2D(vec2(noise_scale * (4 - normalized_coords.x), t * tscale));
-	else if (int(gl_FragCoord.y) >= rend_res.y - 2)
+	else if (int(gl_FragCoord.y) >= rend_res.y - 1)
 		out_wave = noise2D(vec2(noise_scale * (1 + normalized_coords.x), t * tscale));
 	else {
 		vec2 sample_coords = normalized_coords - 10 * veloc / vecs_res;

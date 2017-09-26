@@ -301,8 +301,10 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 		if(usedInputSource == KEYBOARD) {
 			userInputOutput.leftAngle[0]=anl;
 			userInputOutput.rightAngle[0]=anr;
-			userInputOutput.leftVelocity[1]=avl;		
-			userInputOutput.rightVelocity[1]=avr;
+			if(PLAYERS>=2) {
+				userInputOutput.leftVelocity[1]=avl;		
+				userInputOutput.rightVelocity[1]=avr;
+			}
 		}
 	}
 }

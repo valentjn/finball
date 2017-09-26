@@ -19,7 +19,7 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
-        for (int i = 0; i < iter; i++) {
+		for (int i = 0; i < iter; i++) {
 
 		step(input, output);
 	}
@@ -84,19 +84,26 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 				case Level::OBSTACLE:
 					for (int z = 1; z < 9; ++z) {
 
-                                            if (fi_New.value(x, y)[z] != 0.0) {
-                                                constexpr static float c = 1. / 1.732050;
-                                                float density = 0.0f;
-                                                for (int i = 0; i < 9; i++) {
-                                                        density += fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[i]; // density
-                                                }
+						if (fi_New.value(x, y)[z] != 0.0) {
+							constexpr static float c = 1. / 1.732050;
+							float density = 0.0f;
+							for (int i = 0; i < 9; i++) {
+								density += fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[i]; // density
+							}
 
-                                            fi_New.value(x + cx[opp[z]], y + cy[opp[z]])[opp[z]] =
-                                                         fi_New.value(x, y)[z] - 2 / (c*c) *
-                                                      density*w[z]/(4.*iter)*(input.velocities.value(x,y)[0]*cx[z] +
-                                                    input.velocities.value(x,y)[1]*cy[z]);
-                                            fi_New.value(x, y)[z] = 0.0;
-                                            }
+							float neighborFI = fi_New.value(x, y)[z] - 2 / (c*c) *
+								density*w[z]/(4.*iter)*(input.velocities.value(x,y)[0]*cx[z] +
+								input.velocities.value(x,y)[1]*cy[z]);
+
+							int neighborx = x + cx[opp[z]];
+							int neighbory = y + cy[opp[z]];
+							int neighbori = opp[z];
+
+							fi_New.value(neighborx, neighbory)[neighbori] = neighborFI;
+							assert(isSane(neighborFI,neighborx,neighbory,neighbori));
+
+							fi_New.value(x, y)[z] = 0.0;
+						}
 					}
 					break;
 				case Level::INFLOW:
@@ -305,6 +312,13 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 			}
 		}
 	}
+}
+
+bool LatticeBoltzmann::isSane(float fiValue, int x, int y, int i) {
+	if (fiValue >= 0. && fiValue <= 2.) return true;
+	std::cout << "Bad FI value: " << fiValue; 
+	std::cout << " at " << x << "," << y << "," << i << std::endl;
+	return false;
 }
 
 bool LatticeBoltzmann::isBoundaryValid(const Array2D<Level::CellType> &flagfield)

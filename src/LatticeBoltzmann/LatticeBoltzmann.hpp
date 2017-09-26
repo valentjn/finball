@@ -37,6 +37,8 @@ private:
     const int iter = 15;
 
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
+    bool isSane(float fiValue, int x, int y, int i);
+
 
 	void handleCollisions(const LatticeBoltzmannInput &input);
 	void reinitializeFI(LatticeBoltzmannOutput &output);

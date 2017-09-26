@@ -3,6 +3,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <thread>
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
@@ -24,6 +25,24 @@
 using namespace chrono;
 
 std::unique_ptr<Scene> SimulationScene::show() {
+    float score = simulation();
+
+    return std::make_unique<GameOverScene>(context, score);
+}
+
+float SimulationScene::simulation() {
+    // initialize renderer before level
+    Renderer renderer(*context.window);
+
+    LevelLoader levelLoader("data/" + levelName);
+    Level level;
+    levelLoader.load(level);
+
+    GameLogic gameLogic(level);
+    UserInput userInput;
+    LatticeBoltzmann latticeBoltzmann(level);
+    RigidBodyPhysics rigidBodyPhysics(level);
+
     UserInputOutput userInputOutput;
     LatticeBoltzmannOutput latticeBoltzmannOutput(level);
     RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
@@ -33,21 +52,21 @@ std::unique_ptr<Scene> SimulationScene::show() {
 
     Timer timer([&]() {
         // 1. get user input (kinect)
-        userInput->getInput(userInputOutput);
+        userInput.getInput(userInputOutput);
 
         // 2. do calculations (rigid body, LBM)
         RigidBodyPhysicsInput rigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
-        rigidBodyPhysics->compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
+        rigidBodyPhysics.compute(rigidBodyPhysicsInput, rigidBodyPhysicsOutput);
 
         LatticeBoltzmannInput latticeBoltzmannInput(rigidBodyPhysicsOutput);
-        latticeBoltzmann->compute(latticeBoltzmannInput, latticeBoltzmannOutput);
+        latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
 
         GameLogicInput gameLogicInput(userInputOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
-        gameLogic->update(gameLogicInput, gameLogicOutput);
+        gameLogic.update(gameLogicInput, gameLogicOutput);
 
         // 3. draw visualization
         RendererInput rendererInput(gameLogicOutput, rigidBodyPhysicsOutput, latticeBoltzmannOutput);
-        renderer->update(rendererInput);
+        renderer.update(rendererInput);
 
         if (Log::logLevel >= Log::DEBUG) {
             steady_clock::time_point thisFrame = steady_clock::now();
@@ -57,9 +76,19 @@ std::unique_ptr<Scene> SimulationScene::show() {
         }
     });
 
+    Timer simulationTimer([&]() {
+        // TODO
+    });
+
     context.music->play("data/GameTheme.mp3");
+
+    std::thread simulationThread([&]() {
+        simulationTimer.start(1000 / context.parameters->simulationRate, gameLogicOutput.running);
+    });
 
     timer.start(1000 / context.parameters->frameRate, gameLogicOutput.running);
 
-    return std::make_unique<GameOverScene>(context, gameLogicOutput.score);
+    simulationThread.join();
+
+    return gameLogicOutput.score;
 }

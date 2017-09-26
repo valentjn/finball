@@ -203,12 +203,16 @@ if __name__ == "__main__":
         row = []
         for y in range(size_y):
             if y == 0:
-                if int(size_x/2-10) < x < int(size_x/2+10):
+                if not int(size_x/16) < x < int(15*size_x/16):
+                    row.append('2')
+                elif int(3*size_x/8) < x < int(5*size_x/8):
                     row.append('2')
                 else:
                     row.append('1')
             elif y == size_y - 1:
-                if int(size_x/2-10) < x < int(size_x/2+10):
+                if not int(size_x/16) < x < int(15*size_x/16):
+                    row.append('2')
+                elif int(2*size_x/8) < x < int(6*size_x/8):
                     row.append('3')
                 else:
                     row.append('1')

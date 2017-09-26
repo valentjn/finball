@@ -21,28 +21,16 @@ using namespace std;
 class SimulationScene : public Scene {
 
 private:
-    Level level;
-
-    unique_ptr<GameLogic> gameLogic;
-    unique_ptr<UserInput> userInput;
-    unique_ptr<LatticeBoltzmann> latticeBoltzmann;
-    unique_ptr<RigidBodyPhysics> rigidBodyPhysics;
-    unique_ptr<Renderer> renderer;
+    string levelName;
 
 public:
-    SimulationScene(Scene::Context context, string levelName) : Scene(context) {
-        renderer = make_unique<Renderer>(*context.window);
-
-        LevelLoader levelLoader("data/" + levelName);
-        levelLoader.load(level);
-
-        gameLogic = make_unique<GameLogic>(level);
-        userInput = make_unique<UserInput>();
-        latticeBoltzmann = make_unique<LatticeBoltzmann>(level);
-        rigidBodyPhysics = make_unique<RigidBodyPhysics>(level);
-    }
+    SimulationScene(Scene::Context context, string levelName) :
+            Scene(context), levelName(levelName) {}
 
     std::unique_ptr<Scene> show();
+
+private:
+    float simulation();
 
 };
 

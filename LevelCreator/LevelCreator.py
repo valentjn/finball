@@ -26,14 +26,18 @@ class Rectangle(Object):
         self.size_y = size_y
 
     def write_object(self, flag_field):
-        for x in range(self.size_x):
-            for y in range(self.size_y):
+        for xs in range(4*self.size_x):
+            x=xs/4
+            for ys in range(4*self.size_y):
+                y=ys/4
                 flag_field[int(self.pos_x + math.cos(self.angle) * x - math.sin(self.angle) * y + 0.5)] \
                 [int(self.pos_y + math.sin(self.angle) * x + math.cos(self.angle) * y + 0.5)] = '1'
 
     def check_overlap(self, flag_field):
-        for x in range(self.size_x):
-            for y in range(self.size_y):
+        for xs in range(4*self.size_x):
+            x=xs/4
+            for ys in range(4*self.size_y):
+                y=ys/4
                 obs_x = int(self.pos_x + math.cos(self.angle) * x - math.sin(self.angle) * y + 0.5)
                 obs_y = int(self.pos_y + math.sin(self.angle) * x + math.cos(self.angle) * y + 0.5)
                 if not (0 < obs_x < len(flag_field) and 0 < obs_y < len(flag_field[0])):
@@ -77,12 +81,14 @@ class Line(Object):
         self.length = length
 
     def write_object(self, flag_field):
-        for l in range(self.length):
+        for ls in range(4*self.length):
+            l = ls/4
             flag_field[int(self.pos_x + math.cos(self.angle) * l + 0.5)] \
             [int(self.pos_y + math.sin(self.angle) * l + 0.5)] = '1'
 
     def check_overlap(self, flag_field):
-        for l in range(self.length):
+        for ls in range(4*self.length):
+            l = ls/4
             obs_x = int(self.pos_x + math.cos(self.angle) * l + 0.5)
             obs_y = int(self.pos_y + math.sin(self.angle) * l + 0.5)
             if not (0 < obs_x < len(flag_field) and 0 < obs_y < len(flag_field[0])):
@@ -107,9 +113,10 @@ class Triangle(Object):
         l = math.sqrt(h ** 2 + b ** 2)
         alpha = math.acos(b / l)
 
-        for len in range(self.length):
-            for i in range(int(l*len/self.length)):
-
+        for lens in range(4*self.length):
+            len = lens/4
+            for iss in range(4*int(l*len/self.length)):
+                i = iss/4
                 x = int(math.cos(self.angle)*len - math.cos(alpha+self.angle)*i)
                 y = int(math.sin(self.angle)*len - math.sin(alpha+self.angle)*i)
                 flag_field[self.pos_x + x][self.pos_y + y] = '1'
@@ -120,8 +127,10 @@ class Triangle(Object):
         l = math.sqrt(h ** 2 + b ** 2)
         alpha = math.acos(b / l)
 
-        for leng in range(self.length):
-            for i in range(int(l * leng / self.length)):
+        for lengs in range(4*self.length):
+            leng = lengs/4
+            for iss in range(4*int(l * leng / self.length)):
+                i = iss/4
                 obs_x = self.pos_x + int(math.cos(self.angle) * leng - math.cos(alpha + self.angle) * i)
                 obs_y = self.pos_y + int(math.sin(self.angle) * leng - math.sin(alpha + self.angle) * i)
                 if not (0 < obs_x < len(flag_field) and 0 < obs_y < len(flag_field[0])):
@@ -183,43 +192,37 @@ def write_file(file, size_x, size_y, flag_field):
             for x in range(size_y):
                 f.write(str(flag_field[x][y]))
 
+if __name__ == "__main__":
+    size_x = 64
+    size_y = 64
 
-size_x = 64
-size_y = 64
+    flag_field = []
+    objects = []
 
-
-flag_field = []
-
-objects = []
-
-
-for x in range(size_x):
-    row = []
-    for y in range(size_y):
-        if y == 0:
-            row.append('2')
-        elif y == size_y - 1:
-            if int(size_x/2-10) < x < int(size_x/2+10):
-                row.append('3')
-            else:
+    for x in range(size_x):
+        row = []
+        for y in range(size_y):
+            if y == 0:
+                if int(size_x/2-10) < x < int(size_x/2+10):
+                    row.append('2')
+                else:
+                    row.append('1')
+            elif y == size_y - 1:
+                if int(size_x/2-10) < x < int(size_x/2+10):
+                    row.append('3')
+                else:
+                    row.append('1')
+            elif x == 0 or x == size_x - 1:
                 row.append('1')
-        elif x == 0 or x == size_x - 1:
-            row.append('1')
-        else:
-            row.append('0')
-    flag_field.append(row)
+            else:
+                row.append('0')
+        flag_field.append(row)
 
-inflow(size_x, size_y, flag_field)
+    inflow(size_x, size_y, flag_field)
 
-flag_field[32][6] = 'B'
+    flag_field[32][6] = 'B'
 
-for i in range(random.randint(4, 7)):
-    draw_object(flag_field).write_object(flag_field)
+    for i in range(random.randint(4, 7)):
+        draw_object(flag_field).write_object(flag_field)
 
-
-write_file('./data/testLevel3.txt', size_x, size_y, flag_field)
-
-
-
-
-
+    write_file('./data/testLevel3.txt', size_x, size_y, flag_field)

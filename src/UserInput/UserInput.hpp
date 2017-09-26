@@ -93,9 +93,10 @@ private:
 	static constexpr const double a0 = 3.141; // set positive angular acceleration constant
 	
 	void getSDLInput(UserInputOutput& userInputOutput, double delta);
+	void getFakeInput(UserInputOutput& userInputOutput, double delta);
 
 public:
-	UserInput();
+	UserInput(InputSource mUsedInputSource = CHOOSING);
 	~UserInput();
     void getInput(UserInputOutput &userInputOutput);
 

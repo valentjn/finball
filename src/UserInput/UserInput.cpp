@@ -151,7 +151,7 @@ bool UserInput::initializeKinect() {
 #endif
 
 // initialization of user input facilities
-UserInput::UserInput(){
+UserInput::UserInput(InputSource mUsedInputSource){
 	previous_time_point = std::chrono::high_resolution_clock::now();
 
 #ifndef WITHOUT_KINECT_LIBRARIES
@@ -177,7 +177,7 @@ UserInput::UserInput(){
 		rightDifferenceTooBig[k] = false;
 	}
 	// TODO: parse from cli parameters
-	usedInputSource = CHOOSING;
+	usedInputSource = mUsedInputSource;
 }
 
 #ifndef WITHOUT_KINECT_LIBRARIES
@@ -224,6 +224,9 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 			case SDLK_RIGHT:
 				rightPressed = true;
 				break;
+			case SDLK_ESCAPE:
+				userInputOutput.quit = true;
+				return;
 			}
 			break;
 		case SDL_KEYUP:
@@ -236,7 +239,9 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 				break;
 			case SDLK_SPACE:
 				userInputOutput.start = true;
-				usedInputSource = KEYBOARD;
+				if(usedInputSource == CHOOSING) {
+					usedInputSource = KEYBOARD;
+				}
 #ifndef WITHOUT_KINECT_LIBRARIES
 				tryInitializingKinect = false;
 #endif
@@ -466,18 +471,29 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
 			}
 		}
 
-		for(int k = 0; k < PLAYERS; k++){
-			previousLeftAngles[k] = userInputOutput.leftAngle[k];
-			previousRightAngles[k] = userInputOutput.rightAngle[k];
-		}
 		userInputOutput.start = std::all_of(playerJoined, playerJoined+PLAYERS,
 			[](bool x){return x;});
-		if(userInputOutput.start) {
+		if(userInputOutput.start && usedInputSource == CHOOSING) {
 			usedInputSource = KINECT;
 		}
 	}
 }
 #endif
+
+void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
+	static double t = 0;
+	t+=delta * M_PI;
+	if(t >= 2*M_PI) {
+		t -= M_PI;
+	}
+	double a = 0.5*(std::sin(t)+1);
+
+	for(int k=0; k<PLAYERS; k++) {
+		double angle = min_angle[k] + (max_angle[k]-min_angle[k])*a;
+		userInputOutput.leftAngle[k] = angle;
+		userInputOutput.rightAngle[k] = std::copysign(M_PI, angle) - angle;
+	}
+}
 
 // process input
 void UserInput::getInput(UserInputOutput &userInputOutput) {
@@ -497,15 +513,21 @@ void UserInput::getInput(UserInputOutput &userInputOutput) {
 #endif
 	case CHOOSING:
 		getSDLInput(userInputOutput, delta);
+#ifndef WITHOUT_KINECT_LIBRARIES
 		getKinectInput(userInputOutput, delta);
+#endif
 		break;
 	case FAKE:
-		// TODO
+		getSDLInput(userInputOutput, delta);
+		getFakeInput(userInputOutput, delta);
 		break;
 	default:
 		Log::error("Unknown input source selected. Something went terribly wrong.");
 	}
 
 	previous_time_point = now;
-
+	for(int k = 0; k < PLAYERS; k++){
+		previousLeftAngles[k] = userInputOutput.leftAngle[k];
+		previousRightAngles[k] = userInputOutput.rightAngle[k];
+	}
 }

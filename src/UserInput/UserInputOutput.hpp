@@ -6,20 +6,17 @@
 #include <chrono>
 
 struct UserInputOutput {
-    double leftAngle[2];
-    double rightAngle[2];
-    double leftVelocity[2];
-    double rightVelocity[2];
+	static const int PLAYERS = 2;
+	
+    double leftAngle[PLAYERS];
+    double rightAngle[PLAYERS];
+    double leftVelocity[PLAYERS];
+    double rightVelocity[PLAYERS];
 
-    bool playerIsTracked[2];
+    bool playerIsTracked[PLAYERS];
 
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels
-
-    // increasing with duration of left / right arrow pressed
-    // equivalence: pressedL == leftAngle[0] and pressedR == rightAngle[0]+PI
-    double pressedL = 0;
-    double pressedR = 0;
 
     bool quit, start;
 
@@ -27,7 +24,7 @@ struct UserInputOutput {
 
 	void print() {
 		std::cout << (quit?"Q":"") << (start?"S":"");
-		for(int k = 0; k<2; k++) {
+		for(int k = 0; k<PLAYERS; k++) {
 			std::cout << (playerIsTracked[k]?"T":"")
 					  << " L: " << std::setw(15) << leftAngle[k]
 					  << " | " << std::setw(15) << leftVelocity[k]

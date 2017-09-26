@@ -19,9 +19,12 @@ private:
     RenderObject fluid_surface;
 
     steady_clock::time_point startTime;
+	const std::unordered_map<int, Mesh*>& rigid_body_meshes;
 
 public:
-    GameLogic(const Level& level) {
+    GameLogic(const Level& level)
+		: rigid_body_meshes(level.meshes)
+	{
         auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
         fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
         fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.2f};
@@ -54,6 +57,7 @@ public:
         }
 
         output.fluid_mesh = fluid_mesh.get();
+		output.rigid_body_meshes = &rigid_body_meshes;
     }
 };
 

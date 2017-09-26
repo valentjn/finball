@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "Level.hpp"
-#include "Log.hpp"
 #include "Array2D.hpp"
 
 using namespace std;
@@ -66,10 +65,6 @@ public:
             rect.size.height -= 2;
             cv::boxPoints(rect, boxPoints2f);
             boxPoints2f.assignTo(boxPoints, CV_32S); // Convert Point2f to Point
-            cout << "--- " << i << endl;
-            cout << center << " -- " << radius << endl;
-            cout << boxPoints << endl;
-            cout << radius*radius*PI << " -- " << rect.size.area() << endl;
 
             // Choose the one with the smaller area
             if (radius * radius * PI <= rect.size.area()) {

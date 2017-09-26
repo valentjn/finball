@@ -84,7 +84,7 @@ public:
           // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
     {
-        dynamics_world->setGravity(btVector3(-10.f, 0.f, 0.f));
+        dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
 
         grid_static_objects_flow = level.matrix;
 

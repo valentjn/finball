@@ -11,9 +11,9 @@
 class GameOverScene : public Scene {
 private:
     float score;
-
+    bool newHighscore;
 public:
-	GameOverScene(Scene::Params scene_params, float score) : Scene(scene_params), score(score) {}
+	GameOverScene(Scene::Params scene_params, float score) : Scene(scene_params), score(score), newHighscore(false) {}
     
 	std::unique_ptr<Scene> show();
 

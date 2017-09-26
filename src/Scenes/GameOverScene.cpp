@@ -13,12 +13,22 @@ std::unique_ptr<Scene> GameOverScene::show() {
     MenuRenderer menuRenderer(*m_params.window);
     menuRenderer.addBackgroundImage("data/background.jpg");
 
-    menuRenderer.addTitle("Game Over :(");
+
     menuRenderer.addActionText("This was HAIkel! Your HAIscore is " + std::to_string(score) + ".");
-    menuRenderer.addLeftText("Enter your name:\n__________________");
+    if(m_params.highscores->checkNewHighscore(score)){
+    	menuRenderer.addTitle("New Highscore!!!");
+        menuRenderer.addLeftText("Enter your name:\n__________________");
+		newHighscore = true;
+		m_params.music->play("data/WinningOutro.mp3", 1);
+	} else {
+		menuRenderer.addTitle("Game Over :(");
+		menuRenderer.addLeftText("Press any key to continue\n");
+		newHighscore = false;
+		m_params.music->play("data/SadGameOver.mp3", 1);
+	}
 
     menuRenderer.render();
-    m_params.music->play("data/SadGameOver.mp3", 1);
+
 
     listen(menuRenderer);
 
@@ -31,6 +41,9 @@ void GameOverScene::listen(MenuRenderer &menuRenderer) {
 
     SDLEvents events;
     events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
+    	if(not newHighscore){
+    		return false;
+    	}
         SDL_Keycode sym = event.key.keysym.sym;
         if (sym == SDLK_RETURN) {
             m_params.highscores->saveHighscore(score, name);

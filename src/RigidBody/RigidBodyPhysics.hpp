@@ -286,6 +286,7 @@ public:
 
         // TODO: mesh tohether the individual flag fields
         markRBAsObstacles(grid_obj);
+        grid_finFlag(grid_obj, grid_vel, glm::vec2(10, 10), glm::vec2(13, 10), glm::vec2(10, 8));
 
         // grid_finFlag(grid_obj, glm::vec2(0,0),
         // for (int i = GRID_HEIGHT - 1; i >= 0; --i) {
@@ -315,7 +316,7 @@ public:
         //create a new one
     }
 
-    void grid_finFlag(Array2D<Level::CellType> &grid_fin, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3) {
+    void grid_finFlag(Array2D<Level::CellType> &grid_fin, Array2D<glm::vec2>& grid_vel, glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3) {
         glm::vec2 norm1(-(pos1.y - pos2.y), pos1.x - pos2.x);
         glm::vec2 norm2(-(pos2.y - pos3.y), pos2.x - pos3.x);
         glm::vec2 norm3(-(pos3.y - pos1.y), pos3.x - pos1.x);
@@ -329,6 +330,7 @@ public:
                         (tempVec2.x * norm2.x + tempVec2.y * norm2.y >= 0) &&
                         (tempVec3.x * norm3.x + tempVec3.y * norm3.y >= 0)) {
                     grid_fin.value(i, j) = Level::CellType::OBSTACLE;
+                    grid_vel.value(i, j) = glm::vec2(-2. ,2.);
                 }
             }
         }

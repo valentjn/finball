@@ -9,18 +9,24 @@
 #include "SDL/SDLMusic.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "UserInput/UserInput.hpp"
+#include "Visualization/Renderer.hpp"
 
 class SimulationScene : public Scene {
-    const SDLWindow &window;
-    SDLMusic &music;
-    std::unique_ptr<UserInput> userInput;
-    Level &level;
-    Highscores &highscores;
-    int frameRate;
+	std::unique_ptr<Renderer> m_renderer;
+	std::unique_ptr<Level> m_level;
+    std::unique_ptr<UserInput> m_user_input;
 
 public:
-    SimulationScene(const SDLWindow &window, SDLMusic &music, std::unique_ptr<UserInput> userInput, Level &level, Highscores &highscores, int frameRate)
-            : window(window), music(music), userInput(std::move(userInput)), level(level), highscores(highscores), frameRate(frameRate) {}
+	SimulationScene(
+		Scene::Params params,
+		std::unique_ptr<Renderer> renderer,
+		std::unique_ptr<Level> level,
+		std::unique_ptr<UserInput> user_input)
+		: Scene(params)
+		, m_renderer(std::move(renderer))
+		, m_level(std::move(level))
+		, m_user_input(std::move(user_input))
+	{}
 
     std::unique_ptr<Scene> show();
 };

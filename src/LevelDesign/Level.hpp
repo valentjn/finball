@@ -36,15 +36,15 @@ public:
 
     void setUniqueMesh(int id, unique_ptr<Mesh> mesh) {
         Log::debug("starting setUn");
+		meshes[id] = mesh.get();
         unique_meshes.push_back(move(mesh));
         Log::debug("pushed to unique m");
-        meshes[id] = mesh.get();
-        Log::debug("done");
     }
 
     Mesh *addUniqueMesh(unique_ptr<Mesh> mesh) {
+		auto ret = mesh.get();
         unique_meshes.push_back(move(mesh));
-        return mesh.get();
+        return ret;
     }
 };
 

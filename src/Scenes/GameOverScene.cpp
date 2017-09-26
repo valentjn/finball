@@ -10,7 +10,7 @@
 #include "SDL/SDLEvents.hpp"
 
 std::unique_ptr<Scene> GameOverScene::show() {
-    MenuRenderer menuRenderer(window);
+    MenuRenderer menuRenderer(*m_params.window);
     menuRenderer.addBackgroundImage("data/background.jpg");
 
     menuRenderer.addTitle("Game Over :(");
@@ -21,7 +21,7 @@ std::unique_ptr<Scene> GameOverScene::show() {
 
     listen(menuRenderer);
 
-    return std::make_unique<MainMenuScene>(window, music, highscores, level, frameRate);
+    return std::make_unique<MainMenuScene>(m_params);
 }
 
 void GameOverScene::listen(MenuRenderer &menuRenderer) {
@@ -32,7 +32,7 @@ void GameOverScene::listen(MenuRenderer &menuRenderer) {
     events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
         SDL_Keycode sym = event.key.keysym.sym;
         if (sym == SDLK_RETURN) {
-            highscores.saveHighscore(score, name);
+            m_params.highscores->saveHighscore(score, name);
             return false;
         }
 

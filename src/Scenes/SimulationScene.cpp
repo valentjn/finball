@@ -29,26 +29,28 @@
 using namespace chrono;
 
 std::unique_ptr<Scene> SimulationScene::show() {
-    Renderer renderer(window);
-    GameLogic gameLogic(level);
-    LatticeBoltzmann latticeBoltzmann(level);
-    RigidBodyPhysics rigidBodyPhysics(level);
+	Renderer& renderer = *m_renderer;
+    GameLogic gameLogic(*m_level);
+    UserInput& userInput = *m_user_input;
+    LatticeBoltzmann latticeBoltzmann(*m_level);
+    RigidBodyPhysics rigidBodyPhysics(*m_level);
 
     UserInputOutput userInputOutput;
-    LatticeBoltzmannOutput latticeBoltzmannOutput(level);
-    RigidBodyPhysicsOutput rigidBodyPhysicsOutput(level);
+    LatticeBoltzmannOutput latticeBoltzmannOutput(*m_level);
+    RigidBodyPhysicsOutput rigidBodyPhysicsOutput(*m_level);
     GameLogicOutput gameLogicOutput;
 
-    LatticeBoltzmannInput latticeBoltzmannInput(level);
+    LatticeBoltzmannInput latticeBoltzmannInput(*m_level);
     RigidBodyPhysicsInput rigidBodyPhysicsInput;
     GameLogicInput gameLogicInput;
     RendererInput rendererInput;
 
     steady_clock::time_point lastFrame = steady_clock::now();
 
-    Timer timer([&]() {
+    Timer timer([&]()
+	{
         // 1. get user input (kinect)
-        userInput->getInput(userInputOutput);
+        userInput.getInput(userInputOutput);
 
         // 2. do calculations (rigid body, LBM)
         rigidBodyPhysicsInput = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
@@ -74,9 +76,9 @@ std::unique_ptr<Scene> SimulationScene::show() {
         }
     });
 
-    music.load("data/GameTheme.mp3");
+    m_params.music->load("data/GameTheme.mp3");
 
-    timer.start(1000 / frameRate, gameLogicOutput.running);
+    timer.start(1000 / m_params.cmd_params->frameRate, gameLogicOutput.running);
 
-    return std::make_unique<GameOverScene>(window, music, highscores, gameLogicOutput.highscore, level, frameRate);
+    return std::make_unique<GameOverScene>(m_params, gameLogicOutput.highscore);
 }

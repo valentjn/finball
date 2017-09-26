@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Highscores.hpp"
-#include "Level.hpp"
 #include "Scenes/MenuRenderer.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"

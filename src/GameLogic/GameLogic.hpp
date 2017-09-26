@@ -6,7 +6,7 @@
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
 
@@ -26,7 +26,7 @@ public:
         fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
         fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.2f};
         fluid_surface.rotation = 0;
-        fluid_surface.scale = { level.width * 0.5f, level.height * 0.5f };
+        fluid_surface.scale = { (level.width - 2) * 0.5f, (level.height - 2) * 0.5f };
         fluid_surface.mesh = fluid_mesh.get();
 
         startTime = steady_clock::now();

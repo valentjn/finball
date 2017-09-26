@@ -4,7 +4,8 @@
 
 #include "test_lbm.hpp"
 
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
 
 //set density to 1 and velocity to 0
@@ -26,7 +27,6 @@ void printRBPosition(RigidBodyPhysics& sut, int idx){
     printRBPosition(sut.getRigidBody(idx));
 }
 
-//TODO use
 bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
     int width = flagfield.width();
     int height = flagfield.height();
@@ -61,10 +61,11 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
 TEST(RigidBodyTest, static64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
 
-  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
+  levelLoader.load(level);
+  level.setBallPosition(level.width/2, level.height/2);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -76,7 +77,7 @@ TEST(RigidBodyTest, static64) {
 
   RigidBodyPhysics sut(level);
   sut.setGravity(false);
-// for some reason, the first field is zero-initialized
+
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
@@ -100,7 +101,7 @@ TEST(RigidBodyTest, static64) {
 		}
       }
   }
-  
+
   EXPECT_FALSE(changed);
   if(changed){
       printFlagField(init_flagfield);
@@ -118,10 +119,11 @@ TEST(RigidBodyTest, static64) {
 TEST(RigidBodyTest, gravity64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
 
-  level.rigidBodies = vector<std::unique_ptr<RigidBody>>();
-  level.rigidBodies.push_back(std::make_unique<RigidBodyCircle>(Level::BALL_ID, level.width/2, level.height/2));
+  levelLoader.load(level);
+  level.setBallPosition(level.width/2, level.height/2);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -133,7 +135,7 @@ TEST(RigidBodyTest, gravity64) {
 
   RigidBodyPhysics sut(level);
   sut.setGravity(true);
-// for some reason, the first field is zero-initialized
+
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
@@ -174,12 +176,11 @@ TEST(RigidBodyTest, gravity64) {
 TEST(RigidBodyTest, stop64) {
   int idx = Level::BALL_ID;
 
-  Level level("data/testLevel.txt");
-  for (const auto &rb : level.rigidBodies) {
-    if (rb->id == Level::BALL_ID) {
-      rb->position = {level.width/4, level.height*0.9};
-    }
-  }
+  LevelLoader levelLoader("data/testLevel.txt");
+  Level level;
+
+  levelLoader.load(level);
+  level.setBallPosition(level.width/4, level.height*0.9);
 
   RigidBodyPhysicsOutput output(level);
   RigidBodyPhysicsInput input;
@@ -191,7 +192,7 @@ TEST(RigidBodyTest, stop64) {
 
   RigidBodyPhysics sut(level);
   sut.setGravity(true);
-// for some reason, the first field is zero-initialized
+
   sut.compute(input, output);
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
@@ -217,11 +218,11 @@ TEST(RigidBodyTest, stop64) {
         }
       }
   }
-  // TODO
+
   EXPECT_TRUE(changed);
   EXPECT_FLOAT_EQ(before.position.x, after.position.x);
   EXPECT_LE(48, after.position.y);
-  //if(! changed)
+  if(! changed)
   {
     printFlagField(init_flagfield);
     printFlagField(output.grid_objects);

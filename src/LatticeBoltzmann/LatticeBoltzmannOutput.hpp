@@ -7,7 +7,7 @@
 
 #include "Array2D.hpp"
 #include "LatticeBoltzmann/FICell.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 
 class LatticeBoltzmannOutput {
 public:

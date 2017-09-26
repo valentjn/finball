@@ -31,7 +31,6 @@ using namespace chrono;
 std::unique_ptr<Scene> SimulationScene::show() {
     Renderer renderer(window);
     GameLogic gameLogic(level);
-    UserInput userInput;
     LatticeBoltzmann latticeBoltzmann(level);
     RigidBodyPhysics rigidBodyPhysics(level);
 

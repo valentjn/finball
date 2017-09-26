@@ -12,6 +12,8 @@
 #include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
+#include "UserInput/UserInput.hpp"
+#include "UserInput/UserInputOutput.hpp"
 
 std::unique_ptr<Scene> MainMenuScene::show() {
     MenuRenderer menuRenderer(window);
@@ -25,9 +27,20 @@ std::unique_ptr<Scene> MainMenuScene::show() {
 
     music.load("data/MainTheme.mp3");
 
-    listen();
+    // listen();
 
-    return std::make_unique<SimulationScene>(window, music, level, highscores, frameRate);
+    UserInput userInput;
+    UserInputOutput userInputOutput;
+
+    while (true) {
+        userInput.getInput(userInputOutput);
+
+        if (userInputOutput.start) {
+            break;
+        }
+    }
+
+    return std::make_unique<SimulationScene>(window, music, userInput, level, highscores, frameRate);
 }
 
 std::string MainMenuScene::getHighscoreText() {

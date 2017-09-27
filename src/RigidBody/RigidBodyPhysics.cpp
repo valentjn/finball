@@ -30,15 +30,15 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hingeL = new btHingeConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
 		// hingeL->setLimit(0, SIMD_PI/4);
-		hingeL->setMaxMotorImpulse(SIMD_INFINITY);
+		hingeL->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
 		dynamics_world->addConstraint(hingeL);
 	}
 
 	if (level_body->id == level.flipperRightId)
 	{
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
-		hingeR = new btHingeConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
-		hingeR->setMaxMotorImpulse(SIMD_INFINITY);
+		hingeR = new btHingeConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,-1));
+		hingeR->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
 		// hingeR->setLimit(0, SIMD_PI/4);
 		dynamics_world->addConstraint(hingeR);
 	}
@@ -305,10 +305,16 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 	// hingeL->enableAngularMotor(true,1.0f,SIMD_INFINITY);
 	// hingeR->enableAngularMotor(true,1.0f,SIMD_INFINITY);
 	
+	float delta_angle_left = abs(hingeL->getHingeAngle() - input.leftAngle);
+	float delta_angle_right = abs(hingeL->getHingeAngle() - input.rightAngle);
 	hingeL->setMotorTarget(input.leftAngle,1.);
 	hingeR->setMotorTarget(input.rightAngle,1.);
-	hingeL->enableMotor(true);
-	hingeR->enableMotor(true);
+	if (delta_angle_left < SIMD_PI / 72) { // TODO: constexpr
+		hingeL->enableMotor(true);
+	}
+	if (delta_angle_right < SIMD_PI / 72) { // TODO: constexpr
+		hingeR->enableMotor(true);
+	}
 	dynamics_world->stepSimulation(1./60.); // TODO: everybody has to use the same timestep
 
 	for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
@@ -323,10 +329,12 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 	for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
 		auto &obj = dynamics_world->getCollisionObjectArray()[j];
 		btRigidBody *rigid_body = btRigidBody::upcast(obj);
-		if (rigid_body && (obj->getUserIndex() == level.flipperLeftId || obj->getUserIndex() == level.flipperRightId)) {
-			grid_finFlag(grid_obj, grid_vel, rigid_body);
-		} else {
-			std::runtime_error("Fin is not a btRigidBody!");
+		if (obj->getUserIndex() == level.flipperLeftId || obj->getUserIndex() == level.flipperRightId) {
+			if (rigid_body) {
+				grid_finFlag(grid_obj, grid_vel, rigid_body);
+			} else {
+				throw std::runtime_error("Fin is not a btRigidBody!");
+			}
 		}
 	}
 

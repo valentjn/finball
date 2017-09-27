@@ -68,8 +68,8 @@ private:
     Array2D<Level::CellType> grid_fins;
     Array2D<glm::vec2> grid_velocities;
 
-	btHingeConstraint *hingeR;
-	btHingeConstraint *hingeL;
+	std::unique_ptr<btHingeConstraint> hinge_right;
+	std::unique_ptr<btHingeConstraint> hinge_left;
 
 public:
     RigidBodyPhysics(Level &level)

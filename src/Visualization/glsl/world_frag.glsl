@@ -14,8 +14,8 @@ void main()
     if (mode == 0)
 	    out_color = vec4(frag_color, 1);
     else {
-        out_color = vec4(texture(tex, frag_color.xy).xyz, 1);
-		if (out_color.a == 0)
+        out_color = texture(tex, frag_color.xy);
+		if (out_color.a <= 0.5)
 			discard;
 	}
 

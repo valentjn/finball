@@ -32,7 +32,7 @@ void Texture::bind(int index) const
 Texture1F::Texture1F(glm::ivec2 size, bool linear_interpolation)
     : Texture(size, linear_interpolation)
 {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_res.x, m_res.y, 0, GL_R, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_res.x, m_res.y, 0, GL_RED, GL_FLOAT, nullptr);
 }
 
 void Texture1F::setData(const Array2D<float>& data)
@@ -40,7 +40,7 @@ void Texture1F::setData(const Array2D<float>& data)
     assert(data.width() == m_res.x);
     assert(data.height() == m_res.y);
     bind(0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_res.x, m_res.y, 0, GL_R, GL_FLOAT, data.getData()); // TODO: GL_R ?
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_res.x, m_res.y, 0, GL_RED, GL_FLOAT, data.getData()); // TODO: GL_R ?
 }
 
 Texture2F::Texture2F(glm::ivec2 size, bool linear_interpolation)

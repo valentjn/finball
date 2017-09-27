@@ -11,12 +11,12 @@ layout(location = 0) out vec4 out_color;
 
 void main() {
     if (mode == 0)
-	    out_color = vec4(frag_color, 1);
+	      out_color = vec4(frag_color, 1);
     else {
         out_color = texture(tex, frag_color.xy);
-		if (out_color.a == 0)
-			discard;
-	}
+		    if (out_color.a <= 0.5)
+			      discard;
+	  }
 
     gl_FragDepth = frag_depth;
 }

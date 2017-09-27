@@ -66,7 +66,8 @@ class GameComponent
 {
 	template<class I, class... C>
 	friend class GameInput;
-
+	
+	const char* m_name;
 	Comp m_comp;
 	DoubleBuffer<Output> m_output;
 	std::thread m_thread;
@@ -74,7 +75,9 @@ class GameComponent
 
 public:
 	template<class... Args>
-	GameComponent<Comp, Input, Output>(Args&&... args) : m_comp(std::forward<Args>(args)...) {}
+	GameComponent<Comp, Input, Output>(const char* name, Args&&... args)
+		: m_name(name), m_comp(std::forward<Args>(args)...)
+	{}
 
 	~GameComponent<Comp, Input, Output>()
 	{
@@ -100,6 +103,7 @@ public:
 			assert(ticks_per_second >= 0);
 			auto next = std::chrono::steady_clock::now();
 			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
+			int ticks = 0;
 			while (running) {
 				auto now = std::chrono::steady_clock::now();
 				if (next > now)
@@ -107,7 +111,7 @@ public:
 				else
 					next = now;
 				next += duration;
-
+				
 				if (m_input) {
 					const Input& input = m_input->process();
 					compute(input);
@@ -115,6 +119,7 @@ public:
 				else {
 					compute(Input{});
 				}
+				std::cout << m_name << ": " << ++ticks << '\n';
 			}
 		};
 

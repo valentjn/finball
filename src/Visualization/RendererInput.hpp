@@ -8,8 +8,7 @@
 
 #include "Array2D.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "RigidBody/RigidBodyPhysicsOutput.hpp"
+#include "Physics/Physics.hpp"
 #include "Visualization/RenderObject.hpp"
 #include "Visualization/Mesh.hpp"
 #include "Visualization/Texture.hpp"
@@ -35,11 +34,11 @@ public:
 			std::vector<glm::vec3>{ {1, 0, 0.4}, { 0.3, 1, 0.4 }, { 1, 1, 0.4 }, { 1, 0, 0.4 }, { 1, 1, 0.4 }, { 0, 0, 1 }});
 	}
 
-    void process(
-		const GameLogicOutput &gameLogicOutput,
-		const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
-        const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+    void process(const GameLogicOutput &gameLogicOutput, const PhysicsOutput& physicsOutput)
     {   // handle game logic output
+		const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput = physicsOutput.rigidBodyPhysicsOutput;
+		const LatticeBoltzmannOutput &latticeBoltzmannOutput = physicsOutput.latticeBoltzmannOutput;
+
         world_objects.assign(gameLogicOutput.objectsToRender.begin(), gameLogicOutput.objectsToRender.end());
 		ui_objects.clear();
 

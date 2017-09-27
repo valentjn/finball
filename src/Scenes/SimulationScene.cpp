@@ -9,14 +9,11 @@
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
 #include "Highscores.hpp"
-#include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
-#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
+#include "Physics/Physics.hpp"
 #include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Scenes/GameOverScene.hpp"
 #include "Scenes/GameComponent.hpp"
-#include "RigidBody/RigidBodyPhysicsInput.hpp"
-#include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "Timer.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "SDL/SDLRenderer.hpp"
@@ -37,27 +34,24 @@ float SimulationScene::simulation()
 	context.music->play("data/GameTheme.mp3");
 
     // initialize renderer before level
-	GameComponent<Renderer, RendererInput, RendererOutput> renderer{ *context.window };
+	GameComponent<Renderer, RendererInput, RendererOutput> renderer{ "Renderer", *context.window };
 
     LevelLoader levelLoader("data/" + levelName);
     Level level;
     levelLoader.load(level);
     renderer.getComp().setCameraTransformFromLevel(level);
 
-	GameComponent<UserInput, UserInputInput, UserInputOutput> userInput;
-	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ level };
-	GameComponent<RigidBodyPhysics, RigidBodyPhysicsInput, RigidBodyPhysicsOutput> rigidBodyPhysics{ level };
-	GameComponent<LatticeBoltzmann, LatticeBoltzmannInput, LatticeBoltzmannOutput> latticeBoltzmann{ level };
+	GameComponent<UserInput, UserInputInput, UserInputOutput> userInput{ "UserInput" };
+	GameComponent<Physics, PhysicsInput, PhysicsOutput> physics{ "Physics", level };
+	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ "GameLogic", level };
 
-	gameLogic.bindInput(userInput, rigidBodyPhysics, latticeBoltzmann);
-	rigidBodyPhysics.bindInput(userInput, latticeBoltzmann);
-	latticeBoltzmann.bindInput(rigidBodyPhysics);
-	renderer.bindInput(gameLogic, rigidBodyPhysics, latticeBoltzmann);
+	physics.bindInput(userInput);
+	gameLogic.bindInput(userInput, physics);
+	renderer.bindInput(gameLogic, physics);
 	
 	const bool& running = gameLogic.getOutput().running;
 
-	rigidBodyPhysics.run(context.parameters->simulationRate, running);
-	latticeBoltzmann.run(context.parameters->simulationRate, running);
+	physics.run(context.parameters->simulationRate, running);
 	userInput.run(context.parameters->simulationRate, running);
 	gameLogic.run(context.parameters->simulationRate, running);
 	renderer.run(context.parameters->frameRate, running, true);

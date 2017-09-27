@@ -3,10 +3,8 @@
 
 #include <vector>
 
-#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
-#include "RigidBody/RigidBodyPhysicsOutput.hpp"
-#include "RigidBody/Transform.hpp"
 #include "UserInput/UserInputOutput.hpp"
+#include "Physics/Physics.hpp"
 
 class GameLogicInput {
 public:
@@ -15,13 +13,10 @@ public:
 
     GameLogicInput() {}
 
-    void process(
-		const UserInputOutput &userInputOutput,
-        const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
-        const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+    void process(const UserInputOutput &userInputOutput, const PhysicsOutput& physicsOutput)
 	{
         quit = userInputOutput.quit;
-        rigidBodies = &rigidBodyPhysicsOutput.rigid_bodies;
+        rigidBodies = &physicsOutput.rigidBodyPhysicsOutput.rigid_bodies;
     }
 };
 

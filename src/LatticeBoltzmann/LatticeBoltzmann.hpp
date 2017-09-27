@@ -20,7 +20,7 @@ class LatticeBoltzmann {
 private:
 	std::chrono::duration<float> measuredTimes[5];
 
-    Level &level;
+    const Level &level;
 
     // previous f_i field
     Array2D<FICell> fi_Old;
@@ -49,7 +49,7 @@ private:
 	inline float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
 
 public:
-    LatticeBoltzmann(Level &level)
+    LatticeBoltzmann(const Level &level)
         : level(level), fi_Old(level.width, level.height), fi_New(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {

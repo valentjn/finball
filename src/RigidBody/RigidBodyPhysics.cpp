@@ -315,10 +315,6 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
 void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
     auto &grid_obj = output.grid_objects;
     auto &grid_vel = output.grid_velocities;
-	if (grid_obj.width() == 0) {
-		grid_obj = Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT);
-		grid_vel = Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT);
-	}
     output.rigid_bodies.clear();
     // TODO: try to give out a const reference to our internal rigid_bodies vector
 

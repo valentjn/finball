@@ -1,10 +1,15 @@
 #include <memory>
 
-#include "GameController.hpp"
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 #include "Log.hpp"
-#include "MainMenu.hpp"
+#include "Scenes/MainMenuScene.hpp"
+#include "Scenes/SceneManager.hpp"
+#include "Scenes/SimulationScene.hpp"
 #include "Parameters.hpp"
 #include "SDL/SDLWindow.hpp"
+#include "SDL/SDLMusic.hpp"
+
 
 int main(int argc, char *argv[]) {
 
@@ -19,18 +24,20 @@ int main(int argc, char *argv[]) {
                      "Finball", parameters.fullscreen);
     window.setIcon("data/haicon.png");
 
+    SDLMusic music;
+
+    // load highscores
     Highscores highscores("haiscores.txt");
 
-    // show main menu and obtain level from it
-    std::unique_ptr<Level> level;
-    {
-        MainMenu menu(window, highscores);
-        level = menu.show();
-    }
+    Scene::Context sceneContext {
+        &window,
+        &music,
+        &highscores,
+        &parameters
+    };
 
-    // run the game
-    GameController gameController(highscores);
-    gameController.startGame(window, *level);
+    SceneManager sceneManager(std::make_unique<MainMenuScene>(sceneContext));
+    sceneManager.run();
 
     return 0;
 }

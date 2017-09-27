@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include "Array2D.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Visualization/Mesh.hpp"
 #include "Visualization/RenderObject.hpp"
 #include "Visualization/RendererInput.hpp"
@@ -17,8 +17,8 @@
 
 class Renderer {
 private:
-    constexpr static int m_fluid_width = 256;
-    constexpr static int m_fluid_height = 256;
+    constexpr static int m_fluid_width = 512;
+    constexpr static int m_fluid_height = 512;
 
     std::vector<RenderObject> m_world_objects;
     std::vector<RenderObject> m_ui_objects;
@@ -28,16 +28,21 @@ private:
     GLuint m_shader_program_fluid;
 
     std::unique_ptr<Texture3F> m_tex_fluid_input;
-    std::unique_ptr<Texture1F> m_tex_noise;
+	std::unique_ptr<Texture1F> m_tex_waves1;
+	std::unique_ptr<Texture1F> m_tex_waves2;
+    std::unique_ptr<Texture2F> m_tex_noise;
     std::unique_ptr<Texture3F> m_tex_fluid_output;
 
-    GLuint m_framebuffer_fluid_output;
+    std::array<GLuint, 2> m_framebuffers_fluid_output;
+	bool m_inter_fb1;
 
     glm::ivec2 m_resolution;
     SDL_Window *m_window;
     SDL_GLContext m_glcontext;
 
     glm::vec3 m_camera_pos;
+    glm::vec3 m_camera_look_at;
+	int m_ticks;
 
     const Array2D<glm::vec3> *m_fluid_vecs;
 
@@ -47,6 +52,7 @@ private:
 
 public:
     void update(const RendererInput &input);
+    void setCameraTransformFromLevel(Level &level);
 
     Renderer(const SDLWindow &window);
     ~Renderer();

@@ -4,13 +4,15 @@
 #define HIGHSCORE_CUTOFF 5
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "Log.hpp"
 
-//using namespace std;
+using namespace std;
 
 class Highscores {
 public:
@@ -34,11 +36,24 @@ public:
         highscores.push_back(Highscore(score, name));
         sortHighscores(highscores);
         saveHighscores(highscores);
-        Log::info("Saved haiscore: %f %s", score, name);
+        Log::info("Saved haiscore: %f %s", score, name.c_str());
     }
 
-    vector<Highscore> &getHighscores() {
+    const vector<Highscore> &getHighscores() const {
         return highscores;
+    }
+
+    bool checkNewHighscore(float score) {
+    	size_t i = 0;
+    	for(; i < HIGHSCORE_CUTOFF && i < highscores.size(); i++){
+    		if (score > highscores[i].score){
+    			return true;
+    		}
+    	}
+    	if(i < HIGHSCORE_CUTOFF){
+    		return true;
+    	}
+    	return false;
     }
 
 private:
@@ -53,8 +68,8 @@ private:
         float score;
         string name;
         string line;
-        while(std::getline(file,line)){
-			std::istringstream iss(line);
+        while(getline(file,line)){
+			istringstream iss(line);
 			iss >> score;
 			if (iss >> name) {
 			} else {

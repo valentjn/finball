@@ -4,14 +4,16 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <chrono>
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #include "Log.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "SDL/SDLWindow.hpp"
 #include "Visualization/Renderer.hpp"
+#include "Visualization/SimplexNoise.hpp"
 
 // Compiles a shader
 GLuint createShader(const char *file_path, GLuint shader_type) {
@@ -67,7 +69,11 @@ void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // TODO: dynamically set camera positon depending on level size
-Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
+Renderer::Renderer(const SDLWindow &window)
+	: m_camera_pos(32.f, -16.f, 64.f)
+	, m_camera_look_at(32, 24, 0)
+	, m_ticks(0)
+{
     m_window = window.getWindow();
     m_resolution = glm::ivec2(window.getWidth(), window.getHeight());
 
@@ -75,7 +81,7 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    m_glcontext = SDL_GL_CreateContext(m_window);
+	m_glcontext = SDL_GL_CreateContext(m_window);
     if (!m_glcontext) {
         auto error = SDL_GetError();
         Log::error("Failed to create SDL window: %s", error);
@@ -100,37 +106,62 @@ Renderer::Renderer(const SDLWindow &window) : m_camera_pos(32.f, -16.f, 64.f) {
         "src/Visualization/glsl/world_vert.glsl",
         "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_ui = createProgram( // TODO: use different shaders
-        "src/Visualization/glsl/world_vert.glsl",
+        "src/Visualization/glsl/ui_vert.glsl",
         "src/Visualization/glsl/world_frag.glsl");
     m_shader_program_fluid = createProgram(
         "src/Visualization/glsl/fluid_vert.glsl",
         "src/Visualization/glsl/fluid_frag.glsl");
 
     // create the noise texture
-    Array2D<float> noise(m_fluid_width / 2, m_fluid_height / 2);
+    Array2D<glm::vec2> noise(m_fluid_width / 2, m_fluid_height / 2);
     std::default_random_engine engine;
     std::uniform_real_distribution<float> dist{ 0.0f, 1.0f };
+	constexpr float noise_scale = 0.03f;
     for (int i = 0; i < noise.width(); ++i)
         for(int j = 0; j < noise.height(); ++j)
-            noise.value(i, j) = dist(engine);
-    m_tex_noise = std::make_unique<Texture1F>(glm::ivec2{m_fluid_width / 2, m_fluid_height / 2});
+			noise.value(i, j) =
+				glm::vec2{ dist(engine), simplex::noise2D(i * noise_scale, j * noise_scale) * 0.5f + 0.5f };
+    m_tex_noise = std::make_unique<Texture2F>(glm::ivec2{ noise.width(), noise.height() });
     m_tex_noise->setData(noise);
+	m_tex_noise->bind(0);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// create the waves texture
+	m_tex_waves1 = std::make_unique<Texture1F>(glm::ivec2{ m_fluid_width, m_fluid_height });
+	m_tex_waves2 = std::make_unique<Texture1F>(glm::ivec2{ m_fluid_width, m_fluid_height });
+	m_tex_waves1->bind(0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	m_tex_waves2->bind(0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // create lic output texture
     m_tex_fluid_output = std::make_unique<Texture3F>(glm::ivec2{ m_fluid_width, m_fluid_height });
-    glGenFramebuffers(1, &m_framebuffer_fluid_output);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_tex_fluid_output->texture(), 0);
-    GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
-    glDrawBuffers(1, &draw_buffer);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        Log::error("Failed to create framebuffer for fluid visualization.");
+
+	// create intermediate framebuffers
+    glGenFramebuffers(static_cast<GLsizei>(m_framebuffers_fluid_output.size()), m_framebuffers_fluid_output.data());
+	for (size_t i = 0; i < m_framebuffers_fluid_output.size(); ++i) {
+		glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers_fluid_output[i]);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_tex_fluid_output->texture(), 0);
+		if (i == 0)
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_tex_waves1->texture(), 0);
+		else
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_tex_waves2->texture(), 0);
+		std::array<GLenum, 2> draw_buffers{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(static_cast<GLsizei>(draw_buffers.size()), draw_buffers.data());
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			Log::error("Failed to create framebuffer for fluid visualization.");
+	}
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+	m_inter_fb1 = true;
 
     // create a rectangle mesh to use in the first render pass where the fluid is visualized
     auto full_quad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
 	m_full_quad = std::make_unique<ColoredMesh>(full_quad, glm::vec3{});
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 Renderer::~Renderer() {
@@ -138,14 +169,14 @@ Renderer::~Renderer() {
 }
 
 void Renderer::update(const RendererInput &input) {
-    // clear the framebuffer to dark red
-    glClearColor(0.4f, 0.f, 0.f, 1.f);
+    // clear the framebuffer to black
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // setup for the rendering of the fluid
     glViewport(0, 0, m_fluid_width, m_fluid_height);
     glUseProgram(m_shader_program_fluid);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_fluid_output);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers_fluid_output[m_inter_fb1 ? 1 : 0]);
 
     // bind & fill fluid input texture
     auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
@@ -160,6 +191,19 @@ void Renderer::update(const RendererInput &input) {
     glUniform1i(loc, 1);
     m_tex_noise->bind(1);
 
+	// bind waves texture
+	loc = glGetUniformLocation(m_shader_program_fluid, "tex_waves");
+	glUniform1i(loc, 2);
+	if (m_inter_fb1)
+		m_tex_waves1->bind(2);
+	else
+		m_tex_waves2->bind(2);
+
+	// set time
+	loc = glGetUniformLocation(m_shader_program_fluid, "t");
+	++m_ticks;
+	glUniform1ui(loc, static_cast<float>(m_ticks));
+
     // render fluid
 	m_full_quad->render(0);
 
@@ -170,9 +214,9 @@ void Renderer::update(const RendererInput &input) {
     input.fluid_mesh->setTexture(*m_tex_fluid_output);
 
     // update view matrix in shader_program_world
-    glm::mat4 view = glm::lookAt(m_camera_pos,                       // eye
-                                 glm::vec3{32, 24, 0}, // center
-                                 glm::vec3{0, 1, 0});                // up
+    glm::mat4 view = glm::lookAt(m_camera_pos,           // eye
+                                 m_camera_look_at,       // center
+                                 glm::vec3{0, 1, 0});    // up
     glUniformMatrix4fv(glGetUniformLocation(m_shader_program_world, "view"),
                        1,                     // matrix count
                        GL_FALSE,              // is not transposed
@@ -204,6 +248,18 @@ void Renderer::update(const RendererInput &input) {
 
     // Swap back and front buffer
     SDL_GL_SwapWindow(m_window);
+
+	m_inter_fb1 = !m_inter_fb1;
+}
+
+void Renderer::setCameraTransformFromLevel(Level &level) {
+    float fovBorder = 1.35f; // border around level in percent
+    float alpha = 0.24497866f; // angle at which the camera looks to the bottom of the board (in rad)
+    float beta = glm::pi<float>() * 0.25f / fovBorder; // fov in rad / borderFactor
+    float z = level.height / (tan(alpha + beta) - tan(alpha));
+    float y = z * tan(alpha);
+    m_camera_pos = glm::vec3{level.width * 0.5f, -y, z};
+    m_camera_look_at = glm::vec3{m_camera_pos.x, level.height * 0.375f, 0};
 }
 
 // renders an object to the screen (private method)

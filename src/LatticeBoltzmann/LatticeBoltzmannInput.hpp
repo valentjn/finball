@@ -6,7 +6,7 @@
 #include <glm/vec3.hpp>
 
 #include "Array2D.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "UserInput/UserInputOutput.hpp"
 
@@ -24,9 +24,7 @@ public:
         flagfield(level.matrix)
     {}
 
-	// TODO: const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput
-    LatticeBoltzmannInput(const UserInputOutput &userInputOutput,
-                          const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) :
+    LatticeBoltzmannInput(const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) :
         velocities(rigidBodyPhysicsOutput.grid_velocities),
         flagfield(rigidBodyPhysicsOutput.grid_objects)
     {}

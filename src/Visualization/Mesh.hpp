@@ -17,7 +17,7 @@ protected:
 
 public:
     Mesh(GLsizei vertex_count);
-    ~Mesh();
+    virtual ~Mesh();
     virtual void render(GLint mode_location) const = 0;
     Mesh(const Mesh&) = delete;
     Mesh& operator=(const Mesh&) = delete;
@@ -26,6 +26,11 @@ public:
     static std::vector<glm::vec3> createRectangle(glm::vec2 min, glm::vec2 max);
     static std::vector<glm::vec3> createCircle(glm::vec2 center, float radius, int polygons = 48);
     static std::vector<glm::vec3> createArrow(float scale);
+
+#if OPENCV_LIBS
+    static std::unique_ptr<Mesh> createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec3 color={255,255,255},
+			glm::ivec4 bgColor={0,0,0,0}, float fontScale=2.f, int lineThickness=4, bool antiAliasing=true);
+#endif
 };
 
 class ColoredMesh : public Mesh

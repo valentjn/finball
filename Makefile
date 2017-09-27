@@ -1,23 +1,40 @@
 CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
-COMMON_CFLAGS= -pedantic \
+
+ifdef kinect
+KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
+KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2 -D KINECT_LIBS
+endif
+
+ifdef opencv
+OPENCV_CFLAGS:= `pkg-config opencv --cflags`
+OPENCV_LDFLAGS:= `pkg-config opencv --libs` -D OPENCV_LIBS
+endif
+
+COMMON_CFLAGS:= -pedantic \
 		       -Wall \
 		       -Wextra \
 		       -fmessage-length=0 \
 		       -Wno-unused-parameter \
 		       -fmessage-length=0 \
-		       -std=c++14 \
+		       -std=gnu++14 \
+			   -fopenmp \
 		       `pkg-config sdl2 --cflags` \
 		       `pkg-config bullet --cflags` \
 		       -I src \
-		       -I ext
+		       -I ext \
+		       $(KINECT_CFLAGS) $(OPENCV_CFLAGS)
+
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
-RELEASE_CFLAGS:= -O3 -mtune=native -march=native $(COMMON_CFLAGS)
+RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
+
 LDFLAGS:= -lSDL2_image \
 		  -lSDL2_ttf \
+		  -lSDL2_mixer \
 		  -lGL \
 		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs`
+		  `pkg-config bullet --libs` \
+          $(KINECT_LDFLAGS) $(OPENCV_LDFLAGS)
 
 .PHONY: test_all
 
@@ -49,10 +66,10 @@ debug:
 	mkdir -p ./build
 	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
 
-run: release
+run:
 	build/fa_2017_release ${args}
 
-run_verbose: release
+run_verbose:
 	build/fa_2017_release -v 10 ${args}
 
 tidy:
@@ -69,12 +86,18 @@ clean:
 	rm -rf build
 
 test_all: test_deps
-	$(CXX) src/Log.cpp src/LatticeBoltzmann/LatticeBoltzmann.cpp test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS)
+	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) -o build/test $(LDFLAGS) -D WITHOUT_KINECT_LIBRARIES
+	build/test
+test_all-kinect: test_deps
+	$(CXX) $(filter-out src/main.cpp,$(CPP_FILES)) test/test_all.cpp $(GTEST_MAIN_CFLAGS) $(KINECT_CFLAGS) -o build/test $(LDFLAGS) $(KINECT_LDFLAGS)
 	build/test
 
 test_test: test_deps
 	$(CXX) test/test_test.cpp $(GTEST_MAIN_CFLAGS) -o build/test_test
 	build/test_test
+
+make_level:
+	python3 ./LevelCreator/LevelCreator.py
 
 
 GTEST_DIR = ext/googletest/googletest/

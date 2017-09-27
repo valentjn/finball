@@ -1,6 +1,11 @@
-#pragma once
+
+#include "test_lbm.hpp"
+
 #include "gtest/gtest.h"
-#include "../src/LatticeBoltzmann/LatticeBoltzmann.hpp"
+#include <cmath>
+
+#include "LevelDesign/Level.hpp"
+#include "LevelDesign/LevelLoader.hpp"
 
 void printFlagField(Array2D<Level::CellType> &flagfield) {
 
@@ -42,7 +47,7 @@ void printVelocities(LatticeBoltzmannOutput &output) {
     for (int i=0; i<width; i++) {
       float u = output.velocity.value(i,j)[0];
       float v = output.velocity.value(i,j)[1];
-      std::cout << u << "," << v << " ";
+      std::cout << "velocity (" << i << ", " << j << ") is: "<< u << ", " << v << " " << std::endl;
     }
     std::cout << std::endl;
   }
@@ -104,7 +109,7 @@ bool isSmooth(Array2D<float> &rho, float threshold) {
       float left = rho.value(i-1,j);
       float down = rho.value(i,j-1);
 
-      if ((abs(me-left) > threshold) || (abs(me-down) > threshold)) {
+      if ((fabs(me-left) > threshold) || (fabs(me-down) > threshold)) {
           return false;
       }
     }
@@ -114,8 +119,9 @@ bool isSmooth(Array2D<float> &rho, float threshold) {
 
 
 TEST(LBMTest, CollideStep1x1) {
-
-  Level level("test/level5x5.txt");
+  LevelLoader levelLoader("test/level5x5.txt");
+  Level level;
+  levelLoader.load(level);
   printFlagField(level.matrix);
 
   LatticeBoltzmannInput input(level);
@@ -126,15 +132,17 @@ TEST(LBMTest, CollideStep1x1) {
 
   LatticeBoltzmann sut(level);
   sut.compute(input, output);
-  std::cout << output.density.value(0,0) << std::endl;
-  std::cout << output.velocity.value(0,0)[0] << std::endl;
-  std::cout << output.velocity.value(0,0)[1] << std::endl;
+  //std::cout << output.density.value(0,0) << std::endl;
+  //std::cout << output.velocity.value(0,0)[0] << std::endl;
+  //std::cout << output.velocity.value(0,0)[1] << std::endl;
   EXPECT_EQ(5,level.width);
 }
 
 TEST(LBMTest, EquilibriumTrue) {
+  LevelLoader levelLoader("test/level5x5.txt");
+  Level level;
+  levelLoader.load(level);
 
-  Level level("test/level5x5.txt");
   LatticeBoltzmannInput input(level);
   LatticeBoltzmannOutput output(level);
   LatticeBoltzmann sut(level);
@@ -145,19 +153,16 @@ TEST(LBMTest, EquilibriumTrue) {
       input.velocities.value(i,j)[0] = 0.1;
     }
   }
-  printVelocities(input);
+  //printVelocities(input);
   //printFIs(output.afterstream);
   sut.compute(input, output);
   //printFIs(output.prestream);
   //printFIs(output.afterstream);
   printVelocities(output);
-  for (int i =0; i < 1000; ++i){
-     sut.compute(input, output);
-  }
-  printVelocities(output);
+  //for (int i =0; i < 1000; ++i){
+  //   sut.compute(input, output);
+  //}
+  //printVelocities(output);
   //printFIs(output.afterstream);
   EXPECT_EQ(5,level.width);
 }
-
-
-

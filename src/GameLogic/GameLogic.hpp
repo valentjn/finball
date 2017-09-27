@@ -6,7 +6,7 @@
 
 #include "GameLogic/GameLogicInput.hpp"
 #include "GameLogic/GameLogicOutput.hpp"
-#include "Level.hpp"
+#include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Visualization/RenderObject.hpp"
 
@@ -19,13 +19,17 @@ private:
     RenderObject fluid_surface;
 
     steady_clock::time_point startTime;
+	const std::unordered_map<int, Mesh*>& rigid_body_meshes;
 
 public:
-    GameLogic(const Level& level) {
+    GameLogic(const Level& level)
+		: rigid_body_meshes(level.meshes)
+	{
         auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
         fluid_mesh = std::make_unique<TexturedMesh>(rectangle, nullptr);
-        fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.f};
-        fluid_surface.scale = { level.width * 0.5f, level.height * 0.5f };
+        fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.2f};
+        fluid_surface.rotation = 0;
+        fluid_surface.scale = { (level.width - 2) * 0.5f, (level.height - 2) * 0.5f };
         fluid_surface.mesh = fluid_mesh.get();
 
         startTime = steady_clock::now();
@@ -34,9 +38,9 @@ public:
 
     void update(const GameLogicInput &input, GameLogicOutput &output) {
         duration<float> duration = steady_clock::now() - startTime;
-        output.highscore = duration.count();
+        output.score = duration.count();
 
-        for (RigidBody const *rigidBody : *input.rigidBodies) {
+        for (Transform const *rigidBody : *input.rigidBodies) {
             if (rigidBody->id == 1 && rigidBody->position.y < 0) {
                 output.running = false;
                 return;
@@ -53,6 +57,7 @@ public:
         }
 
         output.fluid_mesh = fluid_mesh.get();
+		output.rigid_body_meshes = &rigid_body_meshes;
     }
 };
 

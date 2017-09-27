@@ -1,0 +1,53 @@
+/////////////////////////////////
+// using an image as a texture //
+/////////////////////////////////
+
+
+
+
+//
+// store these two in a way so they are not destroyed
+// (eg. as member variables in GameLogic)
+//
+
+std::unique_ptr<Texture3F> imageTexture;
+std::unique_ptr<TexturedMesh> imageMesh;
+
+
+
+
+//
+// create a render object with the desired texture
+// (only do this once)
+//
+
+// step 1: load the image
+cv::Mat imageMat = cv::imread("path/to/my/image.png", cv::IMREAD_UNCHANGED);
+
+// step 2: create texture from that image
+glm::ivec2 imageResolution{imageMat.cols, imageMat.rows};
+imageTexture = std::make_unique<Texture3F>(imageResolution);
+imageTexture->setData(imageMat);
+
+// step 3: put the texture on a mesh
+const std::vector<glm::vec3> imageQuad = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
+imageMesh = std::make_unique<TexturedMesh>(imageQuad, imageTexture.get());
+
+// step 4: create a render object with the mesh
+RenderObject imageRO;
+imageRO.mesh = imageMesh.get();
+// place the RenderObject however you want
+imageRO.position = glm::vec3{15.0f, 5.0f, -0.95f};
+imageRO.scale = {5, 5};
+imageRO.rotation = 0;
+
+
+
+
+//
+// give the object to the Renderer component
+// for example like this in GameLogic.update()
+// (this also only needs to be done once)
+//
+
+output.objectsToRender.push_back(imageRO);

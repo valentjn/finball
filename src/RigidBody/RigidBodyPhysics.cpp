@@ -27,6 +27,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body)
 	{
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hinge_left = std::make_unique<btHingeConstraint>(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
+		hinge_left->setLimit(0, SIMD_PI/2);
 		hinge_left->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
 		dynamics_world->addConstraint(hinge_left.get());
 	}
@@ -36,6 +37,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body)
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hinge_right = std::make_unique<btHingeConstraint>(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,-1));
 		hinge_right->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
+		hinge_right->setLimit(0, SIMD_PI/2);
 		dynamics_world->addConstraint(hinge_right.get());
 	}
 
@@ -386,17 +388,22 @@ void RigidBodyPhysics::grid_finFlag(Array2D < Level::CellType > &grid_fin, Array
 	glm::vec2 norm2(-(pos2.y - pos3.y), pos2.x - pos3.x);
 	glm::vec2 norm3(-(pos3.y - pos1.y), pos3.x - pos1.x);
 
+	btVector3 localVel(0,0,0);
+	glm::vec2 g2b = gridToBullet(0,0);
 	// TODO: only check in the AABB
 	for (int i = 0; i < grid_fin.width(); i++) {
 		for (int j = 0; j < grid_fin.height(); j++) {
-			glm::vec2 tempVec1 = gridToBullet(i, j) - pos1;
-			glm::vec2 tempVec2 = gridToBullet(i, j) - pos2;
-			glm::vec2 tempVec3 = gridToBullet(i, j) - pos3;
+			g2b = gridToBullet(i,j);
+			glm::vec2 tempVec1 = g2b - pos1;
+			glm::vec2 tempVec2 = g2b - pos2;
+			glm::vec2 tempVec3 = g2b - pos3;
 			if ((tempVec1.x * norm1.x + tempVec1.y * norm1.y >= 0) &&
 				(tempVec2.x * norm2.x + tempVec2.y * norm2.y >= 0) &&
 				(tempVec3.x * norm3.x + tempVec3.y * norm3.y >= 0)) {
 				grid_fin.value(i, j) = Level::CellType::OBSTACLE;
-				grid_vel.value(i, j) = glm::vec2(0., 0.); // TODO
+				localVel = rigid_body->getVelocityInLocalPoint(transform*btVector3(g2b.x,g2b.y,0.0f));
+				localVel *= DISTANCE_GRID_CELLS; // TODO: Scaling???
+				grid_vel.value(i, j) = {localVel.x(), localVel.y()};
 			}
 		}
 	}

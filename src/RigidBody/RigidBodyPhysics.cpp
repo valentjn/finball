@@ -41,7 +41,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
         bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
     }
 
-	if (level_body.id == level.BALL_ID) {
+	if (level.isBall(level_body.id)) {
 		bt_rigid_body->setRestitution(0.8f);
 	}
 
@@ -228,7 +228,7 @@ glm::vec2 RigidBodyPhysics::bulletToGrid(float x, float y) {
 void RigidBodyPhysics::clearDynamicFlagFields(Array2D<Level::CellType> &grid_obj) {
     for (int y = 0; y < GRID_HEIGHT; ++y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
-            grid_ball.value(x, y) = Level::CellType::FLUID;
+            grid_ball.value(x, y) = 0;
             grid_obj.value(x, y) = grid_static_objects_flow.value(x, y);
             // grid_pedals.value(x, y) = false; // TODO
             grid_velocities.value(x, y) = glm::vec2{0., 0.};
@@ -239,9 +239,7 @@ void RigidBodyPhysics::clearDynamicFlagFields(Array2D<Level::CellType> &grid_obj
 void RigidBodyPhysics::markRBAsObstacles(Array2D<Level::CellType> &grid_obj) {
     for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
-            // TODO: grid_pedals
-
-            if (grid_ball.value(x, y) == Level::CellType::OBSTACLE) {
+            if (grid_ball.value(x, y) != 0) {
                 grid_obj.value(x, y) = Level::CellType::OBSTACLE;
             }
         }
@@ -256,7 +254,7 @@ void RigidBodyPhysics::markBallAsObstacle(int id, Array2D<glm::vec2> &grid_vel,
             if (glm::distance(pos, glm::vec2{origin.getX(), origin.getY()}) <=
                 gridToBullet(
                     static_cast<RigidBodyCircle *>(level.rigidBodies[id - 1].get())->radius)) {
-                grid_ball.value(x, y) = Level::CellType::OBSTACLE;
+                grid_ball.value(x, y) = bt_rigid_body->getUserIndex();
                 // TODO: Proper scaling of velocity. Right now only scale the length.
                 grid_vel.value(x, y) = gridToBullet(bt_rigid_body->getLinearVelocity().x(),
                                                     bt_rigid_body->getLinearVelocity().y());
@@ -269,9 +267,9 @@ void RigidBodyPhysics::applyImpulses(btCollisionObject *&obj) {
     btRigidBody *bt_rigid_body = btRigidBody::upcast(obj);
     int id = bt_rigid_body->getUserIndex();
     Transform *rigid_body = rigid_bodies[id].second.get();
-    if (bt_rigid_body && bt_rigid_body->getMotionState() && rigid_body->id == Level::BALL_ID) {
+    if (bt_rigid_body && bt_rigid_body->getMotionState() && level.isBall(id)) {
         bt_rigid_body->applyCentralImpulse(DISTANCE_GRID_CELLS *
-                                           btVector3(impulses[1].x, impulses[1].y, 0.0f));
+                                           btVector3(impulses[id].x, impulses[id].y, 0.0f));
     }
 }
 
@@ -301,7 +299,7 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
 
         output.rigid_bodies.push_back(output_transform);
 
-        if (id == Level::BALL_ID) {
+        if (level.isBall(id)) {
             markBallAsObstacle(id, grid_vel, bt_rigid_body, origin);
         }
     } else {

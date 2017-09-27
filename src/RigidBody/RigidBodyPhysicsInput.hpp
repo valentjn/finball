@@ -29,7 +29,7 @@ public:
 		rightAngle = userInputOutput.rightAngle[0];
 	}
 
-	void computeImpulses(const Array2D<Level::CellType>& grid_ball,
+	void computeImpulses(const Array2D<int>& grid_ball,
 		std::unordered_map<int, glm::vec2>& impulses) const {
 		if (afterStream->width() == 0) return;
 		glm::vec2 impulse(0.0f,0.0f);
@@ -39,7 +39,7 @@ public:
 		// TODO: Scale impulses properly
 		for (int y = 1; y < grid_ball.height()-1; ++y) {
 			for (int x = 1; x < grid_ball.width()-1; ++x) {
-				if (grid_ball.value(x,y) != Level::CellType::FLUID)	{ // Go over only the obstacle cells
+				if (grid_ball.value(x,y) != 0)	{ // Go over only the obstacle cells
 					for (int i = 1; i < 9; ++i) { // Go over the nbhrs
 						nbhX = x + cx[i];
 						nbhY = y + cy[i];

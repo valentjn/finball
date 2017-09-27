@@ -23,7 +23,7 @@ void GameOverScene::render() {
     bool newHighscore = context.highscores->checkNewHighscore(score);
 
     if (newHighscore) {
-    	menuRenderer.addTitle("New Highscore!!!");
+    	menuRenderer.addTitle("New HAIscore!!!");
         menuRenderer.addLeftText("Enter your name:\n__________________");
         context.music->play("data/WinningOutro.mp3", 1);
     } else {

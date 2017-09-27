@@ -13,7 +13,7 @@
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "RigidBody/Transform.hpp"
 
-//TODO: Maybe name variables properly??
+// TODO: Maybe name variables properly??
 // To distinguish bullet unit variables from grid unit variables
 
 // GET THE BODY SHAPE RESPONSIBILITY THING SORTED OUT!!!! (global id for each object)
@@ -62,13 +62,18 @@ private:
     // TODO: int -> std::pair<unique_ptr(?)<RigidBody>, Transform>
     typedef std::pair<std::unique_ptr<btRigidBody>, std::unique_ptr<Transform>> RigidBodiesEntry;
     std::unordered_map<int, RigidBodiesEntry> rigid_bodies;
+    std::vector<std::tuple<
+        std::unique_ptr<btRigidBody>,
+        std::unique_ptr<btCollisionShape>,
+        std::unique_ptr<btMotionState>
+    >> boundary_rigid_bodies;
     std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
     Array2D<glm::vec2> grid_velocities;
 
-	std::unique_ptr<btHingeConstraint> hinge_right;
-	std::unique_ptr<btHingeConstraint> hinge_left;
+    std::unique_ptr<btHingeConstraint> hinge_right;
+    std::unique_ptr<btHingeConstraint> hinge_left;
 
 public:
     RigidBodyPhysics(Level &level)
@@ -80,12 +85,11 @@ public:
           broadphase(std::make_unique<btDbvtBroadphase>()),
           solver(std::make_unique<btSequentialImpulseConstraintSolver>()),
           dynamics_world(std::make_unique<btDiscreteDynamicsWorld>(
-                             dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())),
+              dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())),
           default_collision_shape(std::make_unique<btSphereShape>(DISTANCE_GRID_CELLS)),
           grid_static_objects_flow(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_ball(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
-          grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
-    {
+          grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT)) {
         dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
 
         grid_static_objects_flow = level.matrix;
@@ -94,48 +98,41 @@ public:
             addRigidBody(*level_body);
         }
 
-		addBoundaryRigidBodies();
+        addBoundaryRigidBodies();
     }
 
-    bool isFlipper(const RigidBody& rigid_body);
+    bool isFlipper(int id);
 
     void addRigidBody(const RigidBody &level_body);
 
 	// Add one rigid body that is invisible to user at an inflow cell
-	void createBoundaryRigidBody(btCollisionShape *collision_shape,
-		btDefaultMotionState *motion_state,	btRigidBody *bt_rigid_body,
-		btTransform& transform, const int x, const int y);
+	void createBoundaryRigidBody(const int x, const int y, const int len, const bool axis);
 
-	// TODO: Instead of multiple rigid bodies just make a longer rectangle
-	// Add rigid bodies invisible to the user at inflow cells
-	void addBoundaryRigidBodies();
+    // TODO: Instead of multiple rigid bodies just make a longer rectangle
+    // Add rigid bodies invisible to the user at inflow cells
+    void addBoundaryRigidBodies();
 
     std::unique_ptr<btRigidBody> createBtRigidBody(const RigidBody &level_body);
 
     // TODO: dtor (remove objects, etc. from world before removing from our owning containers)
 
     float gridToBullet(int x);
-
     glm::vec2 gridToBullet(int x, int y);
-
-    //glm::vec2 gridToBullet(const glm::vec2& vec) {
-    //    return gridToBullet(vec. );
-    //}
-
     float bulletToGrid(float x);
-
     glm::vec2 bulletToGrid(float x, float y);
 
-    void clearDynamicFlagFields(Array2D<Level::CellType> & grid_obj);
+    void clearDynamicFlagFields(Array2D<Level::CellType> &grid_obj);
 
-    void markRBAsObstacles(Array2D<Level::CellType> & grid_obj);
+    void markRBAsObstacles(Array2D<Level::CellType> &grid_obj);
 
-    void markBallAsObstacle(int id, Array2D<glm::vec2>& grid_vel, btRigidBody * bt_rigid_body, btVector3 & origin);
+    void markBallAsObstacle(int id, Array2D<glm::vec2> &grid_vel, btRigidBody *bt_rigid_body,
+                            btVector3 &origin);
 
-    void applyImpulses(btCollisionObject*& obj);
+    void applyImpulses(btCollisionObject *&obj);
 
-    //TODO give more meaningful name
-    void processRigidBody(btCollisionObject*& obj, RigidBodyPhysicsOutput & output, Array2D<glm::vec2>& grid_vel);
+    // TODO give more meaningful name
+    void processRigidBody(btCollisionObject *&obj, RigidBodyPhysicsOutput &output,
+                          Array2D<glm::vec2> &grid_vel);
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output);
 
@@ -145,7 +142,8 @@ public:
 
     void setRigidBody(int id, float x, float y, float mass, float rotation);
 
-    void grid_finFlag(Array2D<Level::CellType> &grid_fin, Array2D<glm::vec2> &grid_vel, btRigidBody* rigid_body);
+    void grid_finFlag(Array2D<Level::CellType> &grid_fin, Array2D<glm::vec2> &grid_vel,
+                      btRigidBody *rigid_body);
 };
 
 #endif

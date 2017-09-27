@@ -97,15 +97,13 @@ public:
 	{
 		auto fn = [&]()
 		{
-			//assert(ticks_per_second >= 0);
+			assert(ticks_per_second >= 0);
 			auto next = std::chrono::steady_clock::now();
 			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
-			Log::debug("d1");
 			while (running) {
-				Log::debug("d2");
 				auto now = std::chrono::steady_clock::now();
 				if (next > now)
-					;//std::this_thread::sleep_until(next);
+					std::this_thread::sleep_until(next);
 				else
 					next = now;
 				next += duration;
@@ -118,7 +116,6 @@ public:
 					compute(Input{});
 				}
 			}
-			Log::debug("d3");
 		};
 
 		if (main_thread)

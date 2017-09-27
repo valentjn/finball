@@ -15,8 +15,8 @@ void main()
 	    out_color = vec4(frag_color, 1);
     else {
         out_color = vec4(texture(tex, frag_color.xy).xyz, 1);
-		//if (out_color.a == 0)
-		//	discard;
+		if (out_color.a == 0)
+			discard;
 	}
 
     gl_FragDepth = frag_depth;

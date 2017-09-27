@@ -39,13 +39,19 @@ public:
 
         level.matrix = Array2D<Level::CellType>(level.width, level.height);
         int rigidBodyId = Level::BALL_ID + 1;
+        bool foundBall = false; // TODO: remove, this is only for migration
+
         for (int y = level.height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
-                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y);
-                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
+                    int id = foundBall ? rigidBodyId++ : Level::BALL_ID;
+                    auto rigidBody = make_unique<RigidBodyCircle>(id, x, y);
+                    level.setUniqueMesh(id, rigidBody->createColoredMesh(Level::BALL_COLOR));
                     level.rigidBodies.push_back(move(rigidBody));
+                    
+                    foundBall = true;
+                    level.addBall(id);
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                     if (cell == Level::CellType::OBSTACLE) {

@@ -46,7 +46,7 @@ public:
             file >> file_line;
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
-                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID);
+                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID, x, y);
                     foundBall = true;
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');

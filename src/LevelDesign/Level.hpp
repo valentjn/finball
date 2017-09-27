@@ -22,7 +22,8 @@ using namespace glm;
 struct Level {
 private:
     vector<unique_ptr<Mesh>> unique_meshes;
-    vector<unique_ptr<Texture4F>> unique_textures;
+    unique_ptr<Texture4F> ballTexture;
+    unique_ptr<Mesh> ballMesh;
     vector<int> ballIds;
 
 public:
@@ -45,25 +46,33 @@ public:
     Level(const Level &) = delete;
     Level &operator=(const Level &) = delete;
 
-    Level() {}
-
-    void addBall(int id) {
-        ballIds.push_back(id);
-        rigidBodies.push_back(make_unique<RigidBodyCircle>(id, x, y, BALL_RADIUS, BALL_MASS);
-
+    Level() {
 #ifdef OPENCV_LIBS
         cv::Mat img = cv::imread(BALL_IMAGE_PATH, cv::IMREAD_UNCHANGED);
         if (!img.data) {
             Log::warn("Ball image not found! Using default color mesh.");
-            level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(BALL_COLOR));
-            return;;
+            ballMesh = make_unique<ColoredMesh>(
+                Mesh::createCircle(vec2(0, 0), BALL_RADIUS),
+                BALL_COLOR
+            );
         }
-        Texture4F *texture = addUniqueTexture(make_unique<Texture4F>(glm::ivec2{img.cols, img.rows}));
-        texture->setData(img);
-        setUniqueMesh(id, make_unique<TexturedMesh>(3, texture));
+        else {
+            ballTexture = make_unique<Texture4F>(glm::ivec2{img.cols, img.rows});
+            ballTexture->setData(img);
+            ballMesh = make_unique<TexturedMesh>(static_cast<int>(ceil(BALL_RADIUS)), ballTexture.get());
+        }
 #else
-        setUniqueMesh(id, rigidBody->createColoredMesh(BALL_COLOR));
+        ballMesh = make_unique<ColoredMesh>(
+            Mesh::createCircle(vec2(0, 0), BALL_RADIUS),
+            BALL_COLOR
+        );
 #endif
+    }
+
+    void addBall(int id, int x, int y) {
+        ballIds.push_back(id);
+        meshes[id] = ballMesh.get();
+        rigidBodies.push_back(make_unique<RigidBodyCircle>(id, x, y, BALL_RADIUS, BALL_MASS));
     }
 
     bool isBall(int id) {
@@ -83,12 +92,6 @@ public:
     Mesh *addUniqueMesh(unique_ptr<Mesh> mesh) {
 		auto ret = mesh.get();
         unique_meshes.push_back(move(mesh));
-        return ret;
-    }
-
-    Texture4F *addUniqueTexture(unique_ptr<Texture4F> texture) {
-		auto ret = texture.get();
-        unique_textures.push_back(move(texture));
         return ret;
     }
 };

@@ -104,7 +104,7 @@ public:
             for (int y = 0; y < levelSize.width; y++) {
                 Vec3b pixel = levelImg.at<Vec3b>(Point(x, y));
                 if (pixel == COLOR_BALL) {
-                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID);
+                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID, x, y);
                     foundBall = true;
                 }
                 level.matrix.value(x, level.height - y - 1) = getCellTypeFromColor(pixel);

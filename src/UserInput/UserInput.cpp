@@ -351,6 +351,7 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
                         if(nPlayers==trackedUsers)
                             nPlayers++;
                         trackedUsers++;
+						Log::info("Player found.");
                     }
                 }
             }
@@ -359,6 +360,7 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
         for(XnUInt16 k = 0; k < nPlayers; k++) {
             if(playerJoined[k]) {
                 if(!userGenerator->GetSkeletonCap().IsTracking(players[k])) {
+					Log::info("Player lost");
                     userInputOutput.playerIsTracked[k] = false;
                     playerJoined[k] = false;
                     userIsPlayer[playerIndices[k]] = false;

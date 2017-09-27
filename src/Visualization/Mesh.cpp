@@ -192,6 +192,18 @@ void TexturedMesh::init(const std::vector<Vertex>& vertex_buffer)
     glBindVertexArray(0);
 }
 
+// Creates a square textured mesh
+TexturedMesh::TexturedMesh(int scale, const Texture* texture) :
+        Mesh(static_cast<decltype(m_vertex_count)>(6)),
+        m_texture(texture) {
+    std::vector<glm::vec3> vertices = Mesh::createRectangle({-scale, -scale}, {scale, scale});
+    std::vector<Vertex> vertex_buffer(6);
+    for (int i = 0; i < m_vertex_count; i++) {
+        vertex_buffer[i] = {vertices[i], { vertices[i].x > 0 ? 0 : 1, vertices[i].y > 0 ? 1 : 0 }};
+    }
+    init(vertex_buffer);
+}
+
 TexturedMesh::TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture)
     : Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
     , m_texture(texture)

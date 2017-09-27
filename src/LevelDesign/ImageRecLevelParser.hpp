@@ -103,7 +103,7 @@ public:
             for (int y = 0; y < levelSize.width; y++) {
                 Vec3b pixel = levelImg.at<Vec3b>(Point(x, y));
                 if (pixel == COLOR_BALL) {
-                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, level.height - y - 1);
+                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, level.height - y - 1, Level::BALL_RADIUS, Level::BALL_MASS);
                     level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
                     level.rigidBodies.push_back(move(rigidBody));
                 }

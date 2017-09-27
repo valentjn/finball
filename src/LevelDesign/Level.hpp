@@ -18,11 +18,13 @@ using namespace glm;
 struct Level {
 private:
     vector<unique_ptr<Mesh>> unique_meshes;
-    vector<unique_ptr<Texture>> unique_textures;
+    vector<unique_ptr<Texture4F>> unique_textures;
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
     static const int BALL_ID;
+    static const float BALL_RADIUS;
+    static const float BALL_MASS;
     static const char *BALL_IMAGE_PATH;
     static const vec3 BALL_COLOR;
     static const vec3 OBSTACLE_COLOR;
@@ -51,7 +53,7 @@ public:
         return ret;
     }
 
-    Texture *addUniqueTexture(unique_ptr<Texture> texture) {
+    Texture4F *addUniqueTexture(unique_ptr<Texture4F> texture) {
 		auto ret = texture.get();
         unique_textures.push_back(move(texture));
         return ret;

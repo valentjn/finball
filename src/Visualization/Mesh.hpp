@@ -60,6 +60,7 @@ class TexturedMesh : public Mesh
     void init(const std::vector<Vertex>& vertex_buffer);
 
 public:
+    TexturedMesh(int scale, const Texture* texture);
     TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture);
     TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture, const std::vector<glm::vec2> tex_coords);
     void render(GLint mode_location) const final;

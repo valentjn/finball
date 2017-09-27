@@ -48,16 +48,17 @@ public:
             file >> file_line;
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
-                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y);
+                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y, Level::BALL_RADIUS, Level::BALL_MASS);
 #ifdef OPENCV_LIBS
                     cv::Mat img = cv::imread(Level::BALL_IMAGE_PATH, cv::IMREAD_UNCHANGED);
-                    unique_ptr<Texture4F> texture = make_unique<Texture4F>(glm::ivec2{img.size().width, img.size().height});
+                    if (!img.data) {
+                        Log::warn("Ball image not found! Using default color mesh.");
+                        level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
+                        continue;
+                    }
+                    Texture4F *texture = level.addUniqueTexture(make_unique<Texture4F>(glm::ivec2{img.cols, img.rows}));
                     texture->setData(img);
-                    level.addUniqueTexture(make_unique<Texture>(static_cast<Texture>(*texture))); // TODO: WTF, there must be a better way...
-                    level.setUniqueMesh(Level::BALL_ID, make_unique<TexturedMesh>(
-                        Mesh::createCircle(vec2(0, 0), rigidBody->radius),
-                        texture.get()
-                    ));
+                    level.setUniqueMesh(Level::BALL_ID, make_unique<TexturedMesh>(3, texture));
 #else
                     level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
 #endif

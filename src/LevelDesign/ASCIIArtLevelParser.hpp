@@ -49,6 +49,9 @@ public:
                     auto rigidBody = make_unique<RigidBodyCircle>(id, x, y);
                     level.setUniqueMesh(id, rigidBody->createColoredMesh(Level::BALL_COLOR));
                     level.rigidBodies.push_back(move(rigidBody));
+                    
+                    foundBall = true;
+                    level.addBall(id);
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                     if (cell == Level::CellType::OBSTACLE) {

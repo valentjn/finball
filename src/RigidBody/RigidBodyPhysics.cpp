@@ -108,6 +108,13 @@ void RigidBodyPhysics::addBoundaryRigidBodies()
 			len2 = 0;
 		}
 	}
+	// Take care of inflow that ends at the last cell
+	if (len1 > 0) {
+		createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len1, 1);
+	}
+	if (len2 > 0) {
+		createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2, 1);
+	}
 	len1 = 0;
 	len2 = 0;
 	// Top and bottom
@@ -128,6 +135,13 @@ void RigidBodyPhysics::addBoundaryRigidBodies()
 			createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2, 0);
 			len2 = 0;
 		}
+	}
+	// Take care of inflow that ends at the last cell
+	if (len1 > 0) {
+		createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len1, 1);
+	}
+	if (len2 > 0) {
+		createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2, 1);
 	}
 }
 

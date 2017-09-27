@@ -62,6 +62,11 @@ private:
     // TODO: int -> std::pair<unique_ptr(?)<RigidBody>, Transform>
     typedef std::pair<std::unique_ptr<btRigidBody>, std::unique_ptr<Transform>> RigidBodiesEntry;
     std::unordered_map<int, RigidBodiesEntry> rigid_bodies;
+    std::vector<std::tuple<
+        std::unique_ptr<btRigidBody>,
+        std::unique_ptr<btCollisionShape>,
+        std::unique_ptr<btMotionState>
+    >> boundary_rigid_bodies;
     std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
@@ -101,9 +106,7 @@ public:
     void addRigidBody(const RigidBody &level_body);
 
 	// Add one rigid body that is invisible to user at an inflow cell
-	void createBoundaryRigidBody(btCollisionShape *collision_shape,
-		btDefaultMotionState *motion_state,	btRigidBody *bt_rigid_body,
-		btTransform& transform, const int x, const int y, const int len, const int axis);
+	void createBoundaryRigidBody(const int x, const int y, const int len, const bool axis);
 
     // TODO: Instead of multiple rigid bodies just make a longer rectangle
     // Add rigid bodies invisible to the user at inflow cells

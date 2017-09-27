@@ -56,37 +56,43 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
 }
 
 // Add one rigid body that is invisible to user at an inflow cell
-void RigidBodyPhysics::createBoundaryRigidBody(btCollisionShape *collision_shape,
-                                               btDefaultMotionState *motion_state,
-                                               btRigidBody *bt_rigid_body, btTransform &transform,
-                                               const int x, const int y, const int len,
-                                               const int axis) {
+void RigidBodyPhysics::createBoundaryRigidBody(const int x, const int y, const int len,
+                                               const bool is_vertical) {
     float xExtent = 0.5f, yExtent = 0.5f;
     float xOrig = x, yOrig = y;
-    if (axis == 0) {
-        xExtent = len / 2.0;
-        xOrig -= xExtent;
-    } else {
+    if (is_vertical) {
         yExtent = len / 2.0;
         yOrig -= yExtent;
+    } else {
+        xExtent = len / 2.0;
+        xOrig -= xExtent;
     }
+
     btVector3 extents = DISTANCE_GRID_CELLS * btVector3(xExtent, yExtent, 0.0f); // One grid cell
-    collision_shape = new btBoxShape(extents);
+    auto collision_shape = std::make_unique<btBoxShape>(extents);
+
+    btTransform transform;
+    transform.setIdentity();
     transform.setOrigin(DISTANCE_GRID_CELLS * btVector3(xOrig, yOrig, 0.0f));
-    motion_state = new btDefaultMotionState(transform);
-    bt_rigid_body =
-        new btRigidBody(0.0f, motion_state, collision_shape, btVector3(0.0f, 0.0f, 0.0f));
+    auto motion_state = std::make_unique<btDefaultMotionState>(transform);
+
+    auto bt_rigid_body =
+        std::make_unique<btRigidBody>(0.0f, motion_state.get(), collision_shape.get(), btVector3(0.0f, 0.0f, 0.0f));
     bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
-    dynamics_world->addRigidBody(bt_rigid_body);
+    dynamics_world->addRigidBody(bt_rigid_body.get());
+    boundary_rigid_bodies.push_back(std::make_tuple<
+        std::unique_ptr<btRigidBody>,
+        std::unique_ptr<btCollisionShape>,
+        std::unique_ptr<btMotionState>>(
+            std::move(bt_rigid_body),
+            std::move(collision_shape),
+            std::move(motion_state)
+        )
+    );
 }
 
 // Add rigid bodies invisible to the user at inflow cells
 void RigidBodyPhysics::addBoundaryRigidBodies() {
-    btCollisionShape *collision_shape;
-    btDefaultMotionState *motion_state;
-    btRigidBody *bt_rigid_body;
-    btTransform transform;
-    transform.setIdentity();
     int x = 0, y = 0;
     // Use two for loops as we only want to iterate over the wall
     int len1 = 0, len2 = 0;
@@ -97,8 +103,7 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
         if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
             len1++;
         } else if (len1 > 0) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y,
-                                    len1, 1);
+            createBoundaryRigidBody(x, y, len1, true);
             len1 = 0;
         }
         // Right wall
@@ -106,19 +111,16 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
         if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
             len2++;
         } else if (len2 > 0) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y,
-                                    len2, 1);
+            createBoundaryRigidBody(x, y, len2, true);
             len2 = 0;
         }
     }
     // Take care of inflow that ends at the last cell
     if (len1 > 0) {
-        createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len1,
-                                1);
+        createBoundaryRigidBody(x, y, len1, true);
     }
     if (len2 > 0) {
-        createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2,
-                                1);
+        createBoundaryRigidBody(x, y, len2, true);
     }
     len1 = 0;
     len2 = 0;
@@ -129,8 +131,7 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
         if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
             len1++;
         } else if (len1 > 0) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y,
-                                    len1, 0);
+            createBoundaryRigidBody(x, y, len1, false);
             len1 = 0;
         }
         // Top wall
@@ -138,19 +139,16 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
         if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
             len2++;
         } else if (len2 > 0) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y,
-                                    len2, 0);
+            createBoundaryRigidBody(x, y, len2, false);
             len2 = 0;
         }
     }
     // Take care of inflow that ends at the last cell
     if (len1 > 0) {
-        createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len1,
-                                1);
+        createBoundaryRigidBody(x, y, len1, false);
     }
     if (len2 > 0) {
-        createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2,
-                                1);
+        createBoundaryRigidBody(x, y, len2, false);
     }
 }
 

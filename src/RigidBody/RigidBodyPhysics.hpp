@@ -69,7 +69,7 @@ private:
     >> boundary_rigid_bodies;
     std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
-    Array2D<Level::CellType> grid_ball;
+    Array2D<int> grid_ball;
     Array2D<glm::vec2> grid_velocities;
 
     std::unique_ptr<btHingeConstraint> hinge_right;
@@ -88,7 +88,7 @@ public:
               dispatcher.get(), broadphase.get(), solver.get(), collision_configuration.get())),
           default_collision_shape(std::make_unique<btSphereShape>(DISTANCE_GRID_CELLS)),
           grid_static_objects_flow(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
-          grid_ball(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
+          grid_ball(Array2D<int>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT)) {
         dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));
 

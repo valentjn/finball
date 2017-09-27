@@ -28,7 +28,7 @@ public:
     static std::vector<glm::vec3> createArrow(float scale);
 
 #if OPENCV_LIBS
-    static std::unique_ptr<Mesh> createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec3 color={255,255,255},
+    static std::unique_ptr<Mesh> createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec3 color={1,1,1},
 			glm::ivec4 bgColor={0,0,0,0}, float fontScale=2.f, int lineThickness=4, bool antiAliasing=true);
 #endif
 };
@@ -60,6 +60,7 @@ class TexturedMesh : public Mesh
     void init(const std::vector<Vertex>& vertex_buffer);
 
 public:
+    TexturedMesh(int scale, const Texture* texture);
     TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture);
     TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture, const std::vector<glm::vec2> tex_coords);
     void render(GLint mode_location) const final;

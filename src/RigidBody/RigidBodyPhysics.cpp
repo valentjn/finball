@@ -408,8 +408,8 @@ void RigidBodyPhysics::grid_finFlag(Array2D < Level::CellType > &grid_fin, Array
 				(tempVec3.x * norm3.x + tempVec3.y * norm3.y >= 0)) {
 				grid_fin.value(i, j) = Level::CellType::OBSTACLE;
 				localVel = rigid_body->getVelocityInLocalPoint(transform*btVector3(g2b.x,g2b.y,0.0f));
-				localVel *= DISTANCE_GRID_CELLS;
-				grid_vel.value(i, j) = {localVel.x(), localVel.y()}; // TODO
+				localVel *= DISTANCE_GRID_CELLS; // TODO: Scaling???
+				grid_vel.value(i, j) = {localVel.x(), localVel.y()};
 			}
 		}
 	}

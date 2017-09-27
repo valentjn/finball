@@ -56,25 +56,27 @@ public:
 
         // handle rigid body physics output
         // TODO: rename to transform
-		for (const Transform* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
-            auto iter = (*gameLogicOutput.rigid_body_meshes).find(rigidBody->id);
-			const Mesh* mesh;
-			if (iter != gameLogicOutput.rigid_body_meshes->end()) { // check if the mesh is in the map
-				mesh = iter->second;
+		if (gameLogicOutput.rigid_body_meshes) {
+			for (const Transform* rigidBody : rigidBodyPhysicsOutput.rigid_bodies) {
+				auto iter = gameLogicOutput.rigid_body_meshes->find(rigidBody->id);
+				const Mesh* mesh;
+				if (iter != gameLogicOutput.rigid_body_meshes->end()) { // check if the mesh is in the map
+					mesh = iter->second;
+				}
+				else {
+					Log::info(
+						"WARNING: rigid body with id %d does not have a render mesh, rendering as square",
+						rigidBody->id);
+					mesh = dummy_mesh.get();
+				}
+				RenderObject renderObject;
+				renderObject.position = glm::vec3(rigidBody->position, 0);
+				renderObject.scale = glm::vec2{ 1.0f };
+				renderObject.rotation = rigidBody->rotation;
+				renderObject.mesh = mesh;
+				world_objects.push_back(renderObject);
 			}
-			else {
-				Log::info(
-                    "WARNING: rigid body with id %d does not have a render mesh, rendering as square",
-                    rigidBody->id);
-                mesh = dummy_mesh.get();
-            }
-            RenderObject renderObject;
-            renderObject.position = glm::vec3(rigidBody->position, 0);
-            renderObject.scale = glm::vec2{ 1.0f };
-            renderObject.rotation = rigidBody->rotation;
-			renderObject.mesh = mesh;
-            world_objects.push_back(renderObject);
-        }
+		}
 
         // visualise the flag field from rigidbody
         const int ff_width = rigidBodyPhysicsOutput.grid_objects.width();

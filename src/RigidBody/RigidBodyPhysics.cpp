@@ -56,56 +56,79 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
 
 // Add one rigid body that is invisible to user at an inflow cell
 void RigidBodyPhysics::createBoundaryRigidBody(btCollisionShape *collision_shape,
-                                               btDefaultMotionState *motion_state,
-                                               btRigidBody *bt_rigid_body, btTransform &transform,
-                                               const int x, const int y) {
-
-    btVector3 extents = DISTANCE_GRID_CELLS * btVector3(0.5f, 0.5f, 0.0f); // One grid cell
-    collision_shape = new btBoxShape(extents);
-    transform.setOrigin(DISTANCE_GRID_CELLS * btVector3(x, y, 0.0f)); // grid center
-    motion_state = new btDefaultMotionState(transform);
-    bt_rigid_body =
-        new btRigidBody(0.0f, motion_state, collision_shape, btVector3(0.0f, 0.0f, 0.0f));
-    bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
-    dynamics_world->addRigidBody(bt_rigid_body);
+											   btDefaultMotionState *motion_state, btRigidBody *bt_rigid_body,
+											   btTransform &transform, const int x,
+											   const int y, const int len, const int axis)
+{
+	float xExtent = 0.5f, yExtent = 0.5f;
+	float xOrig = x, yOrig = y;
+	if (axis == 0) {
+		xExtent = len/2.0;
+		xOrig  -= xExtent;
+	} else {
+		yExtent = len/2.0;
+		yOrig  -= yExtent;
+	}
+	btVector3 extents = DISTANCE_GRID_CELLS * btVector3(xExtent, yExtent, 0.0f); // One grid cell
+	collision_shape = new btBoxShape(extents);
+	transform.setOrigin(DISTANCE_GRID_CELLS * btVector3(xOrig, yOrig, 0.0f));
+	motion_state = new btDefaultMotionState(transform);
+	bt_rigid_body = new btRigidBody(0.0f, motion_state, collision_shape, btVector3(0.0f, 0.0f, 0.0f));
+	bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
+	dynamics_world->addRigidBody(bt_rigid_body);
 }
 
-// TODO: Instead of multiple rigid bodies just make a longer rectangle
 // Add rigid bodies invisible to the user at inflow cells
-void RigidBodyPhysics::addBoundaryRigidBodies() {
-    btCollisionShape *collision_shape;
-    btDefaultMotionState *motion_state;
-    btRigidBody *bt_rigid_body;
-    btTransform transform;
-    transform.setIdentity();
-    int x = 0, y = 0;
-    // Use two for loops as we only want to iterate over the wall
-    // Left and right walls
-    for (y = 0; y < grid_static_objects_flow.height(); ++y) {
-        // Left wall
-        x = 0;
-        if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
-        }
-        // Right wall
-        x = grid_static_objects_flow.width() - 1;
-        if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
-        }
-    }
-    // Top and bottom
-    for (x = 0; x < grid_static_objects_flow.width(); ++x) {
-        // Bottom wall
-        y = 0;
-        if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
-        }
-        // Top wall
-        y = grid_static_objects_flow.height() - 1;
-        if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
-            createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y);
-        }
-    }
+void RigidBodyPhysics::addBoundaryRigidBodies()
+{
+	btCollisionShape *collision_shape;
+	btDefaultMotionState *motion_state;
+	btRigidBody *bt_rigid_body;
+	btTransform transform;
+	transform.setIdentity();
+	int x = 0, y = 0;
+	// Use two for loops as we only want to iterate over the wall
+	int len1 = 0, len2 = 0;
+	// Left and right walls
+	for (y = 0; y < grid_static_objects_flow.height(); ++y) {
+		// Left wall
+		x = 0;
+		if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
+			len1++;
+		} else if (len1 > 0) {
+			createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len1, 1);
+			len1 = 0;
+		}
+		// Right wall
+		x = grid_static_objects_flow.width() - 1;
+		if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
+			len2++;
+		} else if (len2 > 0) {
+			createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2, 1);
+			len2 = 0;
+		}
+	}
+	len1 = 0;
+	len2 = 0;
+	// Top and bottom
+	for (x = 0; x < grid_static_objects_flow.width(); ++x) {
+		// Bottom wall
+		y = 0;
+		if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
+			len1++;
+		} else if (len1 > 0) {
+			createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len1, 0);
+			len1 = 0;
+		}
+		// Top wall
+		y = grid_static_objects_flow.height() - 1;
+		if (grid_static_objects_flow.value(x, y) == Level::CellType::INFLOW) {
+			len2++;
+		} else if (len2 > 0) {
+			createBoundaryRigidBody(collision_shape, motion_state, bt_rigid_body, transform, x, y, len2, 0);
+			len2 = 0;
+		}
+	}
 }
 
 bool RigidBodyPhysics::isFlipper(const RigidBody &rigid_body) {

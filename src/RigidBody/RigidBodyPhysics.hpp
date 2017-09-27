@@ -100,10 +100,10 @@ public:
 
     void addRigidBody(const RigidBody &level_body);
 
-    // Add one rigid body that is invisible to user at an inflow cell
-    void createBoundaryRigidBody(btCollisionShape *collision_shape,
-                                 btDefaultMotionState *motion_state, btRigidBody *bt_rigid_body,
-                                 btTransform &transform, const int x, const int y);
+	// Add one rigid body that is invisible to user at an inflow cell
+	void createBoundaryRigidBody(btCollisionShape *collision_shape,
+		btDefaultMotionState *motion_state,	btRigidBody *bt_rigid_body,
+		btTransform& transform, const int x, const int y, const int len, const int axis);
 
     // TODO: Instead of multiple rigid bodies just make a longer rectangle
     // Add rigid bodies invisible to the user at inflow cells

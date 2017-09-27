@@ -49,4 +49,23 @@ public:
     }
 };
 
+struct CollisionType
+{
+	enum Type { ELASTIC, INELASTIC, REALISTIC, FLUID_DRIVEN };
+	Type type;
+
+	float obsticleElastisity;
+	float bodyElastisity;
+	float fluidInfluence;
+
+	CollisionType(Type type) {
+		this->type = type;
+		setValues(type);
+	}
+
+private:
+	void setValues(Type type);
+
+};
+
 #endif

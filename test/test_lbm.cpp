@@ -124,11 +124,11 @@ TEST(LBMTest, CollideStep1x1) {
   levelLoader.load(level);
   printFlagField(level.matrix);
 
-  LatticeBoltzmannInput input(level);
+  LatticeBoltzmannInput input;
   printFlagField(input.flagfield);
-  LatticeBoltzmannOutput output(level);
-  output.density.value(0,0) = 0;
-  output.velocity.value(0,0) = glm::vec2(0,0);
+  LatticeBoltzmannOutput output;
+  //output.density.value(0,0) = 0;
+  //output.velocity.value(0,0) = glm::vec2(0,0);
 
   LatticeBoltzmann sut(level);
   sut.compute(input, output);
@@ -143,11 +143,12 @@ TEST(LBMTest, EquilibriumTrue) {
   Level level;
   levelLoader.load(level);
 
-  LatticeBoltzmannInput input(level);
-  LatticeBoltzmannOutput output(level);
+  LatticeBoltzmannInput input;
+  LatticeBoltzmannOutput output;
   LatticeBoltzmann sut(level);
 
-
+  input.velocities = Array2D<glm::vec2>{ level.width, level.height };
+  input.flagfield = level.matrix;
   for (int i=0; i<5; i++) {
     for (int j=0; j<5; j++) {
       input.velocities.value(i,j)[0] = 0.1;

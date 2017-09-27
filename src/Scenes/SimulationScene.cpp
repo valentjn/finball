@@ -14,6 +14,7 @@
 #include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Scenes/GameOverScene.hpp"
+#include "Scenes/GameComponent.hpp"
 #include "RigidBody/RigidBodyPhysicsInput.hpp"
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "Timer.hpp"
@@ -31,30 +32,37 @@ std::unique_ptr<Scene> SimulationScene::show() {
     return std::make_unique<GameOverScene>(context, score);
 }
 
-float SimulationScene::simulation() {
+float SimulationScene::simulation()
+{
+	context.music->play("data/GameTheme.mp3");
+
     // initialize renderer before level
-    Renderer renderer(*context.window);
+	GameComponent<Renderer, RendererInput, RendererOutput> renderer{ *context.window };
 
     LevelLoader levelLoader("data/" + levelName);
     Level level;
     levelLoader.load(level);
-    renderer.setCameraTransformFromLevel(level);
+    renderer.getComp().setCameraTransformFromLevel(level);
 
-    GameLogic gameLogic(level);
-    UserInput userInput;
-    LatticeBoltzmann latticeBoltzmann(level);
-    RigidBodyPhysics rigidBodyPhysics(level);
+	GameComponent<UserInput, UserInputInput, UserInputOutput> userInput;
+	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ level };
+	GameComponent<RigidBodyPhysics, RigidBodyPhysicsInput, RigidBodyPhysicsOutput> rigidBodyPhysics{ level };
+	GameComponent<LatticeBoltzmann, LatticeBoltzmannInput, LatticeBoltzmannOutput> latticeBoltzmann{ level };
 
+	gameLogic.bindInput(userInput, rigidBodyPhysics, latticeBoltzmann);
+	rigidBodyPhysics.bindInput(userInput, latticeBoltzmann);
+	latticeBoltzmann.bindInput(rigidBodyPhysics);
+	renderer.bindInput(gameLogic, rigidBodyPhysics, latticeBoltzmann);
+	
+	const bool& running = gameLogic.getOutput().running;
 
-    DoubleBuffer<UserInputOutput> userInputOutput;
-    DoubleBuffer<LatticeBoltzmannOutput> latticeBoltzmannOutput(level);
-    DoubleBuffer<RigidBodyPhysicsOutput> rigidBodyPhysicsOutput(level);
-    DoubleBuffer<GameLogicOutput> gameLogicOutput;
+	renderer.run(context.parameters->frameRate, running);
+	userInput.run(context.parameters->frameRate, running);
+	gameLogic.run(context.parameters->frameRate, running);
+	rigidBodyPhysics.run(context.parameters->frameRate, running);
+	latticeBoltzmann.run(context.parameters->frameRate, running);
 
-	RendererInput rendererInput;
-
-    steady_clock::time_point lastFrame = steady_clock::now();
-
+    /*steady_clock::time_point lastFrame = steady_clock::now();
     bool running = true;
 
     Timer timer([&]() {
@@ -125,7 +133,7 @@ float SimulationScene::simulation() {
 
     timer.start(1000 / context.parameters->frameRate, running);
 
-    simulationThread.join();
+    simulationThread.join();*/
 
-    return gameLogicOutput.readBuffer().score;
+    return gameLogic.getOutput().score;
 }

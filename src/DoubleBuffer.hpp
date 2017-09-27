@@ -7,41 +7,40 @@
 using namespace std;
 
 template <typename T>
-class DoubleBuffer {
-
-private:
+class DoubleBuffer
+{
     array<T, 2> buffers;
-    int writeBufferId = 0;
-    std::mutex mtx;
+    int writeBufferId;
+    mutable std::mutex mtx;
 
 public:
-    template<class... Args>
-    DoubleBuffer(Args&&... args)
-        : buffers({ T(forward<Args>(args)...), T(forward<Args>(args)...) })
-    {}
+	DoubleBuffer() : writeBufferId(0) {}
 
-    void swap() {
+    void swap()
+	{
         mtx.lock();
-        writeBufferId = (writeBufferId + 1) % 2;
+        writeBufferId = 1 - writeBufferId;
         mtx.unlock();
     }
 
-    void lock() {
+	bool lock() const
+	{
         mtx.lock();
+		return true;
     }
 
-    void unlock() {
+    bool unlock() const
+	{
         mtx.unlock();
+		return true;
     }
 
-    T &writeBuffer() {
-        return buffers[writeBufferId];
-    }
+    T& writeBuffer() { return buffers[writeBufferId]; }
 
-    T &readBuffer() {
-        return buffers[(writeBufferId + 1) % 2];
-    }
-
+    const T& readBuffer() const { return buffers[1 - writeBufferId]; }
 };
+
+template<>
+class DoubleBuffer<void> {};
 
 #endif

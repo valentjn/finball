@@ -168,7 +168,7 @@ Renderer::~Renderer() {
     SDL_GL_DeleteContext(m_glcontext);
 }
 
-void Renderer::update(const RendererInput &input) {
+void Renderer::compute(const RendererInput &input, RendererOutput&) {
     // clear the framebuffer to black
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -15,6 +15,8 @@
 #include "Visualization/Texture.hpp"
 #include "SDL/SDLWindow.hpp"
 
+class RendererOutput {};
+
 class Renderer {
 private:
     constexpr static int m_fluid_width = 512;
@@ -51,7 +53,7 @@ private:
     void render(const RenderObject &object, GLint model_location, GLint mode_location) const;
 
 public:
-    void update(const RendererInput &input);
+    void compute(const RendererInput &input, class RendererOutput&);
     void setCameraTransformFromLevel(Level &level);
 
     Renderer(const SDLWindow &window);

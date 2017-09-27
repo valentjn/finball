@@ -18,12 +18,13 @@ public:
     RigidBodyPhysicsInput() : afterStream(nullptr), preStream(nullptr),
 	cx(nullptr), cy(nullptr) {}
 
-    RigidBodyPhysicsInput(const UserInputOutput &userInputOutput,
-                          const LatticeBoltzmannOutput &latticeBoltzmannOutput) :
-						  afterStream(&(latticeBoltzmannOutput.afterstream)),
-						  preStream(&(latticeBoltzmannOutput.prestream)),
-						  cx(latticeBoltzmannOutput.cx),
-						  cy(latticeBoltzmannOutput.cy) {}
+	void process(const UserInputOutput &userInputOutput, const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+	{
+		afterStream = &latticeBoltzmannOutput.afterstream;
+		preStream = &latticeBoltzmannOutput.prestream;
+		cx = latticeBoltzmannOutput.cx;
+		cy = latticeBoltzmannOutput.cy;
+	}
 
 	void computeImpulses(const Array2D<Level::CellType>& grid_ball,
 		std::unordered_map<int, glm::vec2>& impulses) const {

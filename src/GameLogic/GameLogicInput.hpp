@@ -15,9 +15,11 @@ public:
 
     GameLogicInput() {}
 
-    GameLogicInput(const UserInputOutput &userInputOutput,
-                   const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
-                   const LatticeBoltzmannOutput &latticeBoltzmannOutput) {
+    void process(
+		const UserInputOutput &userInputOutput,
+        const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput,
+        const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+	{
         quit = userInputOutput.quit;
         rigidBodies = &rigidBodyPhysicsOutput.rigid_bodies;
     }

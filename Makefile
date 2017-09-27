@@ -22,6 +22,7 @@ COMMON_CFLAGS:= -pedantic \
 		       `pkg-config bullet --cflags` \
 		       -I src \
 		       -I ext \
+               -pthread \
 		       $(KINECT_CFLAGS) $(OPENCV_CFLAGS)
 
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)

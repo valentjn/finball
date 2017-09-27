@@ -19,15 +19,11 @@ public:
     // input flag matrix
     Array2D<Level::CellType> flagfield;
 
-    LatticeBoltzmannInput(Level &level) :
-        velocities(level.width,level.height),
-        flagfield(level.matrix)
-    {}
-
-    LatticeBoltzmannInput(const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput) :
-        velocities(rigidBodyPhysicsOutput.grid_velocities),
-        flagfield(rigidBodyPhysicsOutput.grid_objects)
-    {}
+	void process(const RigidBodyPhysicsOutput &rigidBodyPhysicsOutput)
+	{
+        velocities = rigidBodyPhysicsOutput.grid_velocities;
+		flagfield = rigidBodyPhysicsOutput.grid_objects;
+	}
 };
 
 #endif

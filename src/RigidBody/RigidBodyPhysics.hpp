@@ -96,7 +96,7 @@ public:
         addBoundaryRigidBodies();
     }
 
-    bool isFlipper(const RigidBody &rigid_body);
+    bool isFlipper(int id);
 
     void addRigidBody(const RigidBody &level_body);
 
@@ -114,15 +114,8 @@ public:
     // TODO: dtor (remove objects, etc. from world before removing from our owning containers)
 
     float gridToBullet(int x);
-
     glm::vec2 gridToBullet(int x, int y);
-
-    // glm::vec2 gridToBullet(const glm::vec2& vec) {
-    //    return gridToBullet(vec. );
-    //}
-
     float bulletToGrid(float x);
-
     glm::vec2 bulletToGrid(float x, float y);
 
     void clearDynamicFlagFields(Array2D<Level::CellType> &grid_obj);

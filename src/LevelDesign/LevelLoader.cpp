@@ -4,7 +4,7 @@
 #include "Log.hpp"
 #include "Visualization/Mesh.hpp"
 
-const float LevelLoader::FLIPPER_Y = 2.5f;
+const float LevelLoader::FLIPPER_Y = 5.0f;
 const float LevelLoader::FLIPPER_WIDTH = 8.f;
 const float LevelLoader::FLIPPER_HEIGHT = 3.f;
 const float LevelLoader::FLIPPER_GAP = 2.5f;

@@ -66,6 +66,9 @@ private:
     Array2D<Level::CellType> grid_fins;
     Array2D<glm::vec2> grid_velocities;
 
+	btHingeConstraint *hingeR;
+	btHingeConstraint *hingeL;
+
 public:
     RigidBodyPhysics(Level &level)
         : level(level), GRID_WIDTH(level.width), GRID_HEIGHT(level.height),

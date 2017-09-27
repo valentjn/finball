@@ -13,7 +13,7 @@
 #include "RigidBody/Transform.hpp"
 
 #include "RigidBodyPhysics.hpp"
-btHingeAccumulatedAngleConstraint *hingeC;
+
 void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 {
 	btRigidBody *bt_rigid_body = createBtRigidBody(level_body);
@@ -32,9 +32,19 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 	if (level_body->id == level.flipperLeftId)
 	{
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
-		hingeC = new btHingeAccumulatedAngleConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
-		hingeC->setLimit(0, SIMD_PI/4);
-		dynamics_world->addConstraint(hingeC);
+		hingeL = new btHingeConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
+		// hingeL->setLimit(0, SIMD_PI/4);
+		hingeL->setMaxMotorImpulse(SIMD_INFINITY);
+		dynamics_world->addConstraint(hingeL);
+	}
+
+	if (level_body->id == level.flipperRightId)
+	{
+		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
+		hingeR = new btHingeConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
+		hingeR->setMaxMotorImpulse(SIMD_INFINITY);
+		// hingeR->setLimit(0, SIMD_PI/4);
+		dynamics_world->addConstraint(hingeR);
 	}
 
 	if (level_body->mass == 0.f) {
@@ -102,6 +112,7 @@ void RigidBodyPhysics::addBoundaryRigidBodies()
 btRigidBody* RigidBodyPhysics::createBtRigidBody(const unique_ptr <RigidBody> &level_body)
 {
 	btCollisionShape *collision_shape;
+	btScalar mass = level_body->mass;
 	if (typeid(*level_body) == typeid(RigidBodyCircle)) {
 		RigidBodyCircle *circle = static_cast<RigidBodyCircle *>(level_body.get());
 		collision_shape = new btSphereShape(circle->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
@@ -115,7 +126,13 @@ btRigidBody* RigidBodyPhysics::createBtRigidBody(const unique_ptr <RigidBody> &l
 		btVector3 p0 = btVector3(triangle->points[0].x, triangle->points[0].y, 0.) * DISTANCE_GRID_CELLS;
 		btVector3 p1 = btVector3(triangle->points[1].x, triangle->points[1].y, 0.) * DISTANCE_GRID_CELLS;
 		btVector3 p2 = btVector3(triangle->points[2].x, triangle->points[2].y, 0.) * DISTANCE_GRID_CELLS;
-		collision_shape = new btTriangleShapeEx(p0, p1, p2); // FIXME: Memory leak
+		btConvexHullShape* tris = new btConvexHullShape();
+		tris->addPoint(p0);
+		tris->addPoint(p1);
+		tris->addPoint(p2);
+		collision_shape = tris;
+		// collision_shape = new btTriangleShapeEx(p0, p1, p2); // FIXME: Memory leak
+		mass = 1.0f;
 	} else {
 		Log::error("RigidBody didn't have a specific shape! Creating a default sphere.");
 		collision_shape = default_collision_shape.get();
@@ -126,7 +143,6 @@ btRigidBody* RigidBodyPhysics::createBtRigidBody(const unique_ptr <RigidBody> &l
 	transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
 								  level_body->position.y * DISTANCE_GRID_CELLS, 0.f));
 	btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
-	btScalar mass = level_body->mass;
 	btVector3 inertia;
 	collision_shape->calculateLocalInertia(mass, inertia);
 
@@ -239,9 +255,15 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
 		// 	output_transform->rotation = quaternion.getAngle();
 		// }
 
-
+		// TODO: Get the rotation from world transform directly
 		if (id == level.flipperLeftId) {
-			printf("%f \t %f\n",output_transform->rotation, hingeC->getAccumulatedHingeAngle());
+			// printf("Left: %f \t %f\n",output_transform->rotation, hingeL->getHingeAngle());
+			output_transform->rotation = hingeL->getHingeAngle();
+		}
+
+		if (id == level.flipperRightId) {
+			// printf("Right: %f \t %f\n",output_transform->rotation, hingeR->getHingeAngle());
+			output_transform->rotation = hingeR->getHingeAngle();
 		}
 
 		output.rigid_bodies.push_back(output_transform);
@@ -278,7 +300,12 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 	impulses.clear();
 
 	clearDynamicFlagFields(grid_obj);
-	hingeC->enableAngularMotor(true,1.0f,SIMD_INFINITY);
+	// hingeL->enableAngularMotor(true,1.0f,SIMD_INFINITY);
+	// hingeR->enableAngularMotor(true,1.0f,SIMD_INFINITY);
+	hingeL->setMotorTarget(2.0f,1.0f);
+	hingeR->setMotorTarget(2.0f,1.0f);
+	hingeL->enableMotor(true);
+	hingeR->enableMotor(true);
 	dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
 
 	for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
@@ -337,11 +364,12 @@ void RigidBodyPhysics::grid_finFlag(Array2D < Level::CellType > &grid_fin, Array
 	btTransform transform;
 	rigid_body->getMotionState()->getWorldTransform(transform);
 	// TODO: use typeid to check that the shape is correct? (col_shape.getShapeType())
-	const btTriangleShapeEx *triangle_shape = static_cast<const btTriangleShapeEx *>(rigid_body->getCollisionShape());
+	// const btTriangleShapeEx *triangle_shape = static_cast<const btTriangleShapeEx *>(rigid_body->getCollisionShape());
+	const btConvexHullShape *triangle_shape = static_cast<const btConvexHullShape*>(rigid_body->getCollisionShape());
 
-	const btVector3 &p1 = triangle_shape->getVertexPtr(0);
-	const btVector3 &p2 = triangle_shape->getVertexPtr(1);
-	const btVector3 &p3 = triangle_shape->getVertexPtr(2);
+	const btVector3 &p1 = triangle_shape->getUnscaledPoints()[0];
+	const btVector3 &p2 = triangle_shape->getUnscaledPoints()[1];
+	const btVector3 &p3 = triangle_shape->getUnscaledPoints()[2];
 
 	btVector3 p1_world = transform * p1;
 	btVector3 p2_world = transform * p2;

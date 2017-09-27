@@ -1,5 +1,4 @@
 #include <btBulletDynamicsCommon.h>
-#include <bullet/BulletCollision/Gimpact/btTriangleShapeEx.h>
 #include <glm/glm.hpp>
 #include <math.h>
 #include <memory>
@@ -14,22 +13,20 @@
 
 #include "RigidBodyPhysics.hpp"
 
-void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
+void RigidBodyPhysics::addRigidBody(const RigidBody *level_body)
 {
-	btRigidBody *bt_rigid_body = createBtRigidBody(level_body);
+	std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(*level_body);
 
 	auto rigid_body =
 			std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
 	rigid_bodies[level_body->id] = std::move(rigid_body);
 
-	// bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
-	dynamics_world->addRigidBody(bt_rigid_body);
+	dynamics_world->addRigidBody(bt_rigid_body.get());
 
 	if (level_body->id == level.flipperLeftId)
 	{
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hinge_left = std::make_unique<btHingeConstraint>(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
-		// hinge_left->setLimit(0, SIMD_PI/4);
 		hinge_left->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
 		dynamics_world->addConstraint(hinge_left.get());
 	}
@@ -39,7 +36,6 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hinge_right = std::make_unique<btHingeConstraint>(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,-1));
 		hinge_right->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
-		// hinge_right->setLimit(0, SIMD_PI/4);
 		dynamics_world->addConstraint(hinge_right.get());
 	}
 
@@ -50,11 +46,12 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 	}
 
 	if (level_body->mass == 0.f) {
-		// TODO: do this more accurately?
-		// TODO: this only works for rectangles atm
+		// FIXME: not every objects is a rectangle...
 		// FIXME: take width and height into consideration
 		grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
 	}
+
+	bt_rigid_body.release(); // FIXME: we need to store the unique_ptr in our rigid_bodies hashmap
 }
 
 // Add one rigid body that is invisible to user at an inflow cell
@@ -111,46 +108,54 @@ void RigidBodyPhysics::addBoundaryRigidBodies()
 	}
 }
 
-btRigidBody* RigidBodyPhysics::createBtRigidBody(const unique_ptr <RigidBody> &level_body)
+bool RigidBodyPhysics::isFlipper(const RigidBody& rigid_body) {
+	return rigid_body.id == level.flipperLeftId || rigid_body.id == level.flipperRightId;
+}
+
+std::unique_ptr<btRigidBody> RigidBodyPhysics::createBtRigidBody(const RigidBody& level_body)
 {
-	btCollisionShape *collision_shape;
-	btScalar mass = level_body->mass;
-	if (typeid(*level_body) == typeid(RigidBodyCircle)) {
-		RigidBodyCircle *circle = static_cast<RigidBodyCircle *>(level_body.get());
-		collision_shape = new btSphereShape(circle->radius * DISTANCE_GRID_CELLS); // FIXME: Memory leak
-	} else if (typeid(*level_body) == typeid(RigidBodyRect)) {
-		RigidBodyRect *rectangle = static_cast<RigidBodyRect *>(level_body.get());
-		collision_shape = new btBoxShape(btVector3(rectangle->width / 2., rectangle->height / 2., 0) *
+	std::unique_ptr<btCollisionShape> collision_shape;
+	if (const auto* circle = dynamic_cast<const RigidBodyCircle*>(&level_body)) {
+		Log::info("Creating sphere collision shape.");
+		// FIXME: Memory leak
+		collision_shape = std::make_unique<btSphereShape>(circle->radius * DISTANCE_GRID_CELLS);
+	} else if (const auto* rectangle = dynamic_cast<const RigidBodyRect*>(&level_body)) {
+		Log::info("Creating rectangle collision shape.");
+		// FIXME: Memory leak
+		collision_shape = std::make_unique<btBoxShape>(btVector3(rectangle->width / 2., rectangle->height / 2., 0) *
 										 DISTANCE_GRID_CELLS); // these are half-extents!
-		collision_shape = default_collision_shape.get(); // FIXME: Memory leak
-	} else if (typeid(*level_body) == typeid(RigidBodyTriangle)) {
-		RigidBodyTriangle *triangle = static_cast<RigidBodyTriangle *>(level_body.get());
+	} else if (const auto* triangle = dynamic_cast<const RigidBodyTriangle*>(&level_body)) {
+		Log::info("Creating triangle collision shape.");
 		btVector3 p0 = btVector3(triangle->points[0].x, triangle->points[0].y, 0.) * DISTANCE_GRID_CELLS;
 		btVector3 p1 = btVector3(triangle->points[1].x, triangle->points[1].y, 0.) * DISTANCE_GRID_CELLS;
 		btVector3 p2 = btVector3(triangle->points[2].x, triangle->points[2].y, 0.) * DISTANCE_GRID_CELLS;
-		btConvexHullShape* tris = new btConvexHullShape();
-		tris->addPoint(p0);
-		tris->addPoint(p1);
-		tris->addPoint(p2);
-		collision_shape = tris;
-		// collision_shape = new btTriangleShapeEx(p0, p1, p2); // FIXME: Memory leak
-		mass = 1.0f;
-	} else {
-		Log::error("RigidBody didn't have a specific shape! Creating a default sphere.");
-		collision_shape = default_collision_shape.get();
+
+		auto convex_hull = std::make_unique<btConvexHullShape>();
+		convex_hull->addPoint(p0);
+		convex_hull->addPoint(p1);
+		convex_hull->addPoint(p2);
+		collision_shape = std::move(convex_hull);
 	}
+
+	auto *collision_shape_ptr = collision_shape.get();
+	if (!collision_shape_ptr) {
+		Log::error("RigidBody didn't have a specific shape! Creating a default sphere.");
+		collision_shape_ptr = default_collision_shape.get();
+	}
+	collision_shapes.push_back(std::move(collision_shape));
 
 	btTransform transform;
 	transform.setIdentity();
-	transform.setOrigin(btVector3(level_body->position.x * DISTANCE_GRID_CELLS,
-								  level_body->position.y * DISTANCE_GRID_CELLS, 0.f));
+	transform.setOrigin(btVector3(level_body.position.x * DISTANCE_GRID_CELLS,
+								  level_body.position.y * DISTANCE_GRID_CELLS, 0.f));
 	btDefaultMotionState *motion_state = new btDefaultMotionState(transform);
-	btVector3 inertia;
-	collision_shape->calculateLocalInertia(mass, inertia);
 
-	btRigidBody *bt_rigid_body = new btRigidBody(mass, motion_state, collision_shape, inertia);
-	bt_rigid_body->setUserIndex(level_body->id);
-	return bt_rigid_body;
+	btVector3 inertia;
+	collision_shape_ptr->calculateLocalInertia(level_body.mass, inertia);
+
+	auto bt_rigid_body = std::make_unique<btRigidBody>(level_body.mass, motion_state, collision_shape_ptr, inertia);
+	bt_rigid_body->setUserIndex(level_body.id);
+	return std::move(bt_rigid_body);
 }
 
 // TODO: dtor

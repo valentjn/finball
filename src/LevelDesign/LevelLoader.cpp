@@ -13,14 +13,15 @@ void LevelLoader::createFlippers(Level &level) {
     float leftX = level.width * 0.5f - FLIPPER_WIDTH - FLIPPER_GAP;
     float rightX = level.width * 0.5f + FLIPPER_WIDTH + FLIPPER_GAP;
 
+    // positive masses as they aren't static objects
     auto rigidBodyLeft = make_unique<RigidBodyTriangle>(level.flipperLeftId, leftX, FLIPPER_Y,
                                                         vec2(FLIPPER_WIDTH, -FLIPPER_HEIGHT),
                                                         vec2(0.f, -FLIPPER_HEIGHT),
-                                                        0);
+                                                        1);
     auto rigidBodyRight = make_unique<RigidBodyTriangle>(level.flipperRightId, rightX, FLIPPER_Y,
                                                          vec2(0.f, -FLIPPER_HEIGHT),
                                                          vec2(-FLIPPER_WIDTH, -FLIPPER_HEIGHT),
-                                                         0);
+                                                         1);
 
     level.setUniqueMesh(level.flipperLeftId, rigidBodyLeft->createColoredMesh(Level::FLIPPER_COLOR));
     level.setUniqueMesh(level.flipperRightId, rigidBodyRight->createColoredMesh(Level::FLIPPER_COLOR));

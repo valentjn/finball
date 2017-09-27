@@ -2,11 +2,9 @@
 #define RIGID_BODY_PHYSICS_HPP_
 
 #include <btBulletDynamicsCommon.h>
-#include <bullet/BulletCollision/Gimpact/btTriangleShapeEx.h>
 #include <glm/glm.hpp>
 #include <math.h>
 #include <memory>
-#include <stdexcept>
 #include <unordered_map>
 
 #include "LevelDesign/Level.hpp"
@@ -52,7 +50,7 @@ private:
 
     // NOTE: examples are using btAlignedObjectArray<btCollisionShape *>
     //       not sure if there's a performance penalty
-    std::unique_ptr<std::vector<std::unique_ptr<btCollisionShape>>> collision_shapes;
+    std::vector<std::unique_ptr<btCollisionShape>> collision_shapes;
 
     std::unique_ptr<btCollisionConfiguration> collision_configuration;
     std::unique_ptr<btCollisionDispatcher> dispatcher;
@@ -61,11 +59,11 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
     std::unique_ptr<btCollisionShape> default_collision_shape;
 
+    // TODO: int -> std::pair<unique_ptr(?)<RigidBody>, Transform>
     std::unordered_map<int, std::unique_ptr<Transform>> rigid_bodies;
     std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
-    Array2D<Level::CellType> grid_fins;
     Array2D<glm::vec2> grid_velocities;
 
 	std::unique_ptr<btHingeConstraint> hinge_right;
@@ -92,13 +90,15 @@ public:
         grid_static_objects_flow = level.matrix;
 
         for (const unique_ptr<RigidBody> &level_body : level.rigidBodies) {
-            addRigidBody(level_body);
+            addRigidBody(level_body.get());
         }
 
 		addBoundaryRigidBodies();
     }
 
-    void addRigidBody(const unique_ptr<RigidBody> &level_body);
+    bool isFlipper(const RigidBody& rigid_body);
+
+    void addRigidBody(const RigidBody *level_body);
 
 	// Add one rigid body that is invisible to user at an inflow cell
 	void createBoundaryRigidBody(btCollisionShape *collision_shape,
@@ -109,7 +109,7 @@ public:
 	// Add rigid bodies invisible to the user at inflow cells
 	void addBoundaryRigidBodies();
 
-    btRigidBody* createBtRigidBody(const unique_ptr<RigidBody> &level_body);
+    std::unique_ptr<btRigidBody> createBtRigidBody(const RigidBody &level_body);
 
     // TODO: dtor
 

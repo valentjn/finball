@@ -266,7 +266,7 @@ void RigidBodyPhysics::markBallAsObstacle(int id, Array2D<glm::vec2> &grid_vel,
 void RigidBodyPhysics::applyImpulses(btCollisionObject *&obj) {
     btRigidBody *bt_rigid_body = btRigidBody::upcast(obj);
     int id = bt_rigid_body->getUserIndex();
-    Transform *rigid_body = rigid_bodies[id].second.get();
+    // Transform *rigid_body = rigid_bodies[id].second.get();
     if (bt_rigid_body && bt_rigid_body->getMotionState() && level.isBall(id)) {
         bt_rigid_body->applyCentralImpulse(DISTANCE_GRID_CELLS *
                                            btVector3(impulses[id].x, impulses[id].y, 0.0f));

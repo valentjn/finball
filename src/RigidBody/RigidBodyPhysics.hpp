@@ -90,7 +90,7 @@ public:
         grid_static_objects_flow = level.matrix;
 
         for (const unique_ptr<RigidBody> &level_body : level.rigidBodies) {
-            addRigidBody(level_body.get());
+            addRigidBody(*level_body);
         }
 
 		addBoundaryRigidBodies();
@@ -98,7 +98,7 @@ public:
 
     bool isFlipper(const RigidBody& rigid_body);
 
-    void addRigidBody(const RigidBody *level_body);
+    void addRigidBody(const RigidBody &level_body);
 
 	// Add one rigid body that is invisible to user at an inflow cell
 	void createBoundaryRigidBody(btCollisionShape *collision_shape,

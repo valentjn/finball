@@ -13,17 +13,17 @@
 
 #include "RigidBodyPhysics.hpp"
 
-void RigidBodyPhysics::addRigidBody(const RigidBody *level_body)
+void RigidBodyPhysics::addRigidBody(const RigidBody &level_body)
 {
-	std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(*level_body);
+	std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
 
 	auto rigid_body =
-			std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
-	rigid_bodies[level_body->id] = std::move(rigid_body);
+			std::make_unique<Transform>(level_body.id, level_body.position, level_body.rotation);
+	rigid_bodies[level_body.id] = std::move(rigid_body);
 
 	dynamics_world->addRigidBody(bt_rigid_body.get());
 
-	if (level_body->id == level.flipperLeftId)
+	if (level_body.id == level.flipperLeftId)
 	{
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hinge_left = std::make_unique<btHingeConstraint>(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
@@ -31,7 +31,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody *level_body)
 		dynamics_world->addConstraint(hinge_left.get());
 	}
 
-	if (level_body->id == level.flipperRightId)
+	if (level_body.id == level.flipperRightId)
 	{
 		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
 		hinge_right = std::make_unique<btHingeConstraint>(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,-1));
@@ -39,16 +39,16 @@ void RigidBodyPhysics::addRigidBody(const RigidBody *level_body)
 		dynamics_world->addConstraint(hinge_right.get());
 	}
 
-	if (level_body->id != level.flipperRightId && level_body->id != level.flipperLeftId)
+	if (level_body.id != level.flipperRightId && level_body.id != level.flipperLeftId)
 	{
 		bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
 		bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
 	}
 
-	if (level_body->mass == 0.f) {
+	if (level_body.mass == 0.f) {
 		// FIXME: not every objects is a rectangle...
 		// FIXME: take width and height into consideration
-		grid_static_objects_flow.value(level_body->position.x, level_body->position.y) = Level::CellType::OBSTACLE;
+		grid_static_objects_flow.value(level_body.position.x, level_body.position.y) = Level::CellType::OBSTACLE;
 	}
 
 	bt_rigid_body.release(); // FIXME: we need to store the unique_ptr in our rigid_bodies hashmap

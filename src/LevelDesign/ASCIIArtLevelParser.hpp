@@ -39,15 +39,13 @@ public:
         file >> level.width >> level.height;
 
         level.matrix = Array2D<Level::CellType>(level.width, level.height);
-        int rigidBodyId = Level::BALL_ID + 1;
-        bool foundBall = false; // TODO: remove, this is only for migration
+        int rigidBodyId = 1;
 
         for (int y = level.height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
-                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID, x, y);
-                    foundBall = true;
+                    level.addBall(rigidBodyId++, x, y);
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                     if (cell == Level::CellType::OBSTACLE) {

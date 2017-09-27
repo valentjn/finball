@@ -28,7 +28,6 @@ private:
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
-    static const int BALL_ID;
     static const float BALL_RADIUS;
     static const float BALL_MASS;
     static const char *BALL_IMAGE_PATH;

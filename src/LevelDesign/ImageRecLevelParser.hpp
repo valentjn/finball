@@ -61,8 +61,7 @@ public:
         findContours(noBorderImg, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(1, 1));
 
         int i = 0;
-        int rigidBodyId = Level::BALL_ID + 1;
-        bool foundBall = false; // TODO: remove, this is only for migration
+        int rigidBodyId = 1;
 
         for (const vector<Point> &contourPoints : contours) {
             // Skip contour, if it contains other contours
@@ -104,8 +103,7 @@ public:
             for (int y = 0; y < levelSize.width; y++) {
                 Vec3b pixel = levelImg.at<Vec3b>(Point(x, y));
                 if (pixel == COLOR_BALL) {
-                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID, x, y);
-                    foundBall = true;
+                    level.addBall(rigidBodyId++, x, y);
                 }
                 level.matrix.value(x, level.height - y - 1) = getCellTypeFromColor(pixel);
             }

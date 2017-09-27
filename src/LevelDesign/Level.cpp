@@ -1,6 +1,5 @@
 #include "Level.hpp"
 
-const int Level::BALL_ID = 1;
 const float Level::BALL_RADIUS = 3.f;
 const float Level::BALL_MASS = 0.5f;
 const char *Level::BALL_IMAGE_PATH = "data/ball.png";

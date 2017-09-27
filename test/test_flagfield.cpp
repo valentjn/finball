@@ -69,8 +69,6 @@ void setBallPosition(Level &level, int x, int y) {
 // then nothing should move in the first few time steps
 // TODO do the same with lb time steps executed
 TEST(RigidBodyTest, static64) {
-  int idx = Level::BALL_ID;
-
   LevelLoader levelLoader("data/testLevel.txt");
   Level level;
 
@@ -95,13 +93,9 @@ TEST(RigidBodyTest, static64) {
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
   EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
-  Transform before = sut.getRigidBody(idx);
-
   for (int i = 0; i < level.width/2 - 5 ; ++i){
       sut.compute(input, output);
   }
-
-  Transform after = sut.getRigidBody(idx);
 
   bool changed = false;
   for (int i = 0; i<level.width ; ++i){
@@ -120,9 +114,6 @@ TEST(RigidBodyTest, static64) {
       printFlagField(init_flagfield);
       printFlagField(output.grid_objects);
   }
-
-  EXPECT_FLOAT_EQ(before.position.x, after.position.x);
-  EXPECT_FLOAT_EQ(before.position.y, after.position.y);
 }
 
 
@@ -130,8 +121,6 @@ TEST(RigidBodyTest, static64) {
 //AND we have gravity,
 // then something should move in the first few time steps
 TEST(RigidBodyTest, gravity64) {
-  int idx = Level::BALL_ID;
-
   LevelLoader levelLoader("data/testLevel.txt");
   Level level;
 
@@ -154,13 +143,9 @@ TEST(RigidBodyTest, gravity64) {
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
   EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
-  Transform before = sut.getRigidBody(idx);
-
   for (int i = 0; i < level.width ; ++i){
       sut.compute(input, output);
   }
-
-  Transform after = sut.getRigidBody(idx);
 
   bool changed = false;
   for (int i = 0; i<level.width ; ++i){
@@ -177,9 +162,6 @@ TEST(RigidBodyTest, gravity64) {
   if(! changed){
     printFlagField(init_flagfield);
   }
-
-  //EXPECT_NE(before.position.x, after.position.x);
-  EXPECT_NE(before.position.y, after.position.y);
 }
 
 
@@ -187,8 +169,6 @@ TEST(RigidBodyTest, gravity64) {
 //AND we have gravity,
 // then the x coordinate should not change in the first few time steps
 TEST(RigidBodyTest, stop64) {
-  int idx = Level::BALL_ID;
-
   LevelLoader levelLoader("data/testLevel.txt");
   Level level;
 
@@ -211,15 +191,9 @@ TEST(RigidBodyTest, stop64) {
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
   EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
 
-  Transform before = sut.getRigidBody(idx);
-  printRBPosition(before);
-
   for (int i = 0; i < level.width ; ++i){
       sut.compute(input, output);
   }
-
-  Transform after = sut.getRigidBody(idx);
-  printRBPosition(after);
 
   bool changed = false;
   for (int i = 0; i<level.width ; ++i){
@@ -233,8 +207,6 @@ TEST(RigidBodyTest, stop64) {
   }
 
   EXPECT_TRUE(changed);
-  EXPECT_FLOAT_EQ(before.position.x, after.position.x);
-  EXPECT_LE(48, after.position.y);
   if(! changed)
   {
     printFlagField(init_flagfield);

@@ -13,7 +13,7 @@
 #include "RigidBody/Transform.hpp"
 
 #include "RigidBodyPhysics.hpp"
-
+btHingeAccumulatedAngleConstraint *hingeC;
 void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 {
 	btRigidBody *bt_rigid_body = createBtRigidBody(level_body);
@@ -28,6 +28,14 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 
 	// bt_rigid_body->setUserIndex2(static_cast<int>(detection_type));
 	dynamics_world->addRigidBody(bt_rigid_body);
+
+	if (level_body->id == level.flipperLeftId)
+	{
+		bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
+		hingeC = new btHingeAccumulatedAngleConstraint(*bt_rigid_body,btVector3(0,0,0),btVector3(0,0,1));
+		hingeC->setLimit(0, SIMD_PI/4);
+		dynamics_world->addConstraint(hingeC);
+	}
 
 	if (level_body->mass == 0.f) {
 		// TODO: do this more accurately?
@@ -224,11 +232,16 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
 		output_transform->position.y = bulletToGrid(origin.getY());
 
 		// TODO: check that this behaves correctly
-		auto quaternion = transform.getRotation();
-		if (quaternion.getAxis().z() < 0.) {
-			output_transform->rotation = 2 * M_PI - quaternion.getAngle();
-		} else {
-			output_transform->rotation = quaternion.getAngle();
+		// auto quaternion = transform.getRotation();
+		// if (quaternion.getAxis().z() < 0.) {
+		// 	output_transform->rotation = 2 * M_PI - quaternion.getAngle();
+		// } else {
+		// 	output_transform->rotation = quaternion.getAngle();
+		// }
+
+
+		if (id == level.flipperLeftId) {
+			printf("%f \t %f\n",output_transform->rotation, hingeC->getAccumulatedHingeAngle());
 		}
 
 		output.rigid_bodies.push_back(output_transform);
@@ -265,7 +278,7 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 	impulses.clear();
 
 	clearDynamicFlagFields(grid_obj);
-
+	hingeC->enableAngularMotor(true,1.0f,SIMD_INFINITY);
 	dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
 
 	for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {

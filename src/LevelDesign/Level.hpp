@@ -74,7 +74,7 @@ public:
         rigidBodies.push_back(make_unique<RigidBodyCircle>(id, x, y, BALL_RADIUS, BALL_MASS));
     }
 
-    bool isBall(int id) {
+    bool isBall(int id) const {
         for (const int &i : ballIds) {
             if (i == id) {
                 return true;

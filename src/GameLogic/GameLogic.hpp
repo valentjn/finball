@@ -26,12 +26,13 @@ private:
     RenderObject shark_surface_right;
     RenderObject inflow_surface;
 
+    const Level &level;
     steady_clock::time_point startTime;
 	const unordered_map<int, Mesh*>& rigid_body_meshes;
 
 public:
     GameLogic(const Level& level)
-		: rigid_body_meshes(level.meshes)
+		: level(level), rigid_body_meshes(level.meshes)
 	{
         auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
         fluid_mesh = make_unique<TexturedMesh>(rectangle, nullptr);
@@ -51,14 +52,15 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.score = duration.count();
 
+        bool ballInGame = false;
         for (Transform const *rigidBody : *input.rigidBodies) {
-            if (rigidBody->id == 1 && rigidBody->position.y < 0) {
-                output.running = false;
-                return;
+            if (level.isBall(rigidBody->id) && rigidBody->position.y > 0) {
+                ballInGame = true;
+                break;
             }
         }
 
-        if (input.quit) {
+        if (input.quit || !ballInGame) {
             output.running = false;
             return;
         }

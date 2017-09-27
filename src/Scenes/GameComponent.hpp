@@ -119,7 +119,7 @@ public:
 				else {
 					compute(Input{});
 				}
-				std::cout << m_name << ": " << ++ticks << '\n';
+				//std::cout << m_name << ": " << ++ticks << '\n';
 			}
 		};
 

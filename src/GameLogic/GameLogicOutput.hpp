@@ -13,7 +13,7 @@ public:
     TexturedMesh* fluid_mesh;
 	const std::unordered_map<int, Mesh*>* rigid_body_meshes;
 
-    GameLogicOutput() : running(true), score(0) {}
+    GameLogicOutput() : running(true), score(0), fluid_mesh(nullptr) {}
 };
 
 #endif

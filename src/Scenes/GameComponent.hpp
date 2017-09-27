@@ -93,11 +93,11 @@ public:
 	const Comp& getComp() const { return m_comp; }
 	Comp& getComp() { return m_comp; }
 
-	void run(int ticks_per_second, const bool& running)
+	void run(int ticks_per_second, const bool& running, bool main_thread = false)
 	{
-		m_thread = std::thread([&]()
+		auto fn = [&]()
 		{
-			assert(ticks_per_second >= 0);
+			//assert(ticks_per_second >= 0);
 			auto next = std::chrono::steady_clock::now();
 			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
 			Log::debug("d1");
@@ -105,7 +105,7 @@ public:
 				Log::debug("d2");
 				auto now = std::chrono::steady_clock::now();
 				if (next > now)
-					std::this_thread::sleep_until(next);
+					;//std::this_thread::sleep_until(next);
 				else
 					next = now;
 				next += duration;
@@ -119,7 +119,12 @@ public:
 				}
 			}
 			Log::debug("d3");
-		});
+		};
+
+		if (main_thread)
+			fn();
+		else
+			m_thread = std::thread(fn);
 	}
 
 	//template<class T = Output, class = std::enable_if_t<std::is_same<void, T>::value>>
@@ -131,8 +136,8 @@ public:
 	//template<class T = Output, class = std::enable_if_t<!std::is_same<void, T>::value>>
 	void compute(const Input& input)
 	{
-		std::lock_guard<DoubleBuffer<Output>> lock(m_output);
 		m_comp.compute(input, m_output.writeBuffer());
+		m_output.swap();
 	}
 };
 

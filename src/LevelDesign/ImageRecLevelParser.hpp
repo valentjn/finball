@@ -81,17 +81,17 @@ public:
             // Choose the one with the smaller area
             if (radius * radius * glm::pi<float>() <= rect.size.area()) {
                 circle(levelImg, center, radius, Scalar(0, 0, 0), -1);
-                auto rigidBody = make_unique<RigidBodyCircle>(rigidBodyId, center.x, center.y, radius);
-                level.setUniqueMesh(rigidBodyId, rigidBody->createColoredMesh());
+                auto rigidBody = make_unique<RigidBodyCircle>(rigidBodyId, center.x, level.height - center.y - 1, radius, 0);
+                level.setUniqueMesh(rigidBodyId, rigidBody->createColoredMesh(Level::OBSTACLE_COLOR));
                 level.rigidBodies.push_back(move(rigidBody));
             }
             else {
                 fillConvexPoly(levelImg, boxPoints, Scalar(0, 0, 0));
                 auto rigidBody = make_unique<RigidBodyRect>(rigidBodyId,
-                                                            rect.center.x, rect.center.y,
+                                                            rect.center.x, level.height - rect.center.y - 1,
                                                             rect.size.width, rect.size.height,
-                                                            1.f, rect.angle * DEG2RAD);
-                level.setUniqueMesh(rigidBodyId, rigidBody->createColoredMesh());
+                                                            0.f, rect.angle * DEG2RAD);
+                level.setUniqueMesh(rigidBodyId, rigidBody->createColoredMesh(Level::OBSTACLE_COLOR));
                 level.rigidBodies.push_back(move(rigidBody));
             }
             rigidBodyId++;
@@ -104,7 +104,7 @@ public:
                 Vec3b pixel = levelImg.at<Vec3b>(Point(x, y));
                 if (pixel == COLOR_BALL) {
                     auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, level.height - y - 1);
-                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(glm::vec3{0, 255, 255}));
+                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
                     level.rigidBodies.push_back(move(rigidBody));
                 }
                 level.matrix.value(x, level.height - y - 1) = getCellTypeFromColor(pixel);

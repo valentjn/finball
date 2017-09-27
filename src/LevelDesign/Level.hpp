@@ -21,6 +21,9 @@ private:
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
     static const int BALL_ID;
+    static const vec3 BALL_COLOR;
+    static const vec3 OBSTACLE_COLOR;
+    static const vec3 FLIPPER_COLOR;
 
     int width, height;
     int flipperLeftId, flipperRightId;
@@ -44,6 +47,25 @@ public:
         unique_meshes.push_back(move(mesh));
         return ret;
     }
+};
+
+struct CollisionType
+{
+	enum Type { ELASTIC, INELASTIC, REALISTIC, FLUID_DRIVEN };
+	Type type;
+
+	float obsticleElastisity;
+	float bodyElastisity;
+	float fluidInfluence;
+
+	CollisionType(Type type) {
+		this->type = type;
+		setValues(type);
+	}
+
+private:
+	void setValues(Type type);
+
 };
 
 #endif

@@ -214,7 +214,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
         switch (event.type) {
 
         case SDL_QUIT:
-            userInputOutput.quit = true;
+            exit(0);
             break;
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym){

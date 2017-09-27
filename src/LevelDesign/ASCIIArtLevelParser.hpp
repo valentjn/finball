@@ -31,7 +31,7 @@ public:
 
         Mesh *meshRect = level.addUniqueMesh(make_unique<ColoredMesh>(
             Mesh::createRectangle(vec2(-0.5f, -0.5f), vec2(0.5f, 0.5f)),
-            vec3(0, 0, 255)
+            Level::OBSTACLE_COLOR
         ));
 
         string file_line;
@@ -44,7 +44,7 @@ public:
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
                     auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y);
-                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(vec3(255, 0, 0)));
+                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
                     level.rigidBodies.push_back(move(rigidBody));
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');

@@ -19,7 +19,11 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
-		for (int i = 0; i < iter; i++) {
+	// Check if the input from rigidBody is already initialized
+	if (input.velocities.width() == 0)
+		return;
+
+	for (int i = 0; i < iter; i++) {
 
 		step(input, output);
 	}

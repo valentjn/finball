@@ -26,14 +26,14 @@ struct RigidBodyRect : public RigidBody {
     float width;
     float height;
 
-    RigidBodyRect(int id, float x, float y, int width, int height, float mass = 1.f,
+    RigidBodyRect(int id, float x, float y, float width, float height, float mass = 1.f,
                   float rotation = 0.f)
         : RigidBody(id, x, y, mass, rotation), width(width), height(height) {}
 
-    unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 0)) {
-        vec2 sizeHalf(width / 2, height / 2);
+    unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 255)) {
+        vec2 sizeHalf(width / 2.f, height / 2.f);
         return make_unique<ColoredMesh>(
-            Mesh::createRectangle(position - sizeHalf, position + sizeHalf),
+            Mesh::createRectangle(-sizeHalf, sizeHalf),
             color
         );
     }
@@ -46,7 +46,7 @@ struct RigidBodyCircle : public RigidBody {
                     float rotation = 0.f)
         : RigidBody(id, x, y, mass, rotation), radius(radius) {}
 
-    unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 0)) {
+    unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 255)) {
         return make_unique<ColoredMesh>(
             Mesh::createCircle(vec2(0, 0), radius),
             color
@@ -69,7 +69,7 @@ struct RigidBodyTriangle : public RigidBody {
                       float rotation = 0.f)
         : RigidBodyTriangle(id, x, y, vec2(0, 0), p2, p3, mass, rotation) {}
 
-    unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 0)) {
+    unique_ptr<ColoredMesh> createColoredMesh(vec3 color=vec3(0, 0, 255)) {
         vector<vec3> verticies(3);
         verticies.push_back(vec3(points[0].x, points[0].y, 0));
         verticies.push_back(vec3(points[1].x, points[1].y, 0));

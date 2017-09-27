@@ -56,11 +56,11 @@ float SimulationScene::simulation()
 	
 	const bool& running = gameLogic.getOutput().running;
 
-	renderer.run(context.parameters->frameRate, running);
-	userInput.run(context.parameters->frameRate, running);
+	rigidBodyPhysics.run(context.parameters->simulationRate, running);
+	latticeBoltzmann.run(context.parameters->simulationRate, running);
+	userInput.run(context.parameters->simulationRate, running);
 	gameLogic.run(context.parameters->frameRate, running);
-	rigidBodyPhysics.run(context.parameters->frameRate, running);
-	latticeBoltzmann.run(context.parameters->frameRate, running);
+	renderer.run(context.parameters->frameRate, running, true);
 
     /*steady_clock::time_point lastFrame = steady_clock::now();
     bool running = true;

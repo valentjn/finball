@@ -17,6 +17,7 @@ using namespace glm;
 struct Level {
 private:
     vector<unique_ptr<Mesh>> unique_meshes;
+    vector<int> ballIds;
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
@@ -36,6 +37,19 @@ public:
     Level &operator=(const Level &) = delete;
 
     Level() {}
+
+    void addBall(int id) {
+        ballIds.push_back(id);
+    }
+
+    bool isBall(int id) {
+        for (const int &i : ballIds) {
+            if (i == id) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     void setUniqueMesh(int id, unique_ptr<Mesh> mesh) {
 		meshes[id] = mesh.get();

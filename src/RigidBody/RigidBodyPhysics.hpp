@@ -50,7 +50,9 @@ private:
     const float DISTANCE_GRID_CELLS;
     const float DISTANCE_GRID_CELLS_INV;
 
-    std::unique_ptr<btAlignedObjectArray<btCollisionShape *>> collision_shapes;
+    // NOTE: examples are using btAlignedObjectArray<btCollisionShape *>
+    //       not sure if there's a performance penalty
+    std::unique_ptr<std::vector<std::unique_ptr<btCollisionShape>>> collision_shapes;
 
     std::unique_ptr<btCollisionConfiguration> collision_configuration;
     std::unique_ptr<btCollisionDispatcher> dispatcher;
@@ -73,8 +75,7 @@ public:
     RigidBodyPhysics(Level &level)
         : level(level), GRID_WIDTH(level.width), GRID_HEIGHT(level.height),
           DISTANCE_GRID_CELLS(BULLET_WORLD_WIDTH / GRID_WIDTH),
-          DISTANCE_GRID_CELLS_INV(GRID_WIDTH / BULLET_WORLD_WIDTH), // TODO: currently end of grid != (BULLET_WORLD_WITH | BULLET_WORLD_WIDTH)
-          collision_shapes(std::make_unique<btAlignedObjectArray<btCollisionShape *>>()),
+          DISTANCE_GRID_CELLS_INV(GRID_WIDTH / BULLET_WORLD_WIDTH),
           collision_configuration(std::make_unique<btDefaultCollisionConfiguration>()),
           dispatcher(std::make_unique<btCollisionDispatcher>(collision_configuration.get())),
           broadphase(std::make_unique<btDbvtBroadphase>()),
@@ -84,7 +85,6 @@ public:
           default_collision_shape(std::make_unique<btSphereShape>(DISTANCE_GRID_CELLS)),
           grid_static_objects_flow(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_ball(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
-          // grid_pedals(Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT)),
           grid_velocities(Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT))
     {
         dynamics_world->setGravity(btVector3(0.f, 0.f, 0.f));

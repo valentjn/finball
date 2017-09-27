@@ -103,7 +103,7 @@ public:
 			assert(ticks_per_second >= 0);
 			auto next = std::chrono::steady_clock::now();
 			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
-			int ticks = 0;
+			//int ticks = 0;
 			while (running) {
 				auto now = std::chrono::steady_clock::now();
 				if (next > now)

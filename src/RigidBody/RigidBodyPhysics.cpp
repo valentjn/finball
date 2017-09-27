@@ -16,7 +16,7 @@
 void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
-
+	bt_rigid_body->setRestitution(1.0f);
     if (isFlipper(level_body.id)) {
         btVector3 axis;
         if (level_body.id == level.flipperLeftId) {
@@ -40,6 +40,10 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
         bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
         bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
     }
+
+	if (level_body.id == level.BALL_ID) {
+		bt_rigid_body->setRestitution(0.8f);
+	}
 
     if (level_body.mass == 0.f) {
         // FIXME: not every objects is a rectangle...
@@ -77,6 +81,7 @@ void RigidBodyPhysics::createBoundaryRigidBody(btCollisionShape *collision_shape
     bt_rigid_body =
         new btRigidBody(0.0f, motion_state, collision_shape, btVector3(0.0f, 0.0f, 0.0f));
     bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
+	bt_rigid_body->setRestitution(1.0f);
     dynamics_world->addRigidBody(bt_rigid_body);
 }
 

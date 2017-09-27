@@ -10,6 +10,11 @@
 #include "Log.hpp"
 #include "RigidBody/RigidBody.hpp"
 #include "Visualization/Mesh.hpp"
+#include "Visualization/Texture.hpp"
+
+#ifdef OPENCV_LIBS
+#include <opencv2/opencv.hpp>
+#endif
 
 using namespace std;
 
@@ -44,7 +49,18 @@ public:
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
                     auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y);
+#ifdef OPENCV_LIBS
+                    cv::Mat img = cv::imread(Level::BALL_IMAGE_PATH, cv::IMREAD_UNCHANGED);
+                    unique_ptr<Texture4F> texture = make_unique<Texture4F>(glm::ivec2{img.size().width, img.size().height});
+                    texture->setData(img);
+                    level.addUniqueTexture(make_unique<Texture>(static_cast<Texture>(*texture))); // TODO: WTF, there must be a better way...
+                    level.setUniqueMesh(Level::BALL_ID, make_unique<TexturedMesh>(
+                        Mesh::createCircle(vec2(0, 0), rigidBody->radius),
+                        texture.get()
+                    ));
+#else
                     level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
+#endif
                     level.rigidBodies.push_back(move(rigidBody));
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');

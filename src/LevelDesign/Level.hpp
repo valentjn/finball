@@ -10,6 +10,7 @@
 #include "Array2D.hpp"
 #include "RigidBody/RigidBody.hpp"
 #include "Visualization/Mesh.hpp"
+#include "Visualization/Texture.hpp"
 
 using namespace std;
 using namespace glm;
@@ -17,10 +18,12 @@ using namespace glm;
 struct Level {
 private:
     vector<unique_ptr<Mesh>> unique_meshes;
+    vector<unique_ptr<Texture>> unique_textures;
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
     static const int BALL_ID;
+    static const char *BALL_IMAGE_PATH;
     static const vec3 BALL_COLOR;
     static const vec3 OBSTACLE_COLOR;
     static const vec3 FLIPPER_COLOR;
@@ -45,6 +48,12 @@ public:
     Mesh *addUniqueMesh(unique_ptr<Mesh> mesh) {
 		auto ret = mesh.get();
         unique_meshes.push_back(move(mesh));
+        return ret;
+    }
+
+    Texture *addUniqueTexture(unique_ptr<Texture> texture) {
+		auto ret = texture.get();
+        unique_textures.push_back(move(texture));
         return ret;
     }
 };

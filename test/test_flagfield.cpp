@@ -58,7 +58,7 @@ bool checkOutsideNotFluid(Array2D<Level::CellType>& flagfield){
 
 void setBallPosition(Level &level, int x, int y) {
     for (const auto &rb : level.rigidBodies) {
-        if (rb->id == Level::BALL_ID) {
+        if (level.isBall(rb->id)) {
             rb->position = {x, y};
         }
     }
@@ -88,7 +88,9 @@ TEST(RigidBodyTest, static64) {
   RigidBodyPhysics sut(level);
   sut.setGravity(false);
 
-  sut.compute(input, output);
+  for (int i = 0; i < 100 ; ++i) { // Make sure the fins are stable
+      sut.compute(input, output);
+  }
 
   Array2D<Level::CellType> init_flagfield = output.grid_objects;
   EXPECT_TRUE(checkOutsideNotFluid(init_flagfield));
@@ -103,11 +105,12 @@ TEST(RigidBodyTest, static64) {
 
   bool changed = false;
   for (int i = 0; i<level.width ; ++i){
-
       for (int j = 0; j<level.height ; ++j){
         if (init_flagfield.value(i,j) != output.grid_objects.value(i,j)) {
-                        changed = true;
-			break;
+            changed = true;
+			std::cout << "change at: " << i << ", " << j << std::endl;
+			std::cout << "before: " << init_flagfield.value(i,j) << std::endl;
+			std::cout << "after: " << output.grid_objects.value(i,j) << std::endl;
 		}
       }
   }

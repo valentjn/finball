@@ -22,9 +22,20 @@ void LevelLoader::createFlippers(Level &level) {
                                                          vec2(0.f, -FLIPPER_HEIGHT),
                                                          vec2(-FLIPPER_WIDTH, -FLIPPER_HEIGHT),
                                                          1);
-
+#ifdef OPENCV_LIBS
+    unique_ptr<Mesh> meshLeft, meshRight;
+    if ((meshLeft = Mesh::createImageMesh("data/fin_left.png", level.leftFinTexture, FLIPPER_WIDTH)) == nullptr) {
+        meshLeft = rigidBodyLeft->createColoredMesh(Level::FLIPPER_COLOR);
+    }
+    if ((meshRight = Mesh::createImageMesh("data/fin_right.png", level.rightFinTexture, FLIPPER_WIDTH)) == nullptr) {
+        meshRight = rigidBodyRight->createColoredMesh(Level::FLIPPER_COLOR);
+    }
+    level.setUniqueMesh(level.flipperLeftId, move(meshLeft));
+    level.setUniqueMesh(level.flipperRightId, move(meshRight));
+#else
     level.setUniqueMesh(level.flipperLeftId, rigidBodyLeft->createColoredMesh(Level::FLIPPER_COLOR));
     level.setUniqueMesh(level.flipperRightId, rigidBodyRight->createColoredMesh(Level::FLIPPER_COLOR));
+#endif
 
     level.rigidBodies.push_back(std::move(rigidBodyLeft));
     level.rigidBodies.push_back(std::move(rigidBodyRight));

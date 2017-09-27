@@ -35,6 +35,9 @@ public:
     static const vec3 OBSTACLE_COLOR;
     static const vec3 FLIPPER_COLOR;
 
+    unique_ptr<Texture4F> leftFinTexture;
+    unique_ptr<Texture4F> rightFinTexture;
+    
     int width, height;
     int flipperLeftId, flipperRightId;
     Array2D<CellType> matrix;

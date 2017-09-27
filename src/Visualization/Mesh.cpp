@@ -10,6 +10,7 @@
 #include <opencv2/opencv.hpp>
 #endif
 
+#include "Log.hpp"
 #include "Visualization/Mesh.hpp"
 
 Mesh::Mesh(GLsizei vertex_count) : m_vertex_count(vertex_count) {}
@@ -92,6 +93,18 @@ std::unique_ptr<Mesh> Mesh::createTextMesh(const char *text, std::unique_ptr<Tex
 	auto mesh = std::make_unique<TexturedMesh>(textRect, textureOut.get());
 
     return mesh;
+}
+
+std::unique_ptr<Mesh> Mesh::createImageMesh(const char *filePath, std::unique_ptr<Texture4F> &textureOut, int size) {
+    cv::Mat image = cv::imread(filePath, cv::IMREAD_UNCHANGED);
+    if (!image.data) {
+        Log::error("Image %s not found!", filePath);
+        return nullptr;
+    } else {
+        textureOut = std::make_unique<Texture4F>(glm::ivec2{image.cols, image.rows});
+        textureOut->setData(image);
+        return std::make_unique<TexturedMesh>(size, textureOut.get());
+    }
 }
 #endif
 
@@ -199,7 +212,7 @@ TexturedMesh::TexturedMesh(int scale, const Texture* texture) :
     std::vector<glm::vec3> vertices = Mesh::createRectangle({-scale, -scale}, {scale, scale});
     std::vector<Vertex> vertex_buffer(6);
     for (int i = 0; i < m_vertex_count; i++) {
-        vertex_buffer[i] = {vertices[i], { vertices[i].x > 0 ? 0 : 1, vertices[i].y > 0 ? 1 : 0 }};
+        vertex_buffer[i] = {vertices[i], { vertices[i].x > 0 ? 1 : 0, vertices[i].y > 0 ? 1 : 0 }};
     }
     init(vertex_buffer);
 }

@@ -15,6 +15,7 @@ private:
 	const int * cy;
 	int invI[9] = {0,3,4,1,2,7,8,5,6};
 public:
+	float leftAngle, rightAngle;
     RigidBodyPhysicsInput() : afterStream(nullptr), preStream(nullptr),
 	cx(nullptr), cy(nullptr) {}
 
@@ -23,7 +24,9 @@ public:
 						  afterStream(&(latticeBoltzmannOutput.afterstream)),
 						  preStream(&(latticeBoltzmannOutput.prestream)),
 						  cx(latticeBoltzmannOutput.cx),
-						  cy(latticeBoltzmannOutput.cy) {}
+						  cy(latticeBoltzmannOutput.cy),
+						  leftAngle(userInputOutput.leftAngle[0]),
+						  rightAngle(userInputOutput.rightAngle[0]) {}
 
 	void computeImpulses(const Array2D<Level::CellType>& grid_ball,
 		std::unordered_map<int, glm::vec2>& impulses) const {

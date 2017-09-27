@@ -18,10 +18,6 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 {
 	btRigidBody *bt_rigid_body = createBtRigidBody(level_body);
 
-	// Constrain to two dimensions
-	bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
-	bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
-
 	auto rigid_body =
 			std::make_unique<Transform>(level_body->id, level_body->position, level_body->rotation);
 	rigid_bodies[level_body->id] = std::move(rigid_body);
@@ -45,6 +41,12 @@ void RigidBodyPhysics::addRigidBody(const unique_ptr <RigidBody> &level_body)
 		hingeR->setMaxMotorImpulse(SIMD_INFINITY);
 		// hingeR->setLimit(0, SIMD_PI/4);
 		dynamics_world->addConstraint(hingeR);
+	}
+
+	if (level_body->id != level.flipperRightId && level_body->id != level.flipperLeftId)
+	{
+		bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
+		bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
 	}
 
 	if (level_body->mass == 0.f) {
@@ -248,23 +250,23 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
 		output_transform->position.y = bulletToGrid(origin.getY());
 
 		// TODO: check that this behaves correctly
-		// auto quaternion = transform.getRotation();
-		// if (quaternion.getAxis().z() < 0.) {
-		// 	output_transform->rotation = 2 * M_PI - quaternion.getAngle();
-		// } else {
-		// 	output_transform->rotation = quaternion.getAngle();
+		auto quaternion = transform.getRotation();
+		if (quaternion.getAxis().z() < 0.) {
+			output_transform->rotation = 2 * SIMD_PI - quaternion.getAngle();
+		} else {
+			output_transform->rotation = quaternion.getAngle();
+		}
+
+		// Get the rotation from world transform directly
+		// if (id == level.flipperLeftId) {
+		// 	printf("Left: %f \t %f\n",output_transform->rotation, hingeL->getHingeAngle());
+		// 	// output_transform->rotation = hingeL->getHingeAngle();
 		// }
-
-		// TODO: Get the rotation from world transform directly
-		if (id == level.flipperLeftId) {
-			// printf("Left: %f \t %f\n",output_transform->rotation, hingeL->getHingeAngle());
-			output_transform->rotation = hingeL->getHingeAngle();
-		}
-
-		if (id == level.flipperRightId) {
-			// printf("Right: %f \t %f\n",output_transform->rotation, hingeR->getHingeAngle());
-			output_transform->rotation = hingeR->getHingeAngle();
-		}
+		//
+		// if (id == level.flipperRightId) {
+		// 	printf("Right: %f \t %f\n",output_transform->rotation, hingeR->getHingeAngle());
+		// 	// output_transform->rotation = -hingeR->getHingeAngle();
+		// }
 
 		output.rigid_bodies.push_back(output_transform);
 
@@ -302,11 +304,12 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 	clearDynamicFlagFields(grid_obj);
 	// hingeL->enableAngularMotor(true,1.0f,SIMD_INFINITY);
 	// hingeR->enableAngularMotor(true,1.0f,SIMD_INFINITY);
-	hingeL->setMotorTarget(2.0f,1.0f);
-	hingeR->setMotorTarget(2.0f,1.0f);
+	
+	hingeL->setMotorTarget(input.leftAngle,1.);
+	hingeR->setMotorTarget(input.rightAngle,1.);
 	hingeL->enableMotor(true);
 	hingeR->enableMotor(true);
-	dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
+	dynamics_world->stepSimulation(1./60.); // TODO: everybody has to use the same timestep
 
 	for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
 		auto &obj = dynamics_world->getCollisionObjectArray()[j];

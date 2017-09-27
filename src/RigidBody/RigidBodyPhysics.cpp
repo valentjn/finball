@@ -280,10 +280,11 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 	for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
 		auto &obj = dynamics_world->getCollisionObjectArray()[j];
 		btRigidBody *rigid_body = btRigidBody::upcast(obj);
-		if (rigid_body && (obj->getUserIndex() == level.flipperLeftId || obj->getUserIndex() == level.flipperRightId)) {
+		if (obj->getUserIndex() == level.flipperLeftId || obj->getUserIndex() == level.flipperRightId) {
+			if (!rigid_body) {
+				throw std::runtime_error("Fin is not a btRigidBody!");
+			}
 			grid_finFlag(grid_obj, grid_vel, rigid_body);
-		} else {
-			std::runtime_error("Fin is not a btRigidBody!");
 		}
 	}
 

@@ -12,10 +12,6 @@
 #include "Visualization/Mesh.hpp"
 #include "Visualization/Texture.hpp"
 
-#ifdef OPENCV_LIBS
-#include <opencv2/opencv.hpp>
-#endif
-
 using namespace std;
 
 class ASCIIArtLevelParser {
@@ -44,25 +40,14 @@ public:
 
         level.matrix = Array2D<Level::CellType>(level.width, level.height);
         int rigidBodyId = Level::BALL_ID + 1;
+        bool foundBall = false; // TODO: remove, this is only for migration
+
         for (int y = level.height - 1; y >= 0; y--) {
             file >> file_line;
             for (int x = 0; x < level.width; x++) {
                 if (file_line[x] == 'B') {
-                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, y, Level::BALL_RADIUS, Level::BALL_MASS);
-#ifdef OPENCV_LIBS
-                    cv::Mat img = cv::imread(Level::BALL_IMAGE_PATH, cv::IMREAD_UNCHANGED);
-                    if (!img.data) {
-                        Log::warn("Ball image not found! Using default color mesh.");
-                        level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
-                        continue;
-                    }
-                    Texture4F *texture = level.addUniqueTexture(make_unique<Texture4F>(glm::ivec2{img.cols, img.rows}));
-                    texture->setData(img);
-                    level.setUniqueMesh(Level::BALL_ID, make_unique<TexturedMesh>(3, texture));
-#else
-                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
-#endif
-                    level.rigidBodies.push_back(move(rigidBody));
+                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID);
+                    foundBall = true;
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
                     if (cell == Level::CellType::OBSTACLE) {

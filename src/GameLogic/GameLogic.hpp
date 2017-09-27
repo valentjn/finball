@@ -47,7 +47,7 @@ public:
         Log::debug("Haiscore clock started ;-)");
     }
 
-    void update(const GameLogicInput &input, GameLogicOutput &output) {
+    void compute(const GameLogicInput &input, GameLogicOutput &output) {
         duration<float> duration = steady_clock::now() - startTime;
         output.score = duration.count();
 

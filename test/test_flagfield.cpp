@@ -10,6 +10,8 @@
 
 //set density to 1 and velocity to 0
 void initializeLBOutputBoring(LatticeBoltzmannOutput& lbout, int lwidth, int lheight){
+	lbout.velocity = Array2D<glm::vec2>{ lwidth, lheight };
+	lbout.density = Array2D<float>{ lwidth, lheight };
     for (int i = 0; i<lwidth ; ++i){
 
         for (int j = 0; j<lheight ; ++j){
@@ -75,13 +77,13 @@ TEST(RigidBodyTest, static64) {
   levelLoader.load(level);
   setBallPosition(level, level.width/2, level.height/2);
 
-  RigidBodyPhysicsOutput output(level);
+  RigidBodyPhysicsOutput output;
   RigidBodyPhysicsInput input;
 
   UserInputOutput userInputOutput;
-  LatticeBoltzmannOutput latticeBoltzmannOutput(level);
+  LatticeBoltzmannOutput latticeBoltzmannOutput;
   initializeLBOutputBoring(latticeBoltzmannOutput, level.width, level.height);
-  input = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+  input.process(userInputOutput, latticeBoltzmannOutput);
 
   RigidBodyPhysics sut(level);
   sut.setGravity(false);
@@ -133,13 +135,13 @@ TEST(RigidBodyTest, gravity64) {
   levelLoader.load(level);
   setBallPosition(level, level.width / 2, level.height / 2);
 
-  RigidBodyPhysicsOutput output(level);
+  RigidBodyPhysicsOutput output;
   RigidBodyPhysicsInput input;
 
   UserInputOutput userInputOutput;
-  LatticeBoltzmannOutput latticeBoltzmannOutput(level);
+  LatticeBoltzmannOutput latticeBoltzmannOutput;
   initializeLBOutputBoring(latticeBoltzmannOutput, level.width, level.height);
-  input = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+  input.process(userInputOutput, latticeBoltzmannOutput);
 
   RigidBodyPhysics sut(level);
   sut.setGravity(true);
@@ -190,13 +192,13 @@ TEST(RigidBodyTest, stop64) {
   levelLoader.load(level);
   setBallPosition(level, level.width/4, level.height*0.9);
 
-  RigidBodyPhysicsOutput output(level);
+  RigidBodyPhysicsOutput output;
   RigidBodyPhysicsInput input;
 
   UserInputOutput userInputOutput;
-  LatticeBoltzmannOutput latticeBoltzmannOutput(level);
+  LatticeBoltzmannOutput latticeBoltzmannOutput;
   initializeLBOutputBoring(latticeBoltzmannOutput, level.width, level.height);
-  input = RigidBodyPhysicsInput(userInputOutput, latticeBoltzmannOutput);
+  input.process(userInputOutput, latticeBoltzmannOutput);
 
   RigidBodyPhysics sut(level);
   sut.setGravity(true);

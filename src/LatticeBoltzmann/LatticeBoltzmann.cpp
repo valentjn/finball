@@ -19,7 +19,11 @@ void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzm
 	// Check flag field
 	assert(isBoundaryValid(input.flagfield));
 
-		for (int i = 0; i < iter; i++) {
+	// Check if the input from rigidBody is already initialized
+	if (input.velocities.width() == 0)
+		return;
+
+	for (int i = 0; i < iter; i++) {
 
 		step(input, output);
 	}
@@ -158,6 +162,12 @@ void LatticeBoltzmann::stream(const LatticeBoltzmannInput &input)
 
 void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 {
+	if (output.density.width() == 0) {
+		output.velocity = Array2D<glm::vec2>(level.width, level.height);
+		output.density = Array2D<float>(level.width, level.height);
+		output.prestream = Array2D<FICell>(level.width, level.height);
+		output.afterstream = Array2D<FICell>(level.width, level.height);
+	}
 	// Calculate macroscopic quantities for the output
 //#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < this->level.height; y++) {

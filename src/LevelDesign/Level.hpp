@@ -6,6 +6,10 @@
 #include <vector>
 #include <iostream>
 
+#ifdef OPENCV_LIBS
+#include <opencv2/opencv.hpp>
+#endif
+
 #include "Log.hpp"
 #include "Array2D.hpp"
 #include "RigidBody/RigidBody.hpp"
@@ -19,6 +23,7 @@ struct Level {
 private:
     vector<unique_ptr<Mesh>> unique_meshes;
     vector<unique_ptr<Texture4F>> unique_textures;
+    vector<int> ballIds;
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
@@ -41,6 +46,34 @@ public:
     Level &operator=(const Level &) = delete;
 
     Level() {}
+
+    void addBall(int id) {
+        ballIds.push_back(id);
+        rigidBodies.push_back(make_unique<RigidBodyCircle>(id, x, y, BALL_RADIUS, BALL_MASS);
+
+#ifdef OPENCV_LIBS
+        cv::Mat img = cv::imread(BALL_IMAGE_PATH, cv::IMREAD_UNCHANGED);
+        if (!img.data) {
+            Log::warn("Ball image not found! Using default color mesh.");
+            level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(BALL_COLOR));
+            return;;
+        }
+        Texture4F *texture = addUniqueTexture(make_unique<Texture4F>(glm::ivec2{img.cols, img.rows}));
+        texture->setData(img);
+        setUniqueMesh(id, make_unique<TexturedMesh>(3, texture));
+#else
+        setUniqueMesh(id, rigidBody->createColoredMesh(BALL_COLOR));
+#endif
+    }
+
+    bool isBall(int id) {
+        for (const int &i : ballIds) {
+            if (i == id) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     void setUniqueMesh(int id, unique_ptr<Mesh> mesh) {
 		meshes[id] = mesh.get();

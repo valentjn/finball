@@ -318,7 +318,8 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
             initializeKinect();
         }
     } else {
-        context->WaitNoneUpdateAll();
+
+		class UserInputInput {}; rtext->WaitNoneUpdateAll();
 
         XnUInt16 tmpNUsers = MAX_USERS;
         userGenerator->GetUsers(users, tmpNUsers);
@@ -496,7 +497,7 @@ void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
 }
 
 // process input
-void UserInput::getInput(UserInputOutput &userInputOutput) {
+void UserInput::compute(const UserInputInput&, UserInputOutput &userInputOutput) {
     // get timing information
     auto now = high_resolution_clock::now();
     double delta = duration_cast<nanoseconds>(now-previous_time_point).count()

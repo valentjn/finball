@@ -17,19 +17,21 @@ private:
 public:
 	float leftAngle, rightAngle;
     RigidBodyPhysicsInput() : afterStream(nullptr), preStream(nullptr),
-	cx(nullptr), cy(nullptr) {}
+	cx(nullptr), cy(nullptr), leftAngle(0), rightAngle(0) {}
 
-    RigidBodyPhysicsInput(const UserInputOutput &userInputOutput,
-                          const LatticeBoltzmannOutput &latticeBoltzmannOutput) :
-						  afterStream(&(latticeBoltzmannOutput.afterstream)),
-						  preStream(&(latticeBoltzmannOutput.prestream)),
-						  cx(latticeBoltzmannOutput.cx),
-						  cy(latticeBoltzmannOutput.cy),
-						  leftAngle(userInputOutput.leftAngle[0]),
-						  rightAngle(userInputOutput.rightAngle[0]) {}
+	void process(const UserInputOutput &userInputOutput, const LatticeBoltzmannOutput &latticeBoltzmannOutput)
+	{
+		afterStream = &latticeBoltzmannOutput.afterstream;
+		preStream = &latticeBoltzmannOutput.prestream;
+		cx = latticeBoltzmannOutput.cx;
+		cy = latticeBoltzmannOutput.cy;
+		leftAngle = userInputOutput.leftAngle[0];
+		rightAngle = userInputOutput.rightAngle[0];
+	}
 
 	void computeImpulses(const Array2D<Level::CellType>& grid_ball,
 		std::unordered_map<int, glm::vec2>& impulses) const {
+		if (afterStream->width() == 0) return;
 		glm::vec2 impulse(0.0f,0.0f);
 		int nbhX, nbhY;
 		// TODO: Iterate over entire grid. For now do not iterate over the borders

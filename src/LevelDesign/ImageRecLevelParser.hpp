@@ -62,6 +62,7 @@ public:
 
         int i = 0;
         int rigidBodyId = Level::BALL_ID + 1;
+        bool foundBall = false; // TODO: remove, this is only for migration
 
         for (const vector<Point> &contourPoints : contours) {
             // Skip contour, if it contains other contours
@@ -103,9 +104,8 @@ public:
             for (int y = 0; y < levelSize.width; y++) {
                 Vec3b pixel = levelImg.at<Vec3b>(Point(x, y));
                 if (pixel == COLOR_BALL) {
-                    auto rigidBody = make_unique<RigidBodyCircle>(Level::BALL_ID, x, level.height - y - 1, Level::BALL_RADIUS, Level::BALL_MASS);
-                    level.setUniqueMesh(Level::BALL_ID, rigidBody->createColoredMesh(Level::BALL_COLOR));
-                    level.rigidBodies.push_back(move(rigidBody));
+                    level.addBall(foundBall ? rigidBodyId++ : Level::BALL_ID);
+                    foundBall = true;
                 }
                 level.matrix.value(x, level.height - y - 1) = getCellTypeFromColor(pixel);
             }

@@ -168,7 +168,7 @@ Renderer::~Renderer() {
     SDL_GL_DeleteContext(m_glcontext);
 }
 
-void Renderer::update(const RendererInput &input) {
+void Renderer::compute(const RendererInput &input, RendererOutput&) {
     // clear the framebuffer to black
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -181,10 +181,12 @@ void Renderer::update(const RendererInput &input) {
     // bind & fill fluid input texture
     auto loc = glGetUniformLocation(m_shader_program_fluid, "tex_vecs");
     glUniform1i(loc, 0);
-    if (!m_tex_fluid_input)
-        m_tex_fluid_input = std::make_unique<Texture3F>(glm::ivec2{ input.fluid_input.width(), input.fluid_input.height() });
-    m_tex_fluid_input->bind(0);
-    m_tex_fluid_input->setData(input.fluid_input);
+	if (input.fluid_input.width() != 0) {
+		if (!m_tex_fluid_input)
+			m_tex_fluid_input = std::make_unique<Texture3F>(glm::ivec2{ input.fluid_input.width(), input.fluid_input.height() });
+		m_tex_fluid_input->bind(0);
+		m_tex_fluid_input->setData(input.fluid_input);
+	}
 
     // bind noise texture
     loc = glGetUniformLocation(m_shader_program_fluid, "tex_noise");
@@ -211,7 +213,9 @@ void Renderer::update(const RendererInput &input) {
     glViewport(0, 0, m_resolution.x, m_resolution.y);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(m_shader_program_world);
-    input.fluid_mesh->setTexture(*m_tex_fluid_output);
+    
+	if (input.fluid_mesh)
+		input.fluid_mesh->setTexture(*m_tex_fluid_output);
 
     // update view matrix in shader_program_world
     glm::mat4 view = glm::lookAt(m_camera_pos,           // eye

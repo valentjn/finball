@@ -43,9 +43,6 @@ class Texture3F : public Texture
 public:
     Texture3F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec3>& data);
-#ifdef OPENCV_LIBS
-    void setData(const cv::Mat& data);
-#endif
 };
 
 class Texture4F : public Texture
@@ -53,6 +50,9 @@ class Texture4F : public Texture
 public:
     Texture4F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec4>& data);
+#ifdef OPENCV_LIBS
+    void setData(const cv::Mat& data);
+#endif
 };
 
 #endif

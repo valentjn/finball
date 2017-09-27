@@ -6,6 +6,10 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+#ifdef OPENCV_LIBS
+#include <opencv2/opencv.hpp>
+#endif
+
 #include "Visualization/Mesh.hpp"
 
 Mesh::Mesh(GLsizei vertex_count) : m_vertex_count(vertex_count) {}
@@ -64,6 +68,32 @@ std::vector<glm::vec3> Mesh::createArrow(float scale)
         { -0.5f  * scale, -0.15f * scale, 0.0f }
     };
 }
+
+#ifdef OPENCV_LIBS
+// Returns a Textured Mesh with the specified formatted text
+// The corresponding texture is saved to textureOut
+std::unique_ptr<Mesh> Mesh::createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec3 color,
+		glm::ivec4 bgColor, float fontScale, int lineThickness, bool antiAliasing) {
+    int font = cv::FONT_HERSHEY_SIMPLEX;
+    int lineType = antiAliasing ? cv::LINE_AA : cv::LINE_8;
+    int BORDER = 10;
+    cv::Size textSize = cv::getTextSize(text, font, fontScale, lineThickness, NULL);
+
+    cv::Mat mat(textSize.height + BORDER*2, textSize.width + BORDER*2, CV_8UC4, cv::Scalar(bgColor.z, bgColor.y, bgColor.x, bgColor.w));
+    cv::putText(mat, text, cv::Point(BORDER, textSize.height+BORDER), font, fontScale, cv::Scalar(color.z, color.y, color.x), lineThickness, lineType, false);
+
+    glm::ivec2 textSizeVec(textSize.width+BORDER*2, textSize.height+BORDER*2);
+    if (textureOut == nullptr || textureOut->size() != textSizeVec) {
+        textureOut = std::make_unique<Texture4F>(textSizeVec, false);
+    }
+    textureOut->setData(mat);
+
+	auto textRect = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
+	auto mesh = std::make_unique<TexturedMesh>(textRect, textureOut.get());
+
+    return mesh;
+}
+#endif
 
 void ColoredMesh::init(const std::vector<Vertex>& vertex_buffer)
 {
@@ -128,7 +158,7 @@ void ColoredMesh::render(GLint mode_location) const
 }
 
 void TexturedMesh::init(const std::vector<Vertex>& vertex_buffer)
-{    
+{
     // create vertex array object
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -199,4 +229,3 @@ void TexturedMesh::render(GLint mode_location) const
 const Texture& TexturedMesh::getTexture() const { return *m_texture; }
 
 void TexturedMesh::setTexture(const Texture& texture) { m_texture = &texture; }
-

@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 
 #include "Array2D.hpp"
@@ -11,10 +12,11 @@
 #include "RigidBody/RigidBodyPhysicsOutput.hpp"
 #include "Visualization/RenderObject.hpp"
 #include "Visualization/Mesh.hpp"
-#include "Texture.hpp"
+#include "Visualization/Texture.hpp"
 
 class RendererInput {
 	std::unique_ptr<Texture3F> ff_texture;
+	std::unique_ptr<Texture4F> score_texture;
 
 public:
     std::vector<RenderObject> world_objects;
@@ -23,6 +25,7 @@ public:
     TexturedMesh* fluid_mesh;
 	std::unique_ptr<Mesh> dummy_mesh;
 	std::unique_ptr<TexturedMesh> ff_mesh;
+	std::unique_ptr<Mesh> score_mesh;
 
     RendererInput() : fluid_mesh(nullptr)
 	{
@@ -110,6 +113,19 @@ public:
         ff_render_object.scale = {0.25f, 0.25f};
         ff_render_object.rotation = 0;
         ui_objects.push_back(ff_render_object);
+
+#ifdef OPENCV_LIBS
+		char score_str[20];
+		snprintf(score_str, sizeof(char)*20, "Score: %-12.2f", gameLogicOutput.score);
+		score_mesh = Mesh::createTextMesh(score_str, score_texture);
+
+		RenderObject textRenderObject;
+		textRenderObject.mesh = score_mesh.get();
+		textRenderObject.position = glm::vec3{-0.45f, 0.92f, 0.f};
+		textRenderObject.scale = {.55f, .08f};
+		textRenderObject.rotation = 0;
+		ui_objects.push_back(textRenderObject);
+#endif
 
         // handle lattice boltzmann output
         assert(latticeBoltzmannOutput.velocity.width() == latticeBoltzmannOutput.density.width());

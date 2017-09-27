@@ -60,7 +60,8 @@ private:
     std::unique_ptr<btCollisionShape> default_collision_shape;
 
     // TODO: int -> std::pair<unique_ptr(?)<RigidBody>, Transform>
-    std::unordered_map<int, std::unique_ptr<Transform>> rigid_bodies;
+    typedef std::pair<std::unique_ptr<btRigidBody>, std::unique_ptr<Transform>> RigidBodiesEntry;
+    std::unordered_map<int, RigidBodiesEntry> rigid_bodies;
     std::unordered_map<int, glm::vec2> impulses;
     Array2D<Level::CellType> grid_static_objects_flow;
     Array2D<Level::CellType> grid_ball;
@@ -111,7 +112,7 @@ public:
 
     std::unique_ptr<btRigidBody> createBtRigidBody(const RigidBody &level_body);
 
-    // TODO: dtor
+    // TODO: dtor (remove objects, etc. from world before removing from our owning containers)
 
     float gridToBullet(int x);
 

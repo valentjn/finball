@@ -16,11 +16,6 @@
 void RigidBodyPhysics::addRigidBody(const RigidBody &level_body)
 {
 	std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
-
-	auto rigid_body =
-			std::make_unique<Transform>(level_body.id, level_body.position, level_body.rotation);
-	rigid_bodies[level_body.id] = std::move(rigid_body);
-
 	dynamics_world->addRigidBody(bt_rigid_body.get());
 
 	if (level_body.id == level.flipperLeftId)
@@ -53,7 +48,11 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body)
 		grid_static_objects_flow.value(level_body.position.x, level_body.position.y) = Level::CellType::OBSTACLE;
 	}
 
-	bt_rigid_body.release(); // FIXME: we need to store the unique_ptr in our rigid_bodies hashmap
+	auto transform =
+			std::make_unique<Transform>(level_body.id, level_body.position, level_body.rotation);
+	rigid_bodies[level_body.id] =
+		std::make_pair<std::unique_ptr<btRigidBody>, std::unique_ptr<Transform>>
+		(std::move(bt_rigid_body), std::move(transform));
 }
 
 // Add one rigid body that is invisible to user at an inflow cell
@@ -233,7 +232,7 @@ void RigidBodyPhysics::applyImpulses(btCollisionObject *&obj)
 {
 	btRigidBody *bt_rigid_body = btRigidBody::upcast(obj);
 	int id = bt_rigid_body->getUserIndex();
-	Transform *rigid_body = rigid_bodies[id].get();
+	Transform *rigid_body = rigid_bodies[id].second.get();
 	if (bt_rigid_body && bt_rigid_body->getMotionState() && rigid_body->id == Level::BALL_ID) {
 		bt_rigid_body->applyCentralImpulse(DISTANCE_GRID_CELLS * btVector3(impulses[1].x, impulses[1].y, 0.0f));
 	}
@@ -251,7 +250,7 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
 
 		// update the RigidBody and push the reference to our output
 		int id = bt_rigid_body->getUserIndex();
-		Transform *output_transform = rigid_bodies[id].get();
+		Transform *output_transform = rigid_bodies[id].second.get();
 
 		output_transform->position.x = bulletToGrid(origin.getX());
 		output_transform->position.y = bulletToGrid(origin.getY());
@@ -349,9 +348,10 @@ void RigidBodyPhysics::setGravity(bool on)
 	dynamics_world->setGravity(btVector3(0., (on ? -10. : 0.), 0.));
 }
 
+// TODO: this returns a transform...
 Transform RigidBodyPhysics::getRigidBody(int idx)
 {
-	return *(rigid_bodies[idx].get());
+	return *(rigid_bodies[idx].second.get());
 }
 
 void RigidBodyPhysics::setRigidBody(int id, float x, float y, float mass = 1.f, float rotation = 0.f)

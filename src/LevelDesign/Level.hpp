@@ -58,6 +58,10 @@ public:
     bool createCellRigidBody(int x, int y, int id);
 
     void createBoundryRigidBodies(int rigidBodyId);
+
+    float getLeftFinX() const;
+
+    float getRightFinX() const;
 };
 
 #endif

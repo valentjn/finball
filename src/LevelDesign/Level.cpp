@@ -3,7 +3,7 @@
 #endif
 
 #include <Log.hpp>
-#include <Level.hpp>
+#include <LevelDesign/Level.hpp>
 
 const float Level::FLIPPER_Y = 5.f;
 const float Level::FLIPPER_WIDTH = 8.f;

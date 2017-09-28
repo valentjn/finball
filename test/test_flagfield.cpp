@@ -85,6 +85,7 @@ void setBallPosition(Level &level, int x, int y) {
 //
 //   RigidBodyPhysics sut(level);
 //   sut.setGravity(false);
+//	 sut.initOutput(output);
 //
 //   for (int i = 0; i < 100 ; ++i) { // Make sure the fins are stable
 //       sut.compute(input, output);
@@ -186,6 +187,7 @@ TEST(RigidBodyTest, stop64) {
 
   RigidBodyPhysics sut(level);
   sut.setGravity(true);
+  sut.initOutput(output);
 
   sut.compute(input, output);
 

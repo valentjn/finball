@@ -17,8 +17,8 @@ private:
 	glm::ivec2 resolution;
 
 public:
-    SDLWindow(glm::ivec2 resolution, const char* title, bool fullscreen)
-		: resolution(resolution)
+    SDLWindow(glm::ivec2 res, const char* title, bool fullscreen)
+		: resolution(res)
 	{
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
 			Log::error("Failed to initialize SDL: %s", SDL_GetError());

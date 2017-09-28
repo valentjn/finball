@@ -7,7 +7,6 @@
 #include <functional>
 #include <memory>
 #include <tuple>
-#include <thread>
 
 namespace apply_detail
 {
@@ -69,18 +68,11 @@ class GameComponent
 
 	Comp m_comp;
 	DoubleBuffer<Output> m_output;
-	std::thread m_thread;
 	std::unique_ptr<GameInputBase<Input>> m_input;
 
 public:
 	template<class... Args>
 	GameComponent<Comp, Input, Output>(Args&&... args) : m_comp(std::forward<Args>(args)...) {}
-
-	~GameComponent<Comp, Input, Output>()
-	{
-		if (m_thread.joinable())
-			m_thread.join();
-	}
 
 	template<class... Ingoings>
 	void bindInput(const Ingoings&... comps)
@@ -93,48 +85,18 @@ public:
 	const Comp& getComp() const { return m_comp; }
 	Comp& getComp() { return m_comp; }
 
-	void run(int ticks_per_second, const bool& running, bool main_thread = false)
-	{
-		auto fn = [&]()
-		{
-			assert(ticks_per_second >= 0);
-			auto next = std::chrono::steady_clock::now();
-			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
-			while (running) {
-				auto now = std::chrono::steady_clock::now();
-				if (next > now)
-					std::this_thread::sleep_until(next);
-				else
-					next = now;
-				next += duration;
-
-				if (m_input) {
-					const Input& input = m_input->process();
-					compute(input);
-				}
-				else {
-					compute(Input{});
-				}
-			}
-		};
-
-		if (main_thread)
-			fn();
-		else
-			m_thread = std::thread(fn);
-	}
-
-	//template<class T = Output, class = std::enable_if_t<std::is_same<void, T>::value>>
-	//void compute(const Input& input)
-	//{
-	//	m_comp.compute(input);
-	//}
-	//
 	//template<class T = Output, class = std::enable_if_t<!std::is_same<void, T>::value>>
-	void compute(const Input& input)
+	void compute()
 	{
-		m_comp.compute(input, m_output.writeBuffer());
-		m_output.swap();
+    	if (m_input) {
+    		const Input& input = m_input->process();
+    		m_comp.compute(input, m_output.writeBuffer());
+    	}
+    	else {
+    		m_comp.compute(Input{}, m_output.writeBuffer());
+    	}
+
+        m_output.swap();
 	}
 };
 

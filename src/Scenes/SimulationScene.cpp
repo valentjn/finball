@@ -56,11 +56,21 @@ float SimulationScene::simulation()
 
 	const bool& running = gameLogic.getOutput().running;
 
-	rigidBodyPhysics.run(context.parameters->simulationRate, running);
-	latticeBoltzmann.run(context.parameters->simulationRate, running);
-	userInput.run(context.parameters->simulationRate, running);
-	gameLogic.run(context.parameters->simulationRate, running);
-	renderer.run(context.parameters->frameRate, running, true);
+    Timer timer([&]() {
+        userInput.compute();
+        gameLogic.compute();
+        renderer.compute();
+    });
+
+    Timer simulationTimer([&]() {
+        rigidBodyPhysics.compute();
+        latticeBoltzmann.compute();
+    });
+
+    std::thread simulationThread(&Timer::start, simulationTimer, context.parameters->simulationRate, running);
+    timer.start(context.parameters->frameRate, running);
+
+    simulationThread.join();
 
     return gameLogic.getOutput().score;
 }

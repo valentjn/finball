@@ -300,6 +300,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
     if (usedInputSource == KEYBOARD) {
         userInputOutput.leftAngle[0] = anl;
         userInputOutput.rightAngle[0] = anr;
+		Log::debug("UserInput angles: %f, %f", anl, anr);
         if (PLAYERS >= 2) { // TODO: What the hell?
             userInputOutput.leftVelocity[1] = avl;
             userInputOutput.rightVelocity[1] = avr;

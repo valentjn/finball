@@ -59,6 +59,8 @@ public:
         }
         level.flipperLeftId = rigidBodyId++;
         level.flipperRightId = rigidBodyId++;
+        level.sharkLeftId = rigidBodyId++;
+        level.sharkRightId = rigidBodyId++;
         level.createBoundryRigidBodies(rigidBodyId);
 
         return true;

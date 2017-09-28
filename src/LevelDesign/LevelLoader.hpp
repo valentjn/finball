@@ -26,13 +26,12 @@ public:
             Log::error("Could not load level!");
             throw runtime_error("Could not load level");
         }
-        createFlippers(level);
+        level.createFlippers();
+        level.createSharks();
         debugPrint(level);
     }
 
 private:
-    void createFlippers(Level &level);
-
     void debugPrint(Level &level);
 };
 

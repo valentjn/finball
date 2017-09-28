@@ -23,7 +23,7 @@ public:
     Mesh& operator=(const Mesh&) = delete;
     bool operator==(const Mesh& other) const;
 
-    static std::vector<glm::vec3> createRectangle(glm::vec2 min, glm::vec2 max);
+    static std::vector<glm::vec3> createRectangle(glm::vec2 min, glm::vec2 max, float zValue = 0);
     static std::vector<glm::vec3> createCircle(glm::vec2 center, float radius, int polygons = 48);
     static std::vector<glm::vec3> createArrow(float scale);
 
@@ -31,7 +31,7 @@ public:
     static std::unique_ptr<Mesh> createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec4 color={1,1,1,1},
 			glm::ivec4 bgColor={0,0,0,0}, float fontScale=2.f, int lineThickness=4, bool antiAliasing=true);
 
-    static std::unique_ptr<Mesh> createImageMesh(const char *filePath, std::unique_ptr<Texture4F> &textureOut, int size);
+    static std::unique_ptr<Mesh> createImageMesh(const char *filePath, std::unique_ptr<Texture4F> &textureOut, int size, float zValue = 0);
 #endif
 };
 
@@ -62,7 +62,7 @@ class TexturedMesh : public Mesh
     void init(const std::vector<Vertex>& vertex_buffer);
 
 public:
-    TexturedMesh(int scale, const Texture* texture);
+    TexturedMesh(int scale, const Texture* texture, float zValue = 0);
     TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture);
     TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture, const std::vector<glm::vec2> tex_coords);
     void render(GLint mode_location) const final;

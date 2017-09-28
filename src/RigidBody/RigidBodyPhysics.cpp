@@ -27,7 +27,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
 
         bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
         auto hinge = std::make_unique<btHingeConstraint>(*bt_rigid_body, btVector3(0, 0, 0), axis);
-        hinge->setLimit(0, SIMD_PI / 4);
+        hinge->setLimit(0, SIMD_PI / 2);
         hinge->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
         dynamics_world->addConstraint(hinge.get());
 

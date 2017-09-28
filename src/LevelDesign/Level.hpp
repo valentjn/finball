@@ -68,7 +68,10 @@ public:
         else {
             ballTexture = make_unique<Texture4F>(glm::ivec2{img.cols, img.rows});
             ballTexture->setData(img);
-            ballMesh = make_unique<TexturedMesh>(static_cast<int>(ceil(BALL_RADIUS)), ballTexture.get());
+            ballMesh = make_unique<TexturedMesh>(
+				Mesh::createCircle(vec2(0, 0), BALL_RADIUS),
+				ballTexture.get(),
+				BALL_RADIUS);
         }
 #else
         ballMesh = make_unique<ColoredMesh>(

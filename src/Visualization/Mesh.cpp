@@ -34,10 +34,10 @@ std::vector<glm::vec3> Mesh::createRectangle(glm::vec2 min, glm::vec2 max, float
 	glm::vec3 tr{ max.x, max.y, zValue };
     return std::vector<glm::vec3>{ bl, br, tr, bl, tr, tl };
 }
-std::vector<glm::vec3> Mesh::createCircle(glm::vec2 center, float radius, int polygons)
+std::vector<glm::vec3> Mesh::createCircle(glm::vec2 center, float radius, float zValue, int polygons)
 {
 	std::vector<glm::vec3> vertices;
-    glm::vec3 cent;
+	glm::vec3 cent{ center, zValue };
     glm::vec3 rad{radius, 0, 0};
     glm::vec3 normal{0, 0, 1};
     glm::vec3 p2;
@@ -53,28 +53,30 @@ std::vector<glm::vec3> Mesh::createCircle(glm::vec2 center, float radius, int po
 	return vertices;
 }
 
-std::vector<glm::vec3> Mesh::createArrow(float scale)
+std::vector<glm::vec3> Mesh::createArrow(float scale, float zValue)
 {
     return std::vector<glm::vec3>{
-        {  0.25f * scale,  0.25f * scale, 0.0f },
-        {  0.5f  * scale,  0.0f  * scale, 0.0f },
-        {  0.25f * scale, -0.25f * scale, 0.0f },
+        {  0.25f * scale,  0.25f * scale, zValue },
+        {  0.5f  * scale,  0.0f  * scale, zValue },
+        {  0.25f * scale, -0.25f * scale, zValue },
 
-        { -0.5f  * scale,  0.15f * scale, 0.0f },
-        {  0.25f * scale,  0.15f * scale, 0.0f },
-        {  0.25f * scale, -0.15f * scale, 0.0f },
+        { -0.5f  * scale,  0.15f * scale, zValue },
+        {  0.25f * scale,  0.15f * scale, zValue },
+        {  0.25f * scale, -0.15f * scale, zValue },
 
-        { -0.5f  * scale,  0.15f * scale, 0.0f },
-        {  0.25f * scale, -0.15f * scale, 0.0f },
-        { -0.5f  * scale, -0.15f * scale, 0.0f }
+        { -0.5f  * scale,  0.15f * scale, zValue },
+        {  0.25f * scale, -0.15f * scale, zValue },
+        { -0.5f  * scale, -0.15f * scale, zValue }
     };
 }
 
-#ifdef OPENCV_LIBS
+/*#ifdef OPENCV_LIBS
 // Returns a Textured Mesh with the specified formatted text
 // The corresponding texture is saved to textureOut
-std::unique_ptr<Mesh> Mesh::createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec4 color,
-		glm::ivec4 bgColor, float fontScale, int lineThickness, bool antiAliasing) {
+std::unique_ptr<TexturedMesh> Mesh::createTextMesh(
+	const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec4 color,
+		glm::ivec4 bgColor, float fontScale, int lineThickness, bool antiAliasing)
+{
     int font = cv::FONT_HERSHEY_SIMPLEX;
     int lineType = antiAliasing ? cv::LINE_AA : cv::LINE_8;
     int BORDER = 10;
@@ -89,7 +91,8 @@ std::unique_ptr<Mesh> Mesh::createTextMesh(const char *text, std::unique_ptr<Tex
     textureOut->setData(mat);
 
 	auto textRect = Mesh::createRectangle(glm::vec2{-1, -1}, glm::vec2{1, 1});
-	auto mesh = std::make_unique<TexturedMesh>(textRect, textureOut.get());
+	auto mesh = std::make_unique<TexturedMesh>(
+		textRect, textureOut.get(), glm::vec2{ -1, -1 }, glm::vec2{ 1, 1 });
 
     return mesh;
 }
@@ -105,7 +108,7 @@ std::unique_ptr<Mesh> Mesh::createImageMesh(const char *filePath, std::unique_pt
         return std::make_unique<TexturedMesh>(size, textureOut.get(), zValue);
     }
 }
-#endif
+#endif*/
 
 void ColoredMesh::init(const std::vector<Vertex>& vertex_buffer)
 {
@@ -118,114 +121,112 @@ void ColoredMesh::init(const std::vector<Vertex>& vertex_buffer)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        static_cast<GLsizei>(sizeof(Vertex) * vertex_buffer.size()), // data size
-        vertex_buffer.data(),                                        // data pointer
-        GL_STATIC_DRAW); // hint that the data won't be updated
+	static_cast<GLsizei>(sizeof(Vertex) * vertex_buffer.size()), // data size
+	vertex_buffer.data(),                                        // data pointer
+	GL_STATIC_DRAW); // hint that the data won't be updated
 
-    // attach the vertex buffer to the vertex array object
-    glVertexAttribPointer(
-        0,              // attribute index
-        3, GL_FLOAT,    // a position consists of 3 floats
-        GL_FALSE,       // is not normalized
-        sizeof(Vertex), // stride between consecutive position attributes in the buffer
-        reinterpret_cast<void*>(offsetof(Vertex, position))); // offset (in bytes) of the position
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-        1,
-        3, GL_FLOAT,
-        GL_TRUE,
-        sizeof(Vertex),
-        reinterpret_cast<void*>(offsetof(Vertex, color)));
-    glEnableVertexAttribArray(1);
+	// attach the vertex buffer to the vertex array object
+	glVertexAttribPointer(
+		0,              // attribute index
+		3, GL_FLOAT,    // a position consists of 3 floats
+		GL_FALSE,       // is not normalized
+		sizeof(Vertex), // stride between consecutive position attributes in the buffer
+		reinterpret_cast<void*>(offsetof(Vertex, position))); // offset (in bytes) of the position
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		1,
+		3, GL_FLOAT,
+		GL_TRUE,
+		sizeof(Vertex),
+		reinterpret_cast<void*>(offsetof(Vertex, color)));
+	glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 ColoredMesh::ColoredMesh(const std::vector<glm::vec3>& vertices, glm::vec3 color)
-    : Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
+	: Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
 {
-    std::vector<Vertex> vertex_buffer(m_vertex_count);
-    for (int i = 0; i < m_vertex_count; ++i)
-        vertex_buffer[i] = { vertices[i], color };
-    init(vertex_buffer);
+	std::vector<Vertex> vertex_buffer(m_vertex_count);
+	for (int i = 0; i < m_vertex_count; ++i)
+		vertex_buffer[i] = { vertices[i], color };
+	init(vertex_buffer);
 }
 
 ColoredMesh::ColoredMesh(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& colors)
-    : Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
+	: Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
 {
-    assert(vertices.size() == colors.size());
-    std::vector<Vertex> vertex_buffer(m_vertex_count);
-    for (int i = 0; i < m_vertex_count; ++i)
-        vertex_buffer[i] = { vertices[i], colors[i] };
-    init(vertex_buffer);
+	assert(vertices.size() == colors.size());
+	std::vector<Vertex> vertex_buffer(m_vertex_count);
+	for (int i = 0; i < m_vertex_count; ++i)
+		vertex_buffer[i] = { vertices[i], colors[i] };
+	init(vertex_buffer);
 }
 
 void ColoredMesh::render(GLint mode_location) const
 {
-    glBindVertexArray(m_vao);
-    glUniform1i(mode_location, 0); // colored mode: 0
-    glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);
-    glBindVertexArray(0);
+	glBindVertexArray(m_vao);
+	glUniform1i(mode_location, 0); // colored mode: 0
+	glDrawArrays(GL_TRIANGLES, 0, m_vertex_count);
+	glBindVertexArray(0);
 }
 
 void TexturedMesh::init(const std::vector<Vertex>& vertex_buffer)
 {
-    // create vertex array object
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
+	// create vertex array object
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
 
-    // create and fill vertex buffer object
-    glGenBuffers(1, &m_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        static_cast<GLsizei>(sizeof(Vertex) * vertex_buffer.size()), // data size
-        vertex_buffer.data(),                                        // data pointer
-        GL_STATIC_DRAW); // hint that the data won't be updated
+	// create and fill vertex buffer object
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		static_cast<GLsizei>(sizeof(Vertex) * vertex_buffer.size()), // data size
+		vertex_buffer.data(),                                        // data pointer
+		GL_STATIC_DRAW); // hint that the data won't be updated
 
-    // attach the vertex buffer to the vertex array object
-    glVertexAttribPointer(
-        0,              // attribute index
-        3, GL_FLOAT,    // a position consists of 3 floats
-        GL_FALSE,       // is not normalized
-        sizeof(Vertex), // stride between consecutive position attributes in the buffer
-        reinterpret_cast<void*>(offsetof(Vertex, position))); // offset (in bytes) of the position
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-        1,
-        2, GL_FLOAT,
-        GL_TRUE,
-        sizeof(Vertex),
-        reinterpret_cast<void*>(offsetof(Vertex, tex_coord)));
-    glEnableVertexAttribArray(1);
+	// attach the vertex buffer to the vertex array object
+	glVertexAttribPointer(
+		0,              // attribute index
+		3, GL_FLOAT,    // a position consists of 3 floats
+		GL_FALSE,       // is not normalized
+		sizeof(Vertex), // stride between consecutive position attributes in the buffer
+		reinterpret_cast<void*>(offsetof(Vertex, position))); // offset (in bytes) of the position
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		1,
+		2, GL_FLOAT,
+		GL_TRUE,
+		sizeof(Vertex),
+		reinterpret_cast<void*>(offsetof(Vertex, tex_coord)));
+	glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 // Creates a square textured mesh
-TexturedMesh::TexturedMesh(int scale, const Texture* texture, float zValue) :
-        Mesh(static_cast<decltype(m_vertex_count)>(6)),
-        m_texture(texture) {
-    std::vector<glm::vec3> vertices = Mesh::createRectangle({-scale, -scale}, {scale, scale}, zValue);
-    std::vector<Vertex> vertex_buffer(6);
-    for (int i = 0; i < m_vertex_count; i++) {
-        vertex_buffer[i] = {vertices[i], { vertices[i].x > 0 ? 1 : 0, vertices[i].y > 0 ? 1 : 0 }};
-    }
-    init(vertex_buffer);
-}
+TexturedMesh::TexturedMesh(
+	const std::vector<glm::vec3>& vertices,
+	const Texture* texture,
+	float scale)
+	: TexturedMesh(vertices, texture, { -scale, -scale }, { scale, scale })
+{}
 
-TexturedMesh::TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture)
-    : Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
-    , m_texture(texture)
+TexturedMesh::TexturedMesh(
+	const std::vector<glm::vec3>& vertices, const Texture* texture,
+	glm::vec2 tex_min, glm::vec2 tex_max)
+	: Mesh(static_cast<decltype(m_vertex_count)>(vertices.size()))
+	, m_texture(texture)
 {
-    std::vector<Vertex> vertex_buffer(m_vertex_count);
-    for (int i = 0; i < m_vertex_count; ++i) {
-        const glm::vec3& vertex = vertices[i];
-        vertex_buffer[i] = { vertex, glm::vec2(vertex) * 0.5f + 0.5f };
-    }
-    init(vertex_buffer);
+	std::vector<Vertex> vertex_buffer(m_vertex_count);
+	for (int i = 0; i < m_vertex_count; ++i) {
+		const glm::vec3& vertex = vertices[i];
+		vertex_buffer[i] = { vertex, (glm::vec2(vertex) - tex_min) / (tex_max - tex_min) };
+	}
+	init(vertex_buffer);
 }
 
 TexturedMesh::TexturedMesh(const std::vector<glm::vec3>& vertices, const Texture* texture, const std::vector<glm::vec2> tex_coords)

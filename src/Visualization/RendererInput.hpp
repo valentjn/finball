@@ -120,7 +120,8 @@ public:
 #ifdef OPENCV_LIBS
 		char score_str[20];
 		snprintf(score_str, sizeof(char)*20, "Score: %-12.2f", gameLogicOutput.score);
-		score_mesh = Mesh::createTextMesh(score_str, score_texture);
+		Texture4F::createText(score_texture, score_str);
+		score_mesh = std::make_unique<TexturedMesh>(Mesh::createRectangle(), score_texture.get());
 
 		RenderObject textRenderObject;
 		textRenderObject.mesh = score_mesh.get();

@@ -1,6 +1,7 @@
 #ifndef LOG_HPP_
 #define LOG_HPP_
 
+#include <stdexcept>
 #include <cstdarg>
 #include <cstdio>
 #include <string>
@@ -42,6 +43,7 @@ public:
         va_start(format_args, message);
         log(message, ERROR, format_args);
         va_end(format_args);
+		throw std::runtime_error("");
     }
 
     static void warn(string message, ...) {

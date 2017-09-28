@@ -58,15 +58,31 @@ void Level::createFlippers() {
 														 vec2(-FLIPPER_WIDTH, -FLIPPER_HEIGHT),
 														 10);
 #ifdef OPENCV_LIBS
-	unique_ptr<Mesh> meshLeft, meshRight;
-    if ((meshLeft = Mesh::createImageMesh("data/fin_left.png", leftFinTexture, FLIPPER_WIDTH)) == nullptr) {
-        meshLeft = rigidBodyLeft->createColoredMesh(FLIPPER_COLOR);
-    }
-    if ((meshRight = Mesh::createImageMesh("data/fin_right.png", rightFinTexture, FLIPPER_WIDTH)) == nullptr) {
-        meshRight = rigidBodyRight->createColoredMesh(FLIPPER_COLOR);
-    }
-    setUniqueMesh(flipperLeftId, move(meshLeft));
-    setUniqueMesh(flipperRightId, move(meshRight));
+	std::unique_ptr<Mesh> meshLeft, meshRight;
+	try {
+		Texture4F::createImage(leftFinTexture, "data/fin_left.png");
+		glm::vec2 p2 = glm::vec2(leftFinTexture->size());
+		p2 *= FLIPPER_WIDTH / p2.x;
+		glm::vec2 p1 = -p2;
+		auto rectangle = Mesh::createRectangle(p1, p2);
+		meshLeft = std::make_unique<TexturedMesh>(rectangle, leftFinTexture.get(), p1, p2);
+	}
+	catch (const std::runtime_error&) {
+		meshLeft = rigidBodyLeft->createColoredMesh(FLIPPER_COLOR);
+	}
+	try {
+		Texture4F::createImage(rightFinTexture, "data/fin_right.png");
+		glm::vec2 p2 = glm::vec2(rightFinTexture->size());
+		p2 *= FLIPPER_WIDTH / p2.x;
+		glm::vec2 p1 = -p2;
+		auto rectangle = Mesh::createRectangle(p1, p2);
+		meshRight = std::make_unique<TexturedMesh>(rectangle, rightFinTexture.get(), p1, p2);
+	}
+	catch (const std::runtime_error&) {
+		meshRight = rigidBodyRight->createColoredMesh(FLIPPER_COLOR);
+	}
+	setUniqueMesh(flipperLeftId, std::move(meshLeft));
+	setUniqueMesh(flipperRightId, std::move(meshRight));
 #else
 	setUniqueMesh(flipperLeftId, rigidBodyLeft->createColoredMesh(FLIPPER_COLOR));
 	setUniqueMesh(flipperRightId, rigidBodyRight->createColoredMesh(FLIPPER_COLOR));
@@ -89,11 +105,27 @@ void Level::createSharks() {
 														 0);
 
 #ifdef OPENCV_LIBS
-	unique_ptr<Mesh> meshLeft, meshRight;
-	if ((meshLeft = Mesh::createImageMesh("data/shark_left.png", leftSharkTexture, SHARK_HEIGHT, -0.5f)) == nullptr) {
+	std::unique_ptr<Mesh> meshLeft, meshRight;
+	try {
+		Texture4F::createImage(leftSharkTexture, "data/shark_left.png");
+		glm::vec2 p2 = glm::vec2(leftSharkTexture->size());
+		p2 *= SHARK_HEIGHT / p2.y;
+		glm::vec2 p1 = -p2;
+		auto rectangle = Mesh::createRectangle(p1, p2, -0.5f);
+		meshLeft = std::make_unique<TexturedMesh>(rectangle, leftSharkTexture.get(), p1, p2);
+	}
+	catch (const std::runtime_error&) {
 		meshLeft = rigidBodyLeft->createColoredMesh(SHARK_COLOR);
 	}
-	if ((meshRight = Mesh::createImageMesh("data/shark_right.png", rightSharkTexture, SHARK_HEIGHT, -0.5f)) == nullptr) {
+	try {
+		Texture4F::createImage(rightSharkTexture, "data/shark_right.png");
+		glm::vec2 p2 = glm::vec2(rightSharkTexture->size());
+		p2 *= SHARK_HEIGHT / p2.y;
+		glm::vec2 p1 = -p2;
+		auto rectangle = Mesh::createRectangle(p1, p2, -0.5f);
+		meshRight = std::make_unique<TexturedMesh>(rectangle, rightSharkTexture.get(), p1, p2);
+	}
+	catch (const std::runtime_error&) {
 		meshRight = rigidBodyRight->createColoredMesh(SHARK_COLOR);
 	}
 	setUniqueMesh(sharkLeftId, move(meshLeft));

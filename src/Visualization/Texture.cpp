@@ -1,4 +1,5 @@
 #include <Visualization/Texture.hpp>
+#include <Log.hpp>
 
 Texture::Texture(glm::ivec2 size, bool linear_interpolation)
     : m_res(size)
@@ -93,6 +94,56 @@ void Texture4F::setData(const cv::Mat &data) {
     // mirror the image around the x axis (OpenCV and OpenGL store images differently)
 	cv::flip(data, data, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_res.x, m_res.y, 0, GL_BGRA, GL_UNSIGNED_BYTE, data.data);
+}
+
+void Texture4F::createText(
+	std::unique_ptr<Texture4F>& texture,
+	const char *text,
+	glm::vec3 color, glm::vec4 bgColor,
+	float fontScale, int lineThickness, bool antiAliasing)
+{
+	int font = cv::FONT_HERSHEY_SIMPLEX;
+	int lineType = antiAliasing ? cv::LINE_AA : cv::LINE_8;
+	int BORDER = 10;
+	cv::Size textSize = cv::getTextSize(text, font, fontScale, lineThickness, NULL);
+
+	color *= 255;
+	bgColor *= 255;
+	cv::Mat mat(
+		textSize.height + BORDER * 2,
+		textSize.width + BORDER * 2,
+		CV_8UC4,
+		cv::Scalar(bgColor.z, bgColor.y, bgColor.x, bgColor.w));
+	cv::putText(
+		mat,
+		text,
+		cv::Point(BORDER, textSize.height + BORDER),
+		font, fontScale,
+		cv::Scalar(color.z, color.y, color.x),
+		lineThickness, lineType);
+	glm::ivec2 textSizeVec(textSize.width + BORDER * 2, textSize.height + BORDER * 2);
+	
+	if (!texture || texture->size() != textSizeVec)
+		texture = std::make_unique<Texture4F>(textSizeVec, false);
+
+	texture->setData(mat);
+}
+
+void Texture4F::createImage(
+	std::unique_ptr<Texture4F>& texture,
+	const char *filePath)
+{
+	cv::Mat image = cv::imread(filePath, cv::IMREAD_UNCHANGED);
+
+	if (!image.data) {
+		Log::error("Image %s not found!", filePath);
+		return;
+	}
+
+	if (!texture || texture->size() != glm::ivec2{ image.cols, image.rows })
+		texture = std::make_unique<Texture4F>(glm::ivec2{ image.cols, image.rows });
+
+	texture->setData(image);
 }
 
 #endif

@@ -50,8 +50,19 @@ class Texture4F : public Texture
 public:
     Texture4F(glm::ivec2 resolution, bool linear_interpolation = true);
     void setData(const Array2D<glm::vec4>& data);
+
 #ifdef OPENCV_LIBS
     void setData(const cv::Mat& data);
+
+	static void createText(
+		std::unique_ptr<Texture4F>& texture,
+		const char *text,
+		glm::vec3 color = { 1, 1, 1 }, glm::vec4 bgColor = { 0, 0, 0, 0 },
+		float fontScale = 2, int lineThickness = 4, bool antiAliasing = true);
+
+	static void createImage(
+		std::unique_ptr<Texture4F>& texture,
+		const char *filePath);
 #endif
 };
 

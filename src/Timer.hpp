@@ -23,11 +23,8 @@ public:
 		while (running) {
             std::this_thread::sleep_until(next);
             next += std::chrono::milliseconds(interval);
-
-            if (next < std::chrono::steady_clock::now()) {
+            if (next < std::chrono::steady_clock::now())
                 next = std::chrono::steady_clock::now();
-            }
-
 			func();
 		}
 	}

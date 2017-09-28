@@ -483,7 +483,7 @@ void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
     for (int k=0; k<PLAYERS; k++) {
         double angle = min_angle[k] + (max_angle[k]-min_angle[k])*a;
         userInputOutput.leftAngle[k] = angle;
-        userInputOutput.rightAngle[k] = std::copysign(M_PI, angle) - angle;
+        userInputOutput.rightAngle[k] = angle;
     }
 }
 

@@ -17,11 +17,11 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
 
-    bt_rigid_body->setRestitution(0.5f);
+    bt_rigid_body->setRestitution(.1f);
     bt_rigid_body->setCcdMotionThreshold(0);
     bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);
     if (isFlipper(level_body.id)) {
-		bt_rigid_body->setRestitution(2.f);
+		bt_rigid_body->setRestitution(.4f);
         btVector3 axis;
         if (level_body.id == level.flipperLeftId) {
             axis = btVector3(0, 0, 1);
@@ -47,7 +47,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     }
 
 	if (level.isBall(level_body.id)) {
-		bt_rigid_body->setRestitution(0.4f);
+		bt_rigid_body->setRestitution(1.f);
 
 	}
 
@@ -351,12 +351,12 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 
     float delta_angle_left = fabs(hinge_left->getHingeAngle() - input.leftAngle);
     float delta_angle_right = fabs(hinge_left->getHingeAngle() - input.rightAngle);
-    hinge_left->setMotorTarget(input.leftAngle, 1.);
-    hinge_right->setMotorTarget(input.rightAngle, 1.);
-	
+    hinge_left->setMotorTarget(input.leftAngle, .4);
+    hinge_right->setMotorTarget(input.rightAngle, .4);
+
 	hinge_left->enableMotor(true);
 	hinge_right->enableMotor(true);
-	
+
     dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
 
     for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {

@@ -316,7 +316,7 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
         }
     } else {
 
-		class UserInputInput {}; rtext->WaitNoneUpdateAll();
+        context->WaitNoneUpdateAll();
 
         XnUInt16 tmpNUsers = MAX_USERS;
         userGenerator->GetUsers(users, tmpNUsers);

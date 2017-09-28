@@ -6,14 +6,14 @@
 #include <chrono>
 
 struct UserInputOutput {
-	static const int PLAYERS = 1;
-	
-    double leftAngle[PLAYERS];
-    double rightAngle[PLAYERS];
-    double leftVelocity[PLAYERS];
-    double rightVelocity[PLAYERS];
+	static constexpr int PLAYERS = 1;
 
-    bool playerIsTracked[PLAYERS];
+    std::array<double, PLAYERS> leftAngle;
+    std::array<double, PLAYERS> rightAngle;
+    std::array<double, PLAYERS> leftVelocity;
+    std::array<double, PLAYERS> rightVelocity;
+
+    std::array<bool, PLAYERS> playerIsTracked;
 
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels

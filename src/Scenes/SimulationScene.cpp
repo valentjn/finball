@@ -44,7 +44,7 @@ float SimulationScene::simulation()
     levelLoader.load(level);
     renderer.getComp().setCameraTransformFromLevel(level);
 
-	GameComponent<UserInput, UserInputInput, UserInputOutput> userInput;
+	GameComponent<UserInput, UserInputInput, UserInputOutput> userInput{ context.parameters->userInputSource };
 	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ level };
 	GameComponent<RigidBodyPhysics, RigidBodyPhysicsInput, RigidBodyPhysicsOutput> rigidBodyPhysics{ level };
 	GameComponent<LatticeBoltzmann, LatticeBoltzmannInput, LatticeBoltzmannOutput> latticeBoltzmann{ level };
@@ -53,7 +53,7 @@ float SimulationScene::simulation()
 	rigidBodyPhysics.bindInput(userInput, latticeBoltzmann);
 	latticeBoltzmann.bindInput(rigidBodyPhysics);
 	renderer.bindInput(gameLogic, rigidBodyPhysics, latticeBoltzmann);
-	
+
 	const bool& running = gameLogic.getOutput().running;
 
 	rigidBodyPhysics.run(context.parameters->simulationRate, running);

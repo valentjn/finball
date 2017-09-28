@@ -21,7 +21,7 @@ using namespace std::chrono;
 
 #ifdef KINECT_LIBS
 bool UserInput::initializeKinect() {
-    if(kinectIsInitialized) return true;
+    if (kinectIsInitialized) return true;
 
     // init kinect context etc
     context = make_unique<Context>();
@@ -32,7 +32,7 @@ bool UserInput::initializeKinect() {
     XnStatus errorCode = XN_STATUS_OK;
 
     errorCode = context->Init();
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Can't initialize context for kinect.");
         Log::debug("Error code: %i", errorCode);
         kinectIsInitialized = false;
@@ -41,7 +41,7 @@ bool UserInput::initializeKinect() {
 
     // directions are mirrored (so right hand is on the right)
     errorCode = context->SetGlobalMirror(true);
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Can't initialize context for kinect.");
         Log::debug("Error code: %i", errorCode);
         kinectIsInitialized = false;
@@ -50,10 +50,10 @@ bool UserInput::initializeKinect() {
 
     // initialize depth generator
     errorCode = context->FindExistingNode(XN_NODE_TYPE_DEPTH, *depthGenerator);
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Failed to initialize Depth Generator. Retrying...");
         errorCode = depthGenerator->Create(*context);
-        if(errorCode != XN_STATUS_OK) {
+        if (errorCode != XN_STATUS_OK) {
             Log::info("Can't initialize depth generator.");
             Log::debug("Error code: %i", errorCode);
             kinectIsInitialized = false;
@@ -63,10 +63,10 @@ bool UserInput::initializeKinect() {
 
     // initialize user generator
     errorCode = context->FindExistingNode(XN_NODE_TYPE_USER, *userGenerator);
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Failed to initialize User Generator. Retrying...");
         errorCode = userGenerator->Create(*context);
-        if(errorCode != XN_STATUS_OK) {
+        if (errorCode != XN_STATUS_OK) {
             Log::info("Can't initialize user generator.");
             Log::debug("Error code: %i", errorCode);
             kinectIsInitialized = false;
@@ -89,7 +89,7 @@ bool UserInput::initializeKinect() {
             // user lost
         },
         this, hUserCallbacks);
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Can't register user callbacks.");
         Log::debug("Error code: %i", errorCode);
         kinectIsInitialized = false;
@@ -102,7 +102,7 @@ bool UserInput::initializeKinect() {
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
             // calibration start
         }, this, hCalibrationStart);
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Can't register calibration start.");
         Log::debug("Error code: %i", errorCode);
         kinectIsInitialized = false;
@@ -115,7 +115,7 @@ bool UserInput::initializeKinect() {
             void* cookie){
             UserInput* _this = reinterpret_cast<UserInput*>(cookie);
             // calibration complete
-            if(status == XN_CALIBRATION_STATUS_OK) {
+            if (status == XN_CALIBRATION_STATUS_OK) {
                 _this->userGenerator->GetSkeletonCap().StartTracking(nID);
             } else {
                 // TODO: handle errors
@@ -123,7 +123,7 @@ bool UserInput::initializeKinect() {
                     .RequestCalibration(nID, TRUE);
             }
         }, this, hCalibrationComplete);
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Can't register calibration end.");
         Log::debug("Error code: %i", errorCode);
         kinectIsInitialized = false;
@@ -137,7 +137,7 @@ bool UserInput::initializeKinect() {
     // start generating data
     Log::debug("Start generating input data...");
     errorCode = context->StartGeneratingAll();
-    if(errorCode != XN_STATUS_OK) {
+    if (errorCode != XN_STATUS_OK) {
         Log::info("Can't generate data.");
         Log::debug("Error code: %i", errorCode);
         kinectIsInitialized = false;
@@ -158,10 +158,10 @@ UserInput::UserInput(InputSource mUsedInputSource){
     kinectIsInitialized = false;
     nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
 
-    for(int k = 0; k < PLAYERS; k++){
+    for (int k = 0; k < PLAYERS; k++){
         playerJoined[k] = false;
     }
-    for(int k = 0; k < MAX_USERS; k++){
+    for (int k = 0; k < MAX_USERS; k++){
         userIsPlayer[k] = false;
     }
 
@@ -169,7 +169,7 @@ UserInput::UserInput(InputSource mUsedInputSource){
     initializeKinect();
 #endif
 
-    for(int k=0; k < PLAYERS; k++){
+    for (int k=0; k < PLAYERS; k++){
         max_angle[k] = 1.5;
         min_angle[k] = -1.5;
         zero_angle[k] = 0;
@@ -206,11 +206,9 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 
     SDL_Event event;
 
+    aal = -a0;
+    aar = a0;
     while (SDL_PollEvent(&event)) {
-
-        aal = -a0;
-        aar = a0;
-
         switch (event.type) {
 
         case SDL_QUIT:
@@ -239,7 +237,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
                 break;
             case SDLK_SPACE:
                 userInputOutput.start = true;
-                if(usedInputSource == CHOOSING) {
+                if (usedInputSource == CHOOSING) {
                     usedInputSource = KEYBOARD;
                 }
 #ifdef KINECT_LIBS
@@ -261,50 +259,50 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
             userInputOutput.mouseY = event.button.y;
             break;
         }
+    }
 
-        // current v and angle:
-        if(leftPressed){
-            aal = a0;
-        } else {
-            avl =0;
-        }
+    // current v and angle:
+    if (leftPressed){
+        aal = a0;
+    } else {
+        avl = 0;
+    }
 
-        if(rightPressed){
-            aar = -a0;
-        } else {
-            avr=0;
-        }
+    if (rightPressed){
+        aar = -a0;
+    } else {
+        avr = 0;
+    }
 
-        avl = avl + (aal*delta);
-        avr = avr + (aar*delta);
-        anl = anl + (avl*delta);
-        anr = anr + (avr*delta);
+    avl += (aal*delta);
+    avr += (aar*delta);
+    anl += (avl*delta);
+    anr += (avr*delta);
 
 
-        if(anl >= max_angle[0]){
-            anl = max_angle[0];
-            avl =0;
-        }
-        else if(anl <= min_angle[0]){
-            anl = min_angle[0];
-            avl =0;
-        }
-        if(anr <= M_PI-max_angle[0]){
-            anr = M_PI-max_angle[0];
-            avr =0;
-        }
-        else if(anr >= M_PI-min_angle[0]){
-            anr = M_PI-min_angle[0];
-            avr =0;
-        }
+    if (anl >= max_angle[0]){
+        anl = max_angle[0];
+        avl = 0;
+    }
+    else if (anl <= min_angle[0]){
+        anl = min_angle[0];
+        avl = 0;
+    }
+    if (anr <= M_PI-max_angle[0]){
+        anr = M_PI-max_angle[0];
+        avr = 0;
+    }
+    else if (anr >= M_PI-min_angle[0]){
+        anr = M_PI-min_angle[0];
+        avr = 0;
+    }
 
-        if(usedInputSource == KEYBOARD) {
-            userInputOutput.leftAngle[0]=anl;
-            userInputOutput.rightAngle[0]=anr;
-            if(PLAYERS>=2) {
-                userInputOutput.leftVelocity[1]=avl;
-                userInputOutput.rightVelocity[1]=avr;
-            }
+    if (usedInputSource == KEYBOARD) {
+        userInputOutput.leftAngle[0]=anl;
+        userInputOutput.rightAngle[0]=anr;
+        if (PLAYERS >= 2) {
+            userInputOutput.leftVelocity[1]=avl;
+            userInputOutput.rightVelocity[1]=avr;
         }
     }
 }
@@ -312,7 +310,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
 #ifdef KINECT_LIBS
 void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
     if (!kinectIsInitialized) {
-        if(tryInitializingKinect) {
+        if (tryInitializingKinect) {
             // try again to initialize the kinect
             finalizeKinect();
             initializeKinect();
@@ -325,8 +323,8 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
         userGenerator->GetUsers(users, tmpNUsers);
         nUsers = tmpNUsers;
 
-        for(XnUInt16 i=0; i < nUsers; i++) {
-            if(userGenerator->GetSkeletonCap().IsTracking(users[i])==FALSE) {
+        for (XnUInt16 i=0; i < nUsers; i++) {
+            if (userGenerator->GetSkeletonCap().IsTracking(users[i])==FALSE) {
                 continue;
             }
 
@@ -338,18 +336,18 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
             userGenerator->GetSkeletonCap()
                 .GetSkeletonJoint(users[i],XN_SKEL_HEAD, headJoint);
 
-            if(leftHandJoint.position.position.Y - threshold
+            if (leftHandJoint.position.position.Y - threshold
                 > headJoint.position.position.Y
                 && rightHandJoint.position.position.Y - threshold
                 > headJoint.position.position.Y) {
 
-                for(XnUInt16 j=0; j < PLAYERS; j++) {
-                    if(!playerJoined[j] && !userIsPlayer[i]) {
+                for (XnUInt16 j=0; j < PLAYERS; j++) {
+                    if (!playerJoined[j] && !userIsPlayer[i]) {
                         players[j] = users[i];
                         playerJoined[j] = true;
                         userIsPlayer[i] = true;
                         playerIndices[j] = i;
-                        if(nPlayers==trackedUsers)
+                        if (nPlayers==trackedUsers)
                             nPlayers++;
                         trackedUsers++;
                     }
@@ -357,9 +355,9 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
             }
         }
 
-        for(XnUInt16 k = 0; k < nPlayers; k++) {
-            if(playerJoined[k]) {
-                if(!userGenerator->GetSkeletonCap().IsTracking(players[k])) {
+        for (XnUInt16 k = 0; k < nPlayers; k++) {
+            if (playerJoined[k]) {
+                if (!userGenerator->GetSkeletonCap().IsTracking(players[k])) {
                     userInputOutput.playerIsTracked[k] = false;
                     playerJoined[k] = false;
                     userIsPlayer[playerIndices[k]] = false;
@@ -393,24 +391,24 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
                 userInputOutput.rightAngle[k]
                     = std::atan2(rdy, rdx) + zero_angle[k];
 
-                if(userInputOutput.leftAngle[k] < -M_PI) {
+                if (userInputOutput.leftAngle[k] < -M_PI) {
                     userInputOutput.leftAngle[k] += 2*M_PI;
                 }
-                if(userInputOutput.rightAngle[k] > M_PI) {
+                if (userInputOutput.rightAngle[k] > M_PI) {
                     userInputOutput.rightAngle[k] -= 2*M_PI;
                 }
                 double rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
                     - userInputOutput.rightAngle[k];
 
-                if(userInputOutput.leftAngle[k] > max_angle[k]) {
+                if (userInputOutput.leftAngle[k] > max_angle[k]) {
                     userInputOutput.leftAngle[k] = max_angle[k];
-                } else if(userInputOutput.leftAngle[k] < min_angle[k]) {
+                } else if (userInputOutput.leftAngle[k] < min_angle[k]) {
                     userInputOutput.leftAngle[k] = min_angle[k];
                 }
 
-                if(rightPsi > max_angle[k]) {
+                if (rightPsi > max_angle[k]) {
                     userInputOutput.rightAngle[k] = M_PI - max_angle[k];
-                } else if(rightPsi < min_angle[k]) {
+                } else if (rightPsi < min_angle[k]) {
                     userInputOutput.rightAngle[k] = -M_PI -min_angle[k];
                 }
 
@@ -425,18 +423,18 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
                 userInputOutput.leftVelocity[k] = ldAngle / delta;
                 userInputOutput.rightVelocity[k] = rdAngle / delta;
 
-                if(ldAngle < MIN_DIFFERENCE && ldAngle > -MIN_DIFFERENCE) {
+                if (ldAngle < MIN_DIFFERENCE && ldAngle > -MIN_DIFFERENCE) {
                     userInputOutput.leftAngle[k] = previousLeftAngles[k];
                     userInputOutput.leftVelocity[k] = 0;
                 }
-                if(rdAngle < MIN_DIFFERENCE && rdAngle > -MIN_DIFFERENCE) {
+                if (rdAngle < MIN_DIFFERENCE && rdAngle > -MIN_DIFFERENCE) {
                     userInputOutput.rightAngle[k] = previousRightAngles[k];
                     userInputOutput.rightVelocity[k] = 0;
                 }
 
                 // ease input when difference is big
-                if(ldAngle > MAX_DIFFERENCE && ldAngle < -MAX_DIFFERENCE) {
-                    if(leftDifferenceTooBig[k]) {
+                if (ldAngle > MAX_DIFFERENCE && ldAngle < -MAX_DIFFERENCE) {
+                    if (leftDifferenceTooBig[k]) {
                         userInputOutput.leftAngle[k]
                             = previousLeftAngles[k]
                             + BIG_DIFFERENCE_EASING
@@ -451,8 +449,8 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
                         leftDifferenceTooBig[k] = true;
                     }
                 }
-                if(rdAngle > MAX_DIFFERENCE && rdAngle < -MAX_DIFFERENCE) {
-                    if(rightDifferenceTooBig[k]) {
+                if (rdAngle > MAX_DIFFERENCE && rdAngle < -MAX_DIFFERENCE) {
+                    if (rightDifferenceTooBig[k]) {
                         userInputOutput.rightAngle[k]
                             = previousRightAngles[k]
                             + BIG_DIFFERENCE_EASING
@@ -474,7 +472,7 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
 
         userInputOutput.start = std::all_of(playerJoined, playerJoined+PLAYERS,
             [](bool x){return x;});
-        if(userInputOutput.start && usedInputSource == CHOOSING) {
+        if (userInputOutput.start && usedInputSource == CHOOSING) {
             usedInputSource = KINECT;
         }
     }
@@ -483,13 +481,13 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
 
 void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
     static double t = 0;
-    t+=delta * FAKE_SPEED * M_PI;
-    if(t >= 2*M_PI) {
+    t += delta * FAKE_SPEED * M_PI;
+    if (t >= 2*M_PI) {
         t -= 2*M_PI;
     }
     double a = 0.5*(std::sin(t)+1);
 
-    for(int k=0; k<PLAYERS; k++) {
+    for (int k=0; k<PLAYERS; k++) {
         double angle = min_angle[k] + (max_angle[k]-min_angle[k])*a;
         userInputOutput.leftAngle[k] = angle;
         userInputOutput.rightAngle[k] = std::copysign(M_PI, angle) - angle;
@@ -520,7 +518,7 @@ void UserInput::compute(const UserInputInput&, UserInputOutput &userInputOutput)
 #endif
         break;
     case FAKE:
-        getSDLInput(userInputOutput, delta);
+        // getSDLInput(userInputOutput, delta);
         getFakeInput(userInputOutput, delta);
         break;
     default:
@@ -528,7 +526,7 @@ void UserInput::compute(const UserInputInput&, UserInputOutput &userInputOutput)
     }
 
     previous_time_point = now;
-    for(int k = 0; k < PLAYERS; k++){
+    for (int k = 0; k < PLAYERS; k++){
         previousLeftAngles[k] = userInputOutput.leftAngle[k];
         previousRightAngles[k] = userInputOutput.rightAngle[k];
     }

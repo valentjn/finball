@@ -42,7 +42,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
             hinge_right = std::move(hinge);
         }
     } else {
-        bt_rigid_body->setFriction(0.0);
+        bt_rigid_body->setFriction(0.1f);
         bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
         bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
     }
@@ -91,7 +91,7 @@ void RigidBodyPhysics::createBoundaryRigidBody(const int x, const int y, const i
         std::make_unique<btRigidBody>(0.0f, motion_state.get(), collision_shape.get(), btVector3(0.0f, 0.0f, 0.0f));
     bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
     bt_rigid_body->setRestitution(1.0f);
-    bt_rigid_body->setFriction(0.0);
+    bt_rigid_body->setFriction(0.1f);
     dynamics_world->addRigidBody(bt_rigid_body.get());
     bt_rigid_body->setCcdMotionThreshold(0);
     bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);

@@ -6,7 +6,7 @@ const float Level::FLIPPER_HEIGHT = 3.f;
 const float Level::FLIPPER_GAP = 3.5f;
 
 const float Level::BALL_RADIUS = 2.5f;
-const float Level::BALL_MASS = 0.5f;
+const float Level::BALL_MASS = 0.2f;
 const char *Level::BALL_IMAGE_PATH = "data/ball.png";
 const vec3 Level::BALL_COLOR = vec3(1.f, 0, 0);
 const vec3 Level::OBSTACLE_COLOR = vec3(0.82f, 0.82f, 0.9f);

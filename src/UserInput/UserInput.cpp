@@ -497,7 +497,7 @@ void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
 }
 
 // process input
-void UserInput::compute(const UserInputInput&, UserInputOutput &userInputOutput) {
+void UserInput::compute(UserInputOutput &userInputOutput) {
     // get timing information
     auto now = high_resolution_clock::now();
     double delta = duration_cast<nanoseconds>(now-previous_time_point).count()

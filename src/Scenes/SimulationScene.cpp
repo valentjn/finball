@@ -34,14 +34,14 @@ float SimulationScene::simulation()
 	context.music->play("data/GameTheme.mp3");
 
     // initialize renderer before level
-	GameComponent<Renderer, RendererInput, RendererOutput> renderer{ "Renderer", *context.window };
+	GameComponent<Renderer, RendererInput, void> renderer{ "Renderer", *context.window };
 
     LevelLoader levelLoader("data/" + levelName);
     Level level;
     levelLoader.load(level);
     renderer.getComp().setCameraTransformFromLevel(level);
 
-	GameComponent<UserInput, UserInputInput, UserInputOutput> userInput{ "UserInput" };
+	GameComponent<UserInput, void, UserInputOutput> userInput{ "UserInput" };
 	GameComponent<Physics, PhysicsInput, PhysicsOutput> physics{ "Physics", level };
 	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ "GameLogic", level };
 

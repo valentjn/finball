@@ -66,7 +66,7 @@ class GameComponent
 {
 	template<class I, class... C>
 	friend class GameInput;
-	
+
 	const char* m_name;
 	Comp m_comp;
 	DoubleBuffer<Output> m_output;
@@ -96,6 +96,13 @@ public:
 	const Comp& getComp() const { return m_comp; }
 	Comp& getComp() { return m_comp; }
 
+	void compute()
+	{
+		const Input& input = m_input->process();
+		m_comp.compute(input, m_output.writeBuffer());
+		m_output.swap();
+	}
+
 	void run(int ticks_per_second, const bool& running, bool main_thread = false)
 	{
 		auto fn = [&]()
@@ -103,7 +110,6 @@ public:
 			assert(ticks_per_second >= 0);
 			auto next = std::chrono::steady_clock::now();
 			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
-			//int ticks = 0;
 			while (running) {
 				auto now = std::chrono::steady_clock::now();
 				if (next > now)
@@ -111,15 +117,8 @@ public:
 				else
 					next = now;
 				next += duration;
-				
-				if (m_input) {
-					const Input& input = m_input->process();
-					compute(input);
-				}
-				else {
-					compute(Input{});
-				}
-				//std::cout << m_name << ": " << ++ticks << '\n';
+
+				compute();
 			}
 		};
 
@@ -128,18 +127,128 @@ public:
 		else
 			m_thread = std::thread(fn);
 	}
+};
 
-	//template<class T = Output, class = std::enable_if_t<std::is_same<void, T>::value>>
-	//void compute(const Input& input)
-	//{
-	//	m_comp.compute(input);
-	//}
-	//
-	//template<class T = Output, class = std::enable_if_t<!std::is_same<void, T>::value>>
-	void compute(const Input& input)
+template<class Comp, class Output>
+class GameComponent<Comp, void, Output>
+{
+	template<class I, class... C>
+	friend class GameInput;
+
+	const char* m_name;
+	Comp m_comp;
+	DoubleBuffer<Output> m_output;
+	std::thread m_thread;
+
+public:
+	template<class... Args>
+	GameComponent<Comp, void, Output>(const char* name, Args&&... args)
+		: m_name(name), m_comp(std::forward<Args>(args)...)
+	{}
+
+	~GameComponent<Comp, void, Output>()
 	{
-		m_comp.compute(input, m_output.writeBuffer());
+		if (m_thread.joinable())
+			m_thread.join();
+	}
+
+	const Comp& getComp() const { return m_comp; }
+	Comp& getComp() { return m_comp; }
+
+	void compute()
+	{
+		m_comp.compute(m_output.writeBuffer());
 		m_output.swap();
+	}
+
+	void run(int ticks_per_second, const bool& running, bool main_thread = false)
+	{
+		auto fn = [&]()
+		{
+			assert(ticks_per_second >= 0);
+			auto next = std::chrono::steady_clock::now();
+			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
+			while (running) {
+				auto now = std::chrono::steady_clock::now();
+				if (next > now)
+					std::this_thread::sleep_until(next);
+				else
+					next = now;
+				next += duration;
+
+				compute();
+			}
+		};
+
+		if (main_thread)
+			fn();
+		else
+			m_thread = std::thread(fn);
+	}
+};
+
+template<class Comp, class Input>
+class GameComponent<Comp, Input, void>
+{
+	template<class I, class... C>
+	friend class GameInput;
+
+	const char* m_name;
+	Comp m_comp;
+	std::thread m_thread;
+	std::unique_ptr<GameInputBase<Input>> m_input;
+
+public:
+	template<class... Args>
+	GameComponent<Comp, Input, void>(const char* name, Args&&... args)
+		: m_name(name), m_comp(std::forward<Args>(args)...)
+	{}
+
+	~GameComponent<Comp, Input, void>()
+	{
+		if (m_thread.joinable())
+			m_thread.join();
+	}
+
+	template<class... Ingoings>
+	void bindInput(const Ingoings&... comps)
+	{
+		m_input = std::make_unique<GameInput<Input, Ingoings...>>(comps...);
+	}
+
+	const Input& getInput() const { return m_input->getInput(); }
+	const Comp& getComp() const { return m_comp; }
+	Comp& getComp() { return m_comp; }
+
+	void compute()
+	{
+		const Input& input = m_input->process();
+		m_comp.compute(input);
+	}
+
+	void run(int ticks_per_second, const bool& running, bool main_thread = false)
+	{
+		auto fn = [&]()
+		{
+			assert(ticks_per_second >= 0);
+			auto next = std::chrono::steady_clock::now();
+			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
+			while (running) {
+				auto now = std::chrono::steady_clock::now();
+				if (next > now)
+					std::this_thread::sleep_until(next);
+				else
+					next = now;
+				next += duration;
+
+				compute();
+			}
+		};
+
+		if (main_thread)
+			fn();
+		else
+			m_thread = std::thread(fn);
 	}
 };
 

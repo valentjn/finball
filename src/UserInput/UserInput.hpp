@@ -11,9 +11,6 @@
 // standard library includes
 #include <memory>
 
-// TODO: remove
-class UserInputInput {};
-
 #ifdef KINECT_LIBS
 // forward declarations for kinect
 namespace xn {
@@ -118,7 +115,7 @@ public:
 	UserInput(std::string mUsedInputSource)
 		: UserInput(getInputSourceFromName(mUsedInputSource)) {}
 	~UserInput();
-    void compute(const UserInputInput&, UserInputOutput &userInputOutput);
+    void compute(UserInputOutput &userInputOutput);
 
 	InputSource getUsedInputSource() { return usedInputSource; }
 

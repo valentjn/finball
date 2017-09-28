@@ -350,7 +350,7 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
     clearDynamicFlagFields(grid_obj);
 
     float delta_angle_left = fabs(hinge_left->getHingeAngle() - input.leftAngle);
-    float delta_angle_right = fabs(hinge_left->getHingeAngle() - input.rightAngle);
+    float delta_angle_right = fabs(hinge_right->getHingeAngle() - input.rightAngle);
     hinge_left->setMotorTarget(input.leftAngle, 1.);
     hinge_right->setMotorTarget(input.rightAngle, 1.);
 	

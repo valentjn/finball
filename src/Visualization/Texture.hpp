@@ -57,7 +57,7 @@ public:
 	static void createText(
 		std::unique_ptr<Texture4F>& texture,
 		const char *text,
-		glm::vec3 color = { 1, 1, 1 }, glm::vec4 bgColor = { 0, 0, 0, 0 },
+		glm::vec4 color = { 1, 1, 1, 1 }, glm::vec4 bgColor = { 0, 0, 0, 0 },
 		float fontScale = 2, int lineThickness = 4, bool antiAliasing = true);
 
 	static void createImage(

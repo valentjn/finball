@@ -99,7 +99,7 @@ void Texture4F::setData(const cv::Mat &data) {
 void Texture4F::createText(
 	std::unique_ptr<Texture4F>& texture,
 	const char *text,
-	glm::vec3 color, glm::vec4 bgColor,
+	glm::vec4 color, glm::vec4 bgColor,
 	float fontScale, int lineThickness, bool antiAliasing)
 {
 	int font = cv::FONT_HERSHEY_SIMPLEX;
@@ -119,10 +119,10 @@ void Texture4F::createText(
 		text,
 		cv::Point(BORDER, textSize.height + BORDER),
 		font, fontScale,
-		cv::Scalar(color.z, color.y, color.x),
+		cv::Scalar(color.z, color.y, color.x, color.w),
 		lineThickness, lineType);
 	glm::ivec2 textSizeVec(textSize.width + BORDER * 2, textSize.height + BORDER * 2);
-	
+
 	if (!texture || texture->size() != textSizeVec)
 		texture = std::make_unique<Texture4F>(textSizeVec, false);
 

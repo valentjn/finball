@@ -48,7 +48,7 @@ public:
                     level.addBall(rigidBodyId++, x, y);
                 } else {
                     Level::CellType cell = static_cast<Level::CellType>(static_cast<int>(file_line[x]) - '0');
-                    if (cell == Level::CellType::OBSTACLE) {
+                    if (cell == Level::CellType::OBSTACLE && x != 0 && y != 0 && x != level.width && y != level.height) {
                         level.rigidBodies.push_back(make_unique<RigidBodyRect>(rigidBodyId, x, y, 1, 1, 0));
                         level.meshes[rigidBodyId] = meshRect;
                         rigidBodyId++;
@@ -57,9 +57,10 @@ public:
                 }
             }
         }
-
         level.flipperLeftId = rigidBodyId++;
         level.flipperRightId = rigidBodyId++;
+        level.createBoundryRigidBodies(rigidBodyId);
+
         return true;
     }
 };

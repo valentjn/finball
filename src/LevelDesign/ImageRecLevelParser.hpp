@@ -96,14 +96,13 @@ public:
             }
             rigidBodyId++;
         }
-        // cvtColor(noBorderImg, levelImg(noBorderROI), COLOR_GRAY2BGR);
 
         level.matrix = Array2D<Level::CellType>(levelSize.width, levelSize.height);
         for (int x = 0; x < levelSize.width; x++) {
             for (int y = 0; y < levelSize.width; y++) {
                 Vec3b pixel = levelImg.at<Vec3b>(Point(x, y));
                 if (pixel == COLOR_BALL) {
-                    level.addBall(rigidBodyId++, x, y);
+                    level.addBall(rigidBodyId++, x, level.height - y - 1);
                 }
                 level.matrix.value(x, level.height - y - 1) = getCellTypeFromColor(pixel);
             }
@@ -111,11 +110,13 @@ public:
 
         level.flipperLeftId = rigidBodyId++;
         level.flipperRightId = rigidBodyId++;
+        level.createBoundryRigidBodies(rigidBodyId);
 
         return true;
     }
 
 private:
+
     Level::CellType getCellTypeFromColor(Vec3b color) {
         if (color == COLOR_OBSTACLE) {
             return Level::OBSTACLE;

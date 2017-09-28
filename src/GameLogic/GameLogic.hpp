@@ -36,6 +36,7 @@ private:
 	RenderObject shark_surface_right;
 	RenderObject inflow_surface;
 
+	bool foundBall = false;
 	const Level &level;
 	steady_clock::time_point startTime;
 	const unordered_map<int, Mesh*>& rigid_body_meshes;
@@ -66,10 +67,17 @@ public:
 
         bool ballInGame = false;
         for (Transform const *rigidBody : *input.rigidBodies) {
-            if (level.isBall(rigidBody->id) && rigidBody->position.y > 0) {
-                ballInGame = true;
-                break;
-            }
+            if (level.isBall(rigidBody->id)) {
+				if (!foundBall) {
+					foundBall = ballInGame = true;
+					break;
+				}
+				else if (rigidBody->position.y > 0 && rigidBody->position.y < level.height &&
+						 rigidBody->position.x > 0 && rigidBody->position.x < level.width) {
+	                ballInGame = true;
+					break;
+				}
+			}
         }
 
         if (input.quit || !ballInGame) {
@@ -93,9 +101,13 @@ public:
         vector<glm::vec3> rect1 = Mesh::createRectangle({0,0}, {1,level.height});
         vector<glm::vec3> rect2 = Mesh::createRectangle({1,level.height-1}, {level.width-1,level.height});
         vector<glm::vec3> rect3 = Mesh::createRectangle({level.width-1,0}, {level.width,level.height});
+        vector<glm::vec3> rect4 = Mesh::createRectangle({1,0}, {level.getLeftFinX(),1});
+        vector<glm::vec3> rect5 = Mesh::createRectangle({level.getRightFinX(),0}, {level.width-1,1});
         verticies.insert(verticies.end(), rect1.begin(), rect1.end());
         verticies.insert(verticies.end(), rect2.begin(), rect2.end());
         verticies.insert(verticies.end(), rect3.begin(), rect3.end());
+        verticies.insert(verticies.end(), rect4.begin(), rect4.end());
+        verticies.insert(verticies.end(), rect5.begin(), rect5.end());
         inflow_mesh = make_unique<ColoredMesh>(verticies, glm::vec3{0.f, 1.f, 0.f});
 
         inflow_surface.mesh = inflow_mesh.get();

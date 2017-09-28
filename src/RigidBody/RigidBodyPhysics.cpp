@@ -20,6 +20,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     bt_rigid_body->setRestitution(0.5f);
     bt_rigid_body->setCcdMotionThreshold(0);
     bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);
+
     if (isFlipper(level_body.id)) {
 		bt_rigid_body->setRestitution(2.f);
         btVector3 axis;

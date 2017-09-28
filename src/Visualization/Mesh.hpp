@@ -28,7 +28,7 @@ public:
     static std::vector<glm::vec3> createArrow(float scale);
 
 #if OPENCV_LIBS
-    static std::unique_ptr<Mesh> createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec3 color={1,1,1},
+    static std::unique_ptr<Mesh> createTextMesh(const char *text, std::unique_ptr<Texture4F> &textureOut, glm::ivec4 color={1,1,1,1},
 			glm::ivec4 bgColor={0,0,0,0}, float fontScale=2.f, int lineThickness=4, bool antiAliasing=true);
 
     static std::unique_ptr<Mesh> createImageMesh(const char *filePath, std::unique_ptr<Texture4F> &textureOut, int size);

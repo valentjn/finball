@@ -52,12 +52,17 @@ public:
 
 	void compute(const PhysicsInput& input, PhysicsOutput& output)
 	{
-		rigidBodyPhysicsInput.process(input.userInputOutput, latticeBoltzmannOutput);
-		rigidBodyPhysics.compute(rigidBodyPhysicsInput, output.rigidBodyPhysicsOutput);
 
-		latticeBoltzmannInput.process(output.rigidBodyPhysicsOutput);
-		latticeBoltzmann.compute(latticeBoltzmannInput, latticeBoltzmannOutput);
+		for (int i = 0; i < 5; i++) {
+			rigidBodyPhysicsInput.process(input.userInputOutput,
+					latticeBoltzmannOutput);
+			rigidBodyPhysics.compute(rigidBodyPhysicsInput,
+					output.rigidBodyPhysicsOutput);
 
+			latticeBoltzmannInput.process(output.rigidBodyPhysicsOutput);
+			latticeBoltzmann.compute(latticeBoltzmannInput,
+					latticeBoltzmannOutput);
+		}
 		output.latticeBoltzmannOutput = latticeBoltzmannOutput;
 	}
 };

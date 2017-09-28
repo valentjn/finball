@@ -39,6 +39,8 @@ public:
     unique_ptr<Texture4F> leftFinTexture;
     unique_ptr<Texture4F> rightFinTexture;
 
+    Mesh *cellMesh;
+
     int width, height;
     int flipperLeftId, flipperRightId;
     Array2D<CellType> matrix;
@@ -70,6 +72,10 @@ public:
             BALL_COLOR
         );
 #endif
+        cellMesh = addUniqueMesh(make_unique<ColoredMesh>(
+           Mesh::createRectangle(vec2(-0.5f, -0.5f), vec2(0.5f, 0.5f)),
+           OBSTACLE_COLOR
+        ));
     }
 
     void addBall(int id, int x, int y) {
@@ -96,6 +102,47 @@ public:
 		auto ret = mesh.get();
         unique_meshes.push_back(move(mesh));
         return ret;
+    }
+
+    bool createCellRigidBody(int x, int y, int id) {
+        if (matrix.value(x, y) == CellType::OBSTACLE) {
+            rigidBodies.push_back(make_unique<RigidBodyRect>(id, x, y, 1, 1, 0));
+            meshes[id] = cellMesh;
+            return true;
+        }
+        return false;
+    }
+
+    void createBoundryRigidBodies(int rigidBodyId) {
+        int leftX = floor(getLeftFinX());
+        int rightX = ceil(getRightFinX());
+        // for (int x = leftX - 5; x <= rightX + 5; x++) {
+        //     matrix.value(x, 0) = CellType::OBSTACLE;
+        // }
+        for (int x = leftX; x <= rightX; x++) {
+            matrix.value(x, 0) = CellType::OUTFLOW;
+        }
+        for (int y = 0; y <= 4; y++) {
+            matrix.value(leftX-1, y) = CellType::OBSTACLE;
+            matrix.value(rightX+1, y) = CellType::OBSTACLE;
+        }
+
+        for (int x = 0; x < width; x++) {
+            if (createCellRigidBody(x, 0, rigidBodyId)) rigidBodyId++;
+            if (createCellRigidBody(x, height-1, rigidBodyId)) rigidBodyId++;
+        }
+        for (int y = 1; y < height-1; y++) {
+            if (createCellRigidBody(0, y, rigidBodyId)) rigidBodyId++;
+            if (createCellRigidBody(width-1, y, rigidBodyId)) rigidBodyId++;
+        }
+    }
+
+    float getLeftFinX() const {
+        return width * 0.5f - FLIPPER_WIDTH - FLIPPER_GAP;
+    }
+
+    float getRightFinX() const {
+        return width * 0.5f + FLIPPER_WIDTH + FLIPPER_GAP;
     }
 };
 

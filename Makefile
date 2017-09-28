@@ -6,8 +6,8 @@ KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2 -D KINECT_LIBS
 endif
 
 ifdef opencv
-OPENCV_CFLAGS:= `pkg-config opencv --cflags`
-OPENCV_LDFLAGS:= `pkg-config opencv --libs` -D OPENCV_LIBS
+OPENCV_CFLAGS:= -I/usr/local/include/opencv -I/usr/local/include
+OPENCV_LDFLAGS:= -L/usr/local/lib -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -D OPENCV_LIBS
 endif
 
 COMMON_CFLAGS:= -pedantic \

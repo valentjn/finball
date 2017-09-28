@@ -1,13 +1,12 @@
 #ifndef GAME_COMPONENT_HPP_
 #define GAME_COMPONENT_HPP_
 
-#include <Timer.hpp>
-#include <DoubleBuffer.hpp>
-
 #include <functional>
 #include <memory>
 #include <tuple>
 #include <thread>
+
+#include "DoubleBuffer.hpp"
 
 namespace apply_detail
 {
@@ -162,6 +161,7 @@ public:
 
 	const Comp& getComp() const { return m_comp; }
 	Comp& getComp() { return m_comp; }
+	const Output& getOutput() const { return m_output.readBuffer(); }
 
 	void compute()
 	{
@@ -177,6 +177,7 @@ public:
 			auto next = std::chrono::steady_clock::now();
 			auto duration = std::chrono::microseconds(1000000 / ticks_per_second);
 			while (running) {
+                Log::debug("UserInput: running still true");
 				auto now = std::chrono::steady_clock::now();
 				if (next > now)
 					std::this_thread::sleep_until(next);

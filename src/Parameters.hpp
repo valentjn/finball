@@ -15,7 +15,7 @@ public:
     int windowWidth = 800;
     int windowHeight = 600;
     int frameRate = 30;
-    int simulationRate = 30;
+    int simulationRate = 100;
     string level = "testLevel2.txt";
     string userInputSource = "AUTO";
 

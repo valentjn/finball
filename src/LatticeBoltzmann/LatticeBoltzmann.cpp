@@ -19,7 +19,7 @@ const float LatticeBoltzmann::w[9] = { 4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1.
 const int LatticeBoltzmann::cx[9] = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
 const int LatticeBoltzmann::cy[9] = { 0, 0, 1, 0, -1, 1, 1, -1, -1 };
 const int LatticeBoltzmann::opp[9] = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
-const int LatticeBoltzmann::iter = 10;
+const int LatticeBoltzmann::iter = 15;
 
 void LatticeBoltzmann::initOutput(LatticeBoltzmannOutput& output)
 {
@@ -340,7 +340,7 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 
 bool LatticeBoltzmann::isSane(float fiValue, int x, int y, int i) {
 	if (fiValue >= 0. && fiValue <= 2.) return true;
-	std::cout << "Bad FI value: " << fiValue; 
+	std::cout << "Bad FI value: " << fiValue;
 	std::cout << " at " << x << "," << y << "," << i << std::endl;
 	return false;
 }

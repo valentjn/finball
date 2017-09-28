@@ -84,6 +84,8 @@ private:
 	bool leftPressed = false;
 	bool rightPressed = false;
 
+    bool waiting = true;
+
 	double aal =0;
 	double aar =0;// angular acceleration
 	double avl =0; // angular velocity
@@ -117,6 +119,7 @@ public:
 	~UserInput();
 	void initOutput(UserInputOutput &userInputOutput);
     void compute(UserInputOutput &userInputOutput);
+    const bool& isWaiting() { return waiting; }
 
 	InputSource getUsedInputSource() { return usedInputSource; }
 

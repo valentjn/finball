@@ -41,18 +41,17 @@ float SimulationScene::simulation()
     levelLoader.load(level);
     renderer.getComp().setCameraTransformFromLevel(level);
 
-	GameComponent<UserInput, void, UserInputOutput> userInput{ "UserInput", context.parameters->userInputSource };
 	GameComponent<Physics, PhysicsInput, PhysicsOutput> physics{ "Physics", level };
 	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ "GameLogic", level };
 
-	physics.bindInput(userInput);
-	gameLogic.bindInput(userInput, physics);
+	physics.bindInput(*userInput);
+	gameLogic.bindInput(*userInput, physics);
 	renderer.bindInput(gameLogic, physics);
 
-	const bool& running = gameLogic.getOutput().running;
+	const bool &running = gameLogic.getOutput().running;
 
 	physics.run(context.parameters->simulationRate, running);
-	userInput.run(context.parameters->simulationRate, running);
+	userInput->run(context.parameters->simulationRate, running);
 	gameLogic.run(context.parameters->simulationRate, running);
 	renderer.run(context.parameters->frameRate, running, true);
 

@@ -18,12 +18,12 @@ struct UserInputOutput {
 	int mouseX; // x position of mouse in pixels
 	int mouseY; // y position of mouse in pixels
 
-    bool quit, start;
+    bool quit;
 
-    UserInputOutput() : quit(false), start(false) {}
+    UserInputOutput() : quit(false) {}
 
 	void print() {
-		std::cout << (quit?"Q":"") << (start?"S":"");
+		std::cout << (quit?"Q":"");// << (waiting?"W":"");
 		for(int k = 0; k<PLAYERS; k++) {
 			std::cout << (playerIsTracked[k]?"T":"")
 					  << " L: " << std::setw(15) << leftAngle[k]

@@ -235,7 +235,8 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
                 rightPressed = false;
                 break;
             case SDLK_SPACE:
-                userInputOutput.start = true;
+                Log::debug("UserInput: waiting = false");
+                waiting = false;
                 if (usedInputSource == CHOOSING) {
                     usedInputSource = KEYBOARD;
                 }
@@ -469,9 +470,9 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
             }
         }
 
-        userInputOutput.start = std::all_of(playerJoined, playerJoined+PLAYERS,
+        waiting = !std::all_of(playerJoined, playerJoined+PLAYERS,
             [](bool x){return x;});
-        if (userInputOutput.start && usedInputSource == CHOOSING) {
+        if (!waiting && usedInputSource == CHOOSING) {
             usedInputSource = KINECT;
         }
     }

@@ -12,6 +12,9 @@
 #include "SDL/SDLEvents.hpp"
 #include "SDL/SDLRenderer.hpp"
 #include "SDL/SDLWindow.hpp"
+#include "Timer.hpp"
+#include "UserInput/UserInput.hpp"
+#include "UserInput/UserInputOutput.hpp"
 #include "LevelDesign/LevelLoader.hpp"
 #include "LevelDesign/Level.hpp"
 
@@ -20,8 +23,13 @@ using namespace std;
 unique_ptr<Scene> MainMenuScene::show() {
     render();
 
+    auto userInput = make_unique<GameComponent<UserInput, void, UserInputOutput>>
+            ("UserInput", context.parameters->userInputSource);
+
+    userInput->run(100, userInput->getComp().isWaiting(), true);
+
     // switch to simulation scene
-    return std::make_unique<SimulationScene>(context, context.parameters->level);
+    return std::make_unique<SimulationScene>(context, context.parameters->level, move(userInput));
 }
 
 void MainMenuScene::render() {
@@ -34,7 +42,7 @@ void MainMenuScene::render() {
 
     context.music->play("data/MainTheme.mp3");
 
-    listen();
+    // listen();
 }
 
 void MainMenuScene::listen() {

@@ -10,6 +10,7 @@
 #include "LevelDesign/Level.hpp"
 #include "LevelDesign/LevelLoader.hpp"
 #include "RigidBody/RigidBodyPhysics.hpp"
+#include "Scenes/GameComponent.hpp"
 #include "Scenes/Scene.hpp"
 #include "SDL/SDLMusic.hpp"
 #include "SDL/SDLWindow.hpp"
@@ -22,15 +23,17 @@ class SimulationScene : public Scene
 {
 private:
     string levelName;
+    unique_ptr<GameComponent<UserInput, void, UserInputOutput>> userInput;
 
     float simulation();
 
 public:
-    SimulationScene(Scene::Context context, string levelName)
-		: Scene(context), levelName(levelName)
+    SimulationScene(Scene::Context context, string levelName,
+            unique_ptr<GameComponent<UserInput, void, UserInputOutput>> userInput)
+		: Scene(context), levelName(levelName), userInput(move(userInput))
 	{}
 
     std::unique_ptr<Scene> show();
-}; 
+};
 
 #endif

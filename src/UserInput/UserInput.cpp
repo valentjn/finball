@@ -156,7 +156,7 @@ UserInput::UserInput(InputSource mUsedInputSource){
 
 #ifdef KINECT_LIBS
     kinectIsInitialized = false;
-    nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
+    nUsers = 0; nPlayers = 0; trackedUsers = 0;
 
     for (int k = 0; k < PLAYERS; k++){
         playerJoined[k] = false;

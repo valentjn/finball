@@ -26,12 +26,12 @@ bool Mesh::operator==(const Mesh& other) const
 	return m_vao == other.m_vao;
 }
 
-std::vector<glm::vec3> Mesh::createRectangle(glm::vec2 min, glm::vec2 max)
+std::vector<glm::vec3> Mesh::createRectangle(glm::vec2 min, glm::vec2 max, float zValue)
 {
-	glm::vec3 bl{ min.x, min.y, 0.0f };
-	glm::vec3 tl{ min.x, max.y, 0.0f };
-	glm::vec3 br{ max.x, min.y, 0.0f };
-	glm::vec3 tr{ max.x, max.y, 0.0f };
+	glm::vec3 bl{ min.x, min.y, zValue };
+	glm::vec3 tl{ min.x, max.y, zValue };
+	glm::vec3 br{ max.x, min.y, zValue };
+	glm::vec3 tr{ max.x, max.y, zValue };
     return std::vector<glm::vec3>{ bl, br, tr, bl, tr, tl };
 }
 std::vector<glm::vec3> Mesh::createCircle(glm::vec2 center, float radius, int polygons)
@@ -94,7 +94,7 @@ std::unique_ptr<Mesh> Mesh::createTextMesh(const char *text, std::unique_ptr<Tex
     return mesh;
 }
 
-std::unique_ptr<Mesh> Mesh::createImageMesh(const char *filePath, std::unique_ptr<Texture4F> &textureOut, int size) {
+std::unique_ptr<Mesh> Mesh::createImageMesh(const char *filePath, std::unique_ptr<Texture4F> &textureOut, int size, float zValue) {
     cv::Mat image = cv::imread(filePath, cv::IMREAD_UNCHANGED);
     if (!image.data) {
         Log::error("Image %s not found!", filePath);
@@ -102,7 +102,7 @@ std::unique_ptr<Mesh> Mesh::createImageMesh(const char *filePath, std::unique_pt
     } else {
         textureOut = std::make_unique<Texture4F>(glm::ivec2{image.cols, image.rows});
         textureOut->setData(image);
-        return std::make_unique<TexturedMesh>(size, textureOut.get());
+        return std::make_unique<TexturedMesh>(size, textureOut.get(), zValue);
     }
 }
 #endif
@@ -205,10 +205,10 @@ void TexturedMesh::init(const std::vector<Vertex>& vertex_buffer)
 }
 
 // Creates a square textured mesh
-TexturedMesh::TexturedMesh(int scale, const Texture* texture) :
+TexturedMesh::TexturedMesh(int scale, const Texture* texture, float zValue) :
         Mesh(static_cast<decltype(m_vertex_count)>(6)),
         m_texture(texture) {
-    std::vector<glm::vec3> vertices = Mesh::createRectangle({-scale, -scale}, {scale, scale});
+    std::vector<glm::vec3> vertices = Mesh::createRectangle({-scale, -scale}, {scale, scale}, zValue);
     std::vector<Vertex> vertex_buffer(6);
     for (int i = 0; i < m_vertex_count; i++) {
         vertex_buffer[i] = {vertices[i], { vertices[i].x > 0 ? 1 : 0, vertices[i].y > 0 ? 1 : 0 }};

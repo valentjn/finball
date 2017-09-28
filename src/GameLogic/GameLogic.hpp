@@ -25,15 +25,9 @@ using namespace chrono;
 class GameLogic
 {
 private:
-	unique_ptr<Texture4F> shark_left_texture;
-	unique_ptr<Texture4F> shark_right_texture;
 	unique_ptr<TexturedMesh> fluid_mesh;
-	unique_ptr<Mesh> shark_left_mesh;
-	unique_ptr<Mesh> shark_right_mesh;
 	unique_ptr<ColoredMesh> inflow_mesh;
 	RenderObject fluid_surface;
-	RenderObject shark_surface_left;
-	RenderObject shark_surface_right;
 	RenderObject inflow_surface;
 
 	const Level &level;
@@ -51,7 +45,6 @@ public:
 		fluid_surface.scale = { (level.width - 2) * 0.5f, (level.height - 2) * 0.5f };
 		fluid_surface.mesh = fluid_mesh.get();
 
-		createSharks(level);
 		createInflowMesh(level);
 
 		startTime = steady_clock::now();
@@ -79,8 +72,6 @@ public:
 
         if (output.objectsToRender.empty()) {
             output.objectsToRender.push_back(fluid_surface);
-            output.objectsToRender.push_back(shark_surface_left);
-            output.objectsToRender.push_back(shark_surface_right);
             output.objectsToRender.push_back(inflow_surface);
         }
 
@@ -106,38 +97,6 @@ public:
         inflow_surface.position = {-0.5f, -0.5f, 0.1f};
         inflow_surface.rotation = 0;
         inflow_surface.scale = {1.f, 1.f};
-    }
-
-    void createSharks(const Level &level) {
-        auto circle = Mesh::createCircle({0, 0}, 2);
-        bool imageLoadedLeft = false;
-        bool imageLoadedRight = false;
-#ifdef OPENCV_LIBS
-        int sharkSize = Level::FLIPPER_WIDTH*2;
-
-        if ((shark_left_mesh = Mesh::createImageMesh("data/shark_left.png", shark_left_texture, sharkSize)) == nullptr) {
-            shark_left_mesh = make_unique<ColoredMesh>(circle, glm::vec3{0.f, 0.f, 1.f});
-        } else { imageLoadedLeft = true; }
-        if ((shark_right_mesh = Mesh::createImageMesh("data/shark_right.png", shark_right_texture, sharkSize)) == nullptr) {
-            shark_right_mesh = make_unique<ColoredMesh>(circle, glm::vec3{0.f, 0.f, 1.f});
-        } else { imageLoadedRight = true; }
-#else
-        shark_left_mesh = make_unique<ColoredMesh>(circle, glm::vec3{0.f, 0.f, 1.f});
-        shark_right_mesh = make_unique<ColoredMesh>(circle, glm::vec3{0.f, 0.f, 1.f});
-#endif
-
-        float leftX = level.width * 0.5f - Level::FLIPPER_WIDTH - Level::FLIPPER_GAP;
-        float rightX = level.width * 0.5f + Level::FLIPPER_WIDTH + Level::FLIPPER_GAP;
-
-        shark_surface_left.mesh = shark_left_mesh.get();
-        shark_surface_left.position = {leftX, Level::FLIPPER_Y-(imageLoadedLeft?0:Level::FLIPPER_HEIGHT/2), -0.11f};
-        shark_surface_left.rotation = 0;
-        shark_surface_left.scale = {1.f, 1.f};
-
-        shark_surface_right.mesh = shark_right_mesh.get();
-        shark_surface_right.position = {rightX, Level::FLIPPER_Y-(imageLoadedRight?0:Level::FLIPPER_HEIGHT/2), -0.1f};
-        shark_surface_right.rotation = 0;
-        shark_surface_right.scale = {1.f, 1.f};
     }
 };
 

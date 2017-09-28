@@ -29,23 +29,27 @@ private:
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
     static const float FLIPPER_Y, FLIPPER_WIDTH, FLIPPER_HEIGHT, FLIPPER_GAP;
+    static const float SHARK_Y_OFFSET, SHARK_WIDTH, SHARK_HEIGHT;
     static const float BALL_RADIUS;
     static const float BALL_MASS;
     static const char *BALL_IMAGE_PATH;
-    static const vec3 BALL_COLOR;
-    static const vec3 OBSTACLE_COLOR;
-    static const vec3 FLIPPER_COLOR;
+    static const vec3 BALL_COLOR, OBSTACLE_COLOR, FLIPPER_COLOR, SHARK_COLOR;
 
     unique_ptr<Texture4F> leftFinTexture;
     unique_ptr<Texture4F> rightFinTexture;
+    unique_ptr<Texture4F> leftSharkTexture;
+    unique_ptr<Texture4F> rightSharkTexture;
 
     Mesh *cellMesh;
 
     int width, height;
-    int flipperLeftId, flipperRightId;
+    int flipperLeftId, flipperRightId, sharkLeftId, sharkRightId;
     Array2D<CellType> matrix;
     vector<unique_ptr<RigidBody>> rigidBodies;
     unordered_map<int, Mesh*> meshes;
+
+    void createFlippers();
+    void createSharks();
 
     // delete copy constructor and copy-assignment operator
     Level(const Level &) = delete;

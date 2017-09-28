@@ -47,7 +47,7 @@ public:
 	void initOutput(PhysicsOutput& output)
 	{
 		rigidBodyPhysics.initOutput(output.rigidBodyPhysicsOutput);
-		latticeBoltzmann.initOutput(output.latticeBoltzmannOutput);
+		latticeBoltzmann.initOutput(latticeBoltzmannOutput);
 	}
 
 	void compute(const PhysicsInput& input, PhysicsOutput& output)

@@ -19,8 +19,6 @@ public:
     constexpr static float c = 1. / 1.732050; // 1 / sqrt 3
     constexpr static float dt = 1;
     constexpr static float dx = 1;
-    static constexpr std::array<int, 9> cx{0, 1, 0, -1, 0, 1, -1, -1, 1};
-    static constexpr std::array<int, 9> cy{0, 0, 1, 0, -1, 1, 1, -1, -1};
     // f_i outputs
     Array2D<FICell> prestream;
     Array2D<FICell> afterstream;

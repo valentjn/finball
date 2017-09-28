@@ -1,4 +1,8 @@
 CPP_FILES:= $(wildcard src/*.cpp) $(wildcard src/**/*.cpp)
+HPP_FILES:= $(wildcard src/*.hpp) $(wildcard src/**/*.hpp)
+RELEASE_OBJ_FILES:= $(patsubst src/%.cpp, build/release/%.o, $(CPP_FILES))
+OPT_OBJ_FILES:=     $(patsubst src/%.cpp, build/optimal/%.o, $(CPP_FILES))
+DEBUG_OBJ_FILES:=   $(patsubst src/%.cpp, build/debug/%.o,   $(CPP_FILES))
 
 ifdef kinect
 KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
@@ -55,17 +59,26 @@ install_icon:
 	cp data/finball.desktop ~/.local/share/applications
 	sed -i 's?PWD?'`pwd`'?' ~/.local/share/applications/finball.desktop
 
-release:
-	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(RELEASE_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+release: $(RELEASE_OBJ_FILES)
+	$(CXX) $(RELEASE_CFLAGS) $(RELEASE_OBJ_FILES) $(LDFLAGS) -o build/fa_2017_release
 
-optimal:
-	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(OPT_CFLAGS) -o build/fa_2017_release $(LDFLAGS)
+optimal: $(OPT_OBJ_FILES)
+	$(CXX) $(OPT_CFLAGS) $(OPT_OBJ_FILES) $(LDFLAGS) -o build/fa_2017_release
 
-debug:
-	mkdir -p ./build
-	$(CXX) $(CPP_FILES) $(DEBUG_CFLAGS) -o build/fa_2017_debug $(LDFLAGS)
+debug: $(DEBUG_OBJ_FILES)
+	$(CXX) $(DEBUG_CFLAGS) $(DEBUG_OBJ_FILES) $(LDFLAGS) -o build/fa_2017_debug
+
+build/release/%.o: src/%.cpp $(HPP_FILES)
+	mkdir -p $(dir $@)
+	$(CXX) $(RELEASE_CFLAGS) -c $< -o $@
+
+build/optimal/%.o: src/%.cpp $(HPP_FILES)
+	mkdir -p $(dir $@)
+	$(CXX) $(OPT_CFLAGS) -c $< -o $@
+
+build/debug/%.o: src/%.cpp $(HPP_FILES)
+	mkdir -p $(dir $@)
+	$(CXX) $(DEBUG_CFLAGS) -c $< -o $@
 
 run:
 	build/fa_2017_release ${args}

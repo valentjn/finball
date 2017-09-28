@@ -505,21 +505,25 @@ void UserInput::compute(UserInputOutput &userInputOutput) {
 
     switch(usedInputSource){
     case KEYBOARD:
+		Log::debug("UserInput: Source: KEYBOARD");
         getSDLInput(userInputOutput, delta);
         break;
 #ifdef KINECT_LIBS
     case KINECT:
+		Log::debug("UserInput: Source: KINECT");		
         getSDLInput(userInputOutput, delta);
         getKinectInput(userInputOutput, delta);
         break;
 #endif
     case CHOOSING:
-        getSDLInput(userInputOutput, delta);
+		Log::debug("UserInput: Source: CHOOSING");
+		getSDLInput(userInputOutput, delta);
 #ifdef KINECT_LIBS
         getKinectInput(userInputOutput, delta);
 #endif
         break;
     case FAKE:
+		Log::debug("UserInput: Source: FAKE");
         getSDLInput(userInputOutput, delta);
         getFakeInput(userInputOutput, delta);
         break;

@@ -16,8 +16,9 @@
 void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
-	bt_rigid_body->setRestitution(1.0f);
+	bt_rigid_body->setRestitution(1.f);
     if (isFlipper(level_body.id)) {
+		bt_rigid_body->setRestitution(5.f);
         btVector3 axis;
         if (level_body.id == level.flipperLeftId) {
             axis = btVector3(0, 0, 1);
@@ -42,7 +43,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     }
 
 	if (level.isBall(level_body.id)) {
-		bt_rigid_body->setRestitution(0.8f);
+		bt_rigid_body->setRestitution(.2f);
 	}
 
     if (level_body.mass == 0.f) {

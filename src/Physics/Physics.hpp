@@ -37,8 +37,6 @@ class Physics
 	LatticeBoltzmannInput latticeBoltzmannInput;
 	RigidBodyPhysicsInput rigidBodyPhysicsInput;
 
-	LatticeBoltzmannOutput* prevLbmOutput;
-
 public:
 	Physics(const Level& level)
 		: level(level)

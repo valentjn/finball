@@ -16,11 +16,16 @@
 
 using namespace glm;
 
-class LatticeBoltzmann {
+class LatticeBoltzmann
+{
+public:
+	static const int cx[9];
+	static const int cy[9];
+
 private:
 	std::chrono::duration<float> measuredTimes[5];
 
-    Level &level;
+    const Level &level;
 
     // previous f_i field
     Array2D<FICell> fi_Old;
@@ -29,12 +34,9 @@ private:
     Array2D<FICell> fi_New;
 
     // quadrature weights for approximating equilibrium distribution
-    const float w[9] = {4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1. / 9.,
-                  1. / 36., 1. / 36., 1. / 36., 1. / 36.};
-    const int cx[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};
-    const int cy[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};
-    const int opp[9] = {0, 3, 4, 1, 2, 7, 8, 5, 6};
-    const int iter = 15;
+    static const float w[9];
+    static const int opp[9];
+    static const int iter;
 
     bool isBoundaryValid(const Array2D<Level::CellType> &flagfield);
     bool isSane(float fiValue, int x, int y, int i);
@@ -49,7 +51,7 @@ private:
 	inline float handleWindShadow(const LatticeBoltzmannInput &input, int x, int y);
 
 public:
-    LatticeBoltzmann(Level &level)
+    LatticeBoltzmann(const Level &level)
         : level(level), fi_Old(level.width, level.height), fi_New(level.width, level.height) {
         for (int y = 0; y < level.height; y++) {
             for (int x = 0; x < level.width; x++) {
@@ -64,6 +66,8 @@ public:
 				measuredTimes[i] = std::chrono::duration<float>(0.);
 			}
     }
+
+	void initOutput(LatticeBoltzmannOutput& output);
 
     void compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output);
 

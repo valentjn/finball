@@ -1,6 +1,6 @@
 #include "Level.hpp"
 
-const float Level::FLIPPER_Y = 2.f;
+const float Level::FLIPPER_Y = 5.f;
 const float Level::FLIPPER_WIDTH = 8.f;
 const float Level::FLIPPER_HEIGHT = 3.f;
 const float Level::FLIPPER_GAP = 3.5f;

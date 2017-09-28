@@ -5,14 +5,29 @@
 #include <omp.h>
 
 #include "FICell.hpp"
-#include "LatticeBoltzmann.hpp"
-#include "LatticeBoltzmannOutput.hpp"
-#include "LatticeBoltzmannInput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmann.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannInput.hpp"
 #include "LevelDesign/Level.hpp"
 #include "Log.hpp"
 #include "Array2D.hpp"
 
 using namespace glm;
+
+const float LatticeBoltzmann::w[9] = { 4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1. / 9.,
+1. / 36., 1. / 36., 1. / 36., 1. / 36. };
+const int LatticeBoltzmann::cx[9] = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
+const int LatticeBoltzmann::cy[9] = { 0, 0, 1, 0, -1, 1, 1, -1, -1 };
+const int LatticeBoltzmann::opp[9] = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
+const int LatticeBoltzmann::iter = 15;
+
+void LatticeBoltzmann::initOutput(LatticeBoltzmannOutput& output)
+{
+	output.velocity = Array2D<glm::vec2>(level.width, level.height);
+	output.density = Array2D<float>(level.width, level.height);
+	output.prestream = Array2D<FICell>(level.width, level.height);
+	output.afterstream = Array2D<FICell>(level.width, level.height);
+}
 
 void LatticeBoltzmann::compute(const LatticeBoltzmannInput &input, LatticeBoltzmannOutput &output)
 {
@@ -162,14 +177,8 @@ void LatticeBoltzmann::stream(const LatticeBoltzmannInput &input)
 
 void LatticeBoltzmann::Output(LatticeBoltzmannOutput &output)
 {
-	if (output.density.width() == 0) {
-		output.velocity = Array2D<glm::vec2>(level.width, level.height);
-		output.density = Array2D<float>(level.width, level.height);
-		output.prestream = Array2D<FICell>(level.width, level.height);
-		output.afterstream = Array2D<FICell>(level.width, level.height);
-	}
 	// Calculate macroscopic quantities for the output
-//#pragma omp parallel for schedule(dynamic)
+	//#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < this->level.height; y++) {
 		for (int x = 0; x < this->level.width; x++) {
 			float &density = output.density.value(x, y);

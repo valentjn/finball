@@ -27,7 +27,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
 
         bt_rigid_body->setActivationState(DISABLE_DEACTIVATION);
         auto hinge = std::make_unique<btHingeConstraint>(*bt_rigid_body, btVector3(0, 0, 0), axis);
-        hinge->setLimit(0, SIMD_PI / 4);
+        hinge->setLimit(0, SIMD_PI / 2);
         hinge->setMaxMotorImpulse(SIMD_INFINITY); // FIXME?: infinity may be problematic
         dynamics_world->addConstraint(hinge.get());
 
@@ -310,19 +310,23 @@ void RigidBodyPhysics::processRigidBody(btCollisionObject *&obj, RigidBodyPhysic
     }
 }
 
-void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output) {
+void RigidBodyPhysics::initOutput(RigidBodyPhysicsOutput& output)
+{
+	output.grid_objects = Array2D<Level::CellType>(level.width, level.height);
+	output.grid_velocities = Array2D<glm::vec2>(level.width, level.height);
+}
+
+void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output)
+{
     auto &grid_obj = output.grid_objects;
     auto &grid_vel = output.grid_velocities;
-	if (grid_obj.width() == 0) {
-		grid_obj = Array2D<Level::CellType>(GRID_WIDTH, GRID_HEIGHT);
-		grid_vel = Array2D<glm::vec2>(GRID_WIDTH, GRID_HEIGHT);
-	}
     output.rigid_bodies.clear();
     // TODO: try to give out a const reference to our internal rigid_bodies vector
 
     // Compute impulses
     // TODO: Make it work for multiple balls.
-    input.computeImpulses(grid_ball, impulses);
+	if (input.isValid())
+		input.computeImpulses(grid_ball, impulses);
 
     for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {
         auto &obj = dynamics_world->getCollisionObjectArray()[j];

@@ -146,6 +146,7 @@ TEST(LBMTest, EquilibriumTrue) {
   LatticeBoltzmannInput input;
   LatticeBoltzmannOutput output;
   LatticeBoltzmann sut(level);
+  sut.initOutput(output);
 
   input.velocities = Array2D<glm::vec2>{ level.width, level.height };
   input.flagfield = level.matrix;

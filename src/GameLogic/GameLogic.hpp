@@ -22,40 +22,43 @@
 using namespace std;
 using namespace chrono;
 
-class GameLogic {
+class GameLogic
+{
 private:
-    unique_ptr<Texture4F> shark_left_texture;
-    unique_ptr<Texture4F> shark_right_texture;
-    unique_ptr<TexturedMesh> fluid_mesh;
-    unique_ptr<Mesh> shark_left_mesh;
-    unique_ptr<Mesh> shark_right_mesh;
-    unique_ptr<ColoredMesh> inflow_mesh;
-    RenderObject fluid_surface;
-    RenderObject shark_surface_left;
-    RenderObject shark_surface_right;
-    RenderObject inflow_surface;
+	unique_ptr<Texture4F> shark_left_texture;
+	unique_ptr<Texture4F> shark_right_texture;
+	unique_ptr<TexturedMesh> fluid_mesh;
+	unique_ptr<Mesh> shark_left_mesh;
+	unique_ptr<Mesh> shark_right_mesh;
+	unique_ptr<ColoredMesh> inflow_mesh;
+	RenderObject fluid_surface;
+	RenderObject shark_surface_left;
+	RenderObject shark_surface_right;
+	RenderObject inflow_surface;
 
-    const Level &level;
-    steady_clock::time_point startTime;
+	const Level &level;
+	steady_clock::time_point startTime;
 	const unordered_map<int, Mesh*>& rigid_body_meshes;
 
 public:
-    GameLogic(const Level& level)
+	GameLogic(const Level& level)
 		: level(level), rigid_body_meshes(level.meshes)
 	{
-        auto rectangle = Mesh::createRectangle({-1.f, -1.f}, {1.f, 1.f});
-        fluid_mesh = make_unique<TexturedMesh>(rectangle, nullptr);
-        fluid_surface.position = {(level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.2f};
-        fluid_surface.rotation = 0;
-        fluid_surface.scale = { (level.width - 2) * 0.5f, (level.height - 2) * 0.5f };
-        fluid_surface.mesh = fluid_mesh.get();
+		auto rectangle = Mesh::createRectangle({ -1.f, -1.f }, { 1.f, 1.f });
+		fluid_mesh = make_unique<TexturedMesh>(rectangle, nullptr);
+		fluid_surface.position = { (level.width - 1) * 0.5f, (level.height - 1) * 0.5f, 0.2f };
+		fluid_surface.rotation = 0;
+		fluid_surface.scale = { (level.width - 2) * 0.5f, (level.height - 2) * 0.5f };
+		fluid_surface.mesh = fluid_mesh.get();
 
-        createSharks(level);
-        createInflowMesh(level);
+		createSharks(level);
+		createInflowMesh(level);
 
-        startTime = steady_clock::now();
-        Log::debug("Haiscore clock started ;-)");
-    }
+		startTime = steady_clock::now();
+		Log::debug("Haiscore clock started ;-)");
+	}
+
+	void initOutput(GameLogicOutput& output) {}
 
     void compute(const GameLogicInput &input, GameLogicOutput &output) {
         duration<float> duration = steady_clock::now() - startTime;

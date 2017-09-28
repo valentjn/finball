@@ -40,7 +40,7 @@
 
 class RigidBodyPhysics {
 private:
-    Level &level;
+    const Level &level;
 
     const float BULLET_WORLD_WIDTH = 16.0f;
     const int GRID_WIDTH;
@@ -76,7 +76,7 @@ private:
     std::unique_ptr<btHingeConstraint> hinge_left;
 
 public:
-    RigidBodyPhysics(Level &level)
+    RigidBodyPhysics(const Level &level)
         : level(level), GRID_WIDTH(level.width), GRID_HEIGHT(level.height),
           DISTANCE_GRID_CELLS(BULLET_WORLD_WIDTH / GRID_WIDTH),
           DISTANCE_GRID_CELLS_INV(GRID_WIDTH / BULLET_WORLD_WIDTH),
@@ -133,6 +133,8 @@ public:
     // TODO give more meaningful name
     void processRigidBody(btCollisionObject *&obj, RigidBodyPhysicsOutput &output,
                           Array2D<glm::vec2> &grid_vel);
+
+	void initOutput(RigidBodyPhysicsOutput& output);
 
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output);
 

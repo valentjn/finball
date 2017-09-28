@@ -16,7 +16,7 @@
 void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
-	bt_rigid_body->setRestitution(1.f);
+	bt_rigid_body->setRestitution(.2f);
     if (isFlipper(level_body.id)) {
 		bt_rigid_body->setRestitution(5.f);
 

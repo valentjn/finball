@@ -235,7 +235,8 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
                 rightPressed = false;
                 break;
             case SDLK_SPACE:
-                userInputOutput.start = true;
+                Log::debug("UserInput: waiting = false");
+                waiting = false;
                 if (usedInputSource == CHOOSING) {
                     usedInputSource = KEYBOARD;
                 }
@@ -299,6 +300,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
     if (usedInputSource == KEYBOARD) {
         userInputOutput.leftAngle[0] = anl;
         userInputOutput.rightAngle[0] = anr;
+		Log::debug("UserInput angles: %f, %f", anl, anr);
         if (PLAYERS >= 2) { // TODO: What the hell?
             userInputOutput.leftVelocity[1] = avl;
             userInputOutput.rightVelocity[1] = avr;
@@ -469,9 +471,9 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
             }
         }
 
-        userInputOutput.start = std::all_of(playerJoined, playerJoined+PLAYERS,
+        waiting = !std::all_of(playerJoined, playerJoined+PLAYERS,
             [](bool x){return x;});
-        if (userInputOutput.start && usedInputSource == CHOOSING) {
+        if (!waiting && usedInputSource == CHOOSING) {
             usedInputSource = KINECT;
         }
     }
@@ -504,21 +506,25 @@ void UserInput::compute(UserInputOutput &userInputOutput) {
 
     switch(usedInputSource){
     case KEYBOARD:
+		Log::debug("UserInput: Source: KEYBOARD");
         getSDLInput(userInputOutput, delta);
         break;
 #ifdef KINECT_LIBS
     case KINECT:
+		Log::debug("UserInput: Source: KINECT");		
         getSDLInput(userInputOutput, delta);
         getKinectInput(userInputOutput, delta);
         break;
 #endif
     case CHOOSING:
-        getSDLInput(userInputOutput, delta);
+		Log::debug("UserInput: Source: CHOOSING");
+		getSDLInput(userInputOutput, delta);
 #ifdef KINECT_LIBS
         getKinectInput(userInputOutput, delta);
 #endif
         break;
     case FAKE:
+		Log::debug("UserInput: Source: FAKE");
         getSDLInput(userInputOutput, delta);
         getFakeInput(userInputOutput, delta);
         break;

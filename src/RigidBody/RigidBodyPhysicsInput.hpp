@@ -26,11 +26,12 @@ public:
 	}
 
 	void process(const UserInputOutput &userInputOutput, const LatticeBoltzmannOutput &latticeBoltzmannOutput)
-	{	
+	{
 		afterStream = &latticeBoltzmannOutput.afterstream;
 		preStream = &latticeBoltzmannOutput.prestream;
 		leftAngle = userInputOutput.leftAngle[0];
 		rightAngle = userInputOutput.rightAngle[0];
+		Log::debug("Rigid body input: %f, %f", leftAngle, rightAngle);
 	}
 
 	void computeImpulses(const Array2D<int>& grid_ball,

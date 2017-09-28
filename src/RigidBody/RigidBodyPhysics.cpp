@@ -353,12 +353,10 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
     float delta_angle_right = fabs(hinge_left->getHingeAngle() - input.rightAngle);
     hinge_left->setMotorTarget(input.leftAngle, 1.);
     hinge_right->setMotorTarget(input.rightAngle, 1.);
-    if (delta_angle_left < SIMD_PI / 72) { // TODO: constexpr
-        hinge_left->enableMotor(true);
-    }
-    if (delta_angle_right < SIMD_PI / 72) { // TODO: constexpr
-        hinge_right->enableMotor(true);
-    }
+	
+	hinge_left->enableMotor(true);
+	hinge_right->enableMotor(true);
+	
     dynamics_world->stepSimulation(1. / 60.); // TODO: everybody has to use the same timestep
 
     for (int j = 0; j < dynamics_world->getNumCollisionObjects(); j++) {

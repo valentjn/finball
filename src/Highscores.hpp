@@ -61,7 +61,7 @@ private:
         fstream file;
         file.open(filename, fstream::in);
         if (!file.is_open()) {
-            Log::error("Failed to load haiscores");
+            Log::warn("Failed to load haiscores");
             return;
         }
 

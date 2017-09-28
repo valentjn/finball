@@ -156,7 +156,7 @@ UserInput::UserInput(InputSource mUsedInputSource){
 
 #ifdef KINECT_LIBS
     kinectIsInitialized = false;
-    nUsers = 0; nPlayers = MAX_USERS; trackedUsers = 0;
+    nUsers = 0; nPlayers = 0; trackedUsers = 0;
 
     for (int k = 0; k < PLAYERS; k++){
         playerJoined[k] = false;
@@ -206,7 +206,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
     SDL_Event event;
 
     aal = -a0;
-    aar = a0;
+    aar = -a0;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
 
@@ -269,7 +269,7 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
     }
 
     if (rightPressed){
-        aar = -a0;
+        aar = a0;
     } else {
         avr = 0;
     }
@@ -280,20 +280,20 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
     anr += (avr*delta);
 
 
-    if (anl >= max_angle[0]){
+    if (anl > max_angle[0]){
         anl = max_angle[0];
         avl = 0;
     }
-    else if (anl <= min_angle[0]){
+    else if (anl < min_angle[0]){
         anl = min_angle[0];
         avl = 0;
     }
-    if (anr <= M_PI-max_angle[0]){
-        anr = M_PI-max_angle[0];
+    if (anr > max_angle[0]){
+        anr = max_angle[0];
         avr = 0;
     }
-    else if (anr >= M_PI-min_angle[0]){
-        anr = M_PI-min_angle[0];
+    else if (anr < min_angle[0]){
+        anr = min_angle[0];
         avr = 0;
     }
 
@@ -390,16 +390,14 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
 
                 userInputOutput.leftAngle[k] = std::atan2(ldy, ldx) - zero_angle[k];
                 userInputOutput.rightAngle[k]
-                    = std::atan2(rdy, rdx) + zero_angle[k];
+                    = std::atan2(rdy, -rdx) - zero_angle[k];
 
                 if (userInputOutput.leftAngle[k] < -M_PI) {
                     userInputOutput.leftAngle[k] += 2*M_PI;
                 }
-                if (userInputOutput.rightAngle[k] > M_PI) {
-                    userInputOutput.rightAngle[k] -= 2*M_PI;
+                if (userInputOutput.rightAngle[k] < -M_PI) {
+                    userInputOutput.rightAngle[k] += 2*M_PI;
                 }
-                double rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
-                    - userInputOutput.rightAngle[k];
 
                 if (userInputOutput.leftAngle[k] > max_angle[k]) {
                     userInputOutput.leftAngle[k] = max_angle[k];
@@ -407,20 +405,16 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
                     userInputOutput.leftAngle[k] = min_angle[k];
                 }
 
-                if (rightPsi > max_angle[k]) {
-                    userInputOutput.rightAngle[k] = M_PI - max_angle[k];
-                } else if (rightPsi < min_angle[k]) {
-                    userInputOutput.rightAngle[k] = -M_PI -min_angle[k];
+                if (userInputOutput.rightAngle[k] > max_angle[k]) {
+                    userInputOutput.rightAngle[k] = max_angle[k];
+                } else if (userInputOutput.rightAngle[k] < min_angle[k]) {
+                    userInputOutput.rightAngle[k] = min_angle[k];
                 }
 
-                rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
-                    - userInputOutput.rightAngle[k];
-
-                double previousRightPsi = copysign(M_PI, previousRightAngles[k])
-                    - previousRightAngles[k];
                 double ldAngle
                     = userInputOutput.leftAngle[k] - previousLeftAngles[k];
-                double rdAngle = rightPsi - previousRightPsi;
+                double rdAngle
+					= userInputOutput.rightAngle[k] - previousRightAngles[k];
                 userInputOutput.leftVelocity[k] = ldAngle / delta;
                 userInputOutput.rightVelocity[k] = rdAngle / delta;
 
@@ -457,8 +451,6 @@ void UserInput::getKinectInput(UserInputOutput &userInputOutput, double delta) {
                             + BIG_DIFFERENCE_EASING
                             * (userInputOutput.rightAngle[k]
                                 -previousRightAngles[k]);
-                        rightPsi = copysign(M_PI, userInputOutput.rightAngle[k])
-                            - userInputOutput.rightAngle[k];
                         userInputOutput.rightVelocity[k]
                             = rdAngle / delta;
                     } else {
@@ -491,7 +483,7 @@ void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
     for (int k=0; k<PLAYERS; k++) {
         double angle = min_angle[k] + (max_angle[k]-min_angle[k])*a;
         userInputOutput.leftAngle[k] = angle;
-        userInputOutput.rightAngle[k] = std::copysign(M_PI, angle) - angle;
+        userInputOutput.rightAngle[k] = angle;
     }
 }
 

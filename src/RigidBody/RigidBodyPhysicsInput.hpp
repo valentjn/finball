@@ -8,6 +8,7 @@
 #include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "UserInput/UserInputOutput.hpp"
 #include "glm/vec2.hpp"
+#include "Log.hpp"
 
 class RigidBodyPhysicsInput {
 private:

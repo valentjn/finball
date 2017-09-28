@@ -19,7 +19,7 @@ const float LatticeBoltzmann::w[9] = { 4. / 9.,  1. / 9.,  1. / 9.,  1. / 9., 1.
 const int LatticeBoltzmann::cx[9] = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
 const int LatticeBoltzmann::cy[9] = { 0, 0, 1, 0, -1, 1, 1, -1, -1 };
 const int LatticeBoltzmann::opp[9] = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
-const int LatticeBoltzmann::iter = 10;
+const int LatticeBoltzmann::iter = 15;
 
 void LatticeBoltzmann::initOutput(LatticeBoltzmannOutput& output)
 {
@@ -104,6 +104,9 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 					for (int z = 1; z < 9; ++z) {
 
 						if (fi_New.value(x, y)[z] != 0.0) {
+                                                        float velx = std::fmax(-0.1f,std::fmin(0.1f,input.velocities.value(x,y)[0]/iter));
+                                                        float vely = std::fmax(-0.1f,std::fmin(0.1f,input.velocities.value(x,y)[1]/iter));
+
 							constexpr static float c = 1. / 1.732050;
 							float density = 0.0f;
 							for (int i = 0; i < 9; i++) {
@@ -111,18 +114,18 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
 							}
 
 							float neighborFI = fi_New.value(x, y)[z] - 2 / (c*c) *
-								density*w[z]/(4.*iter)*(input.velocities.value(x,y)[0]*cx[z] +
-								input.velocities.value(x,y)[1]*cy[z]);
+                                                                density*w[z]*(velx*cx[z] +
+                                                                vely*cy[z]);
 
 							int neighborx = x + cx[opp[z]];
 							int neighbory = y + cy[opp[z]];
 							int neighbori = opp[z];
 
-							neighborFI = (neighborFI > 0.) ? neighborFI : 0.;
-							fi_New.value(neighborx, neighbory)[neighbori] = neighborFI;
+                                                        neighborFI = (neighborFI > 0.) ? neighborFI : 0.1;
+                                                        fi_New.value(neighborx, neighbory)[neighbori] = std::fmin(1.0f,neighborFI);
 							assert(isSane(neighborFI,neighborx,neighbory,neighbori));
 
-							fi_New.value(x, y)[z] = 0.0;
+                                                        fi_New.value(x, y)[z] = 0.0;
 						}
 					}
 					break;
@@ -221,7 +224,7 @@ float LatticeBoltzmann::handleWindShadow(const LatticeBoltzmannInput &input, int
                 }
             }
         }
-        if (count > 0){
+        if (count > 0 && rho != 0.0){
             rho /= count;
         } else {
             rho = 0.1;
@@ -336,7 +339,7 @@ void LatticeBoltzmann::handleCollisions(const LatticeBoltzmannInput &input)
 
 bool LatticeBoltzmann::isSane(float fiValue, int x, int y, int i) {
 	if (fiValue >= 0. && fiValue <= 2.) return true;
-	std::cout << "Bad FI value: " << fiValue; 
+	std::cout << "Bad FI value: " << fiValue;
 	std::cout << " at " << x << "," << y << "," << i << std::endl;
 	return false;
 }

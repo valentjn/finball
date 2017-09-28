@@ -28,6 +28,7 @@ private:
 
 public:
     enum CellType { FLUID, OBSTACLE, INFLOW, OUTFLOW };
+    static const float FLIPPER_Y, FLIPPER_WIDTH, FLIPPER_HEIGHT, FLIPPER_GAP;
     static const float BALL_RADIUS;
     static const float BALL_MASS;
     static const char *BALL_IMAGE_PATH;
@@ -37,7 +38,7 @@ public:
 
     unique_ptr<Texture4F> leftFinTexture;
     unique_ptr<Texture4F> rightFinTexture;
-    
+
     int width, height;
     int flipperLeftId, flipperRightId;
     Array2D<CellType> matrix;

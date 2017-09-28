@@ -106,7 +106,7 @@ public:
         bool imageLoadedLeft = false;
         bool imageLoadedRight = false;
 #ifdef OPENCV_LIBS
-        int sharkSize = LevelLoader::FLIPPER_WIDTH*2;
+        int sharkSize = Level::FLIPPER_WIDTH*2;
 
         if ((shark_left_mesh = Mesh::createImageMesh("data/shark_left.png", shark_left_texture, sharkSize)) == nullptr) {
             shark_left_mesh = make_unique<ColoredMesh>(circle, glm::vec3{0.f, 0.f, 1.f});
@@ -119,16 +119,16 @@ public:
         shark_right_mesh = make_unique<ColoredMesh>(circle, glm::vec3{0.f, 0.f, 1.f});
 #endif
 
-        float leftX = level.width * 0.5f - LevelLoader::FLIPPER_WIDTH - LevelLoader::FLIPPER_GAP;
-        float rightX = level.width * 0.5f + LevelLoader::FLIPPER_WIDTH + LevelLoader::FLIPPER_GAP;
+        float leftX = level.width * 0.5f - Level::FLIPPER_WIDTH - Level::FLIPPER_GAP;
+        float rightX = level.width * 0.5f + Level::FLIPPER_WIDTH + Level::FLIPPER_GAP;
 
         shark_surface_left.mesh = shark_left_mesh.get();
-        shark_surface_left.position = {leftX, LevelLoader::FLIPPER_Y-(imageLoadedLeft?0:LevelLoader::FLIPPER_HEIGHT/2), -0.11f};
+        shark_surface_left.position = {leftX, Level::FLIPPER_Y-(imageLoadedLeft?0:Level::FLIPPER_HEIGHT/2), -0.11f};
         shark_surface_left.rotation = 0;
         shark_surface_left.scale = {1.f, 1.f};
 
         shark_surface_right.mesh = shark_right_mesh.get();
-        shark_surface_right.position = {rightX, LevelLoader::FLIPPER_Y-(imageLoadedRight?0:LevelLoader::FLIPPER_HEIGHT/2), -0.1f};
+        shark_surface_right.position = {rightX, Level::FLIPPER_Y-(imageLoadedRight?0:Level::FLIPPER_HEIGHT/2), -0.1f};
         shark_surface_right.rotation = 0;
         shark_surface_right.scale = {1.f, 1.f};
     }

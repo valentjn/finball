@@ -129,10 +129,10 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
     }
     // Take care of inflow that ends at the last cell
     if (len1 > 0) {
-        createBoundaryRigidBody(x, y, len1, true);
+        createBoundaryRigidBody(0, y - 1, len1, true);
     }
     if (len2 > 0) {
-        createBoundaryRigidBody(x, y, len2, true);
+        createBoundaryRigidBody(grid_static_objects_flow.width() - 1, y - 1, len2, true);
     }
     len1 = 0;
     len2 = 0;
@@ -157,10 +157,10 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
     }
     // Take care of inflow that ends at the last cell
     if (len1 > 0) {
-        createBoundaryRigidBody(x, y, len1, false);
+        createBoundaryRigidBody(x - 1, 0, len1, false);
     }
     if (len2 > 0) {
-        createBoundaryRigidBody(x, y, len2, false);
+        createBoundaryRigidBody(x - 1, grid_static_objects_flow.height() - 1, len2, false);
     }
 }
 

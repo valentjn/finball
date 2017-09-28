@@ -14,12 +14,17 @@ class SDLWindow {
 
 private:
     SDL_Window *window;
-    int width, height;
+	glm::ivec2 resolution;
 
 public:
-    SDLWindow(int width, int height, const char* title, bool fullscreen) {
-        handleError(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0, "Failed to initialize SDL", SDL_GetError());
-        handleError(TTF_Init() != 0, "Failed to initialize TTF", TTF_GetError());
+    SDLWindow(glm::ivec2 resolution, const char* title, bool fullscreen)
+		: resolution(resolution)
+	{
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
+			Log::error("Failed to initialize SDL: %s", SDL_GetError());
+
+		if (TTF_Init() != 0)
+			Log::error("Failed to initialize TTF: %s", TTF_GetError());
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         atexit(SDL_Quit);
@@ -27,13 +32,12 @@ public:
         if (fullscreen) {
             SDL_DisplayMode displayMode;
             SDL_GetCurrentDisplayMode(0, &displayMode);
-            width = displayMode.w;
-            height = displayMode.h;
+            resolution.x = displayMode.w;
+            resolution.y = displayMode.h;
         }
-        createWindow(width, height, title, fullscreen);
-        SDL_GetWindowSize(window, &this->width, &this->height);
+        createWindow(resolution, title, fullscreen);
 
-        Log::info("Window size is %d x %d", this->width, this->height);
+        Log::info("Window size is %d x %d", resolution.x, resolution.y);
     }
 
     ~SDLWindow() {
@@ -42,43 +46,49 @@ public:
         SDL_Quit();
     }
 
-    int getWidth() const {
-        return width;
-    }
+	glm::ivec2 getResolution() const
+	{
+		return resolution;
+	}
 
-    int getHeight() const {
-        return height;
-    }
+	int getWidth() const
+	{
+		return resolution.x;
+	}
 
-    void setIcon(const char* path) {
+	int getHeight() const
+	{
+		return resolution.y;
+	}
+
+    void setIcon(const char* path)
+	{
         SDL_Surface *icon_surface = IMG_Load(path);
         SDL_SetWindowIcon(window, icon_surface);
         SDL_FreeSurface(icon_surface);
     }
 
-    SDL_Window *getWindow() const {
+    SDL_Window* getWindow() const
+	{
         return window;
     }
 
 private:
-    void handleError(bool condition, const char* message, const char* error) {
-        if (condition) {
-            Log::error("%s: %s", message, error);
-            throw std::runtime_error(error);
-        }
-    }
-
-    void createWindow(int width, int height, const char* title, bool fullscreen) {
+    void createWindow(glm::ivec2 resolution, const char* title, bool fullscreen)
+	{
         uint32_t flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
-        if (fullscreen) {
+        if (fullscreen)
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-        }
 
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                  width, height, flags);
+        window = SDL_CreateWindow(
+			title,
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			resolution.x, resolution.y,
+			flags);
 
-        handleError(window == nullptr, "Failed to create SDL Window", SDL_GetError());
+		if (!window)
+			Log::error("Failed to create SDL Window: %s", SDL_GetError());
     }
 };
 

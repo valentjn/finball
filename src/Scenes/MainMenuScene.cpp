@@ -26,7 +26,7 @@ unique_ptr<Scene> MainMenuScene::show() {
     auto userInput = make_unique<GameComponent<UserInput, void, UserInputOutput>>
             ("UserInput", context.parameters->userInputSource);
 
-    userInput->run(100, userInput->getComp().isWaiting(), true);
+	userInput->run(100, userInput->getComp().isWaiting(), true);
 
     // switch to simulation scene
     return std::make_unique<SimulationScene>(context, context.parameters->level, move(userInput));

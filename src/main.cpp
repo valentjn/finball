@@ -20,8 +20,7 @@ int main(int argc, char *argv[]) {
     Log::setLogLevel(parameters.verbosityLevel);
 
     // create SDL Controller
-    SDLWindow window(parameters.windowWidth, parameters.windowHeight,
-                     "Finball", parameters.fullscreen);
+    SDLWindow window(parameters.windowResolution, "Finball", parameters.fullscreen);
     window.setIcon("data/haicon.png");
 
     SDLMusic music;

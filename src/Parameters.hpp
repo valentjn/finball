@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string>
 #include <unistd.h>
+#include <glm/glm.hpp>
 
 using namespace std;
 
@@ -12,8 +13,7 @@ class Parameters {
 public:
     int verbosityLevel = 0;
     bool fullscreen = false;
-    int windowWidth = 800;
-    int windowHeight = 600;
+	glm::ivec2 windowResolution{ 800, 600 };
     int frameRate = 30;
     int simulationRate = 100;
     string level = "testLevel2.txt";
@@ -34,11 +34,11 @@ public:
                 break;
 
             case 'w':
-                windowWidth = atoi(optarg);
+                windowResolution.x = atoi(optarg);
                 break;
 
             case 'h':
-                windowHeight = atoi(optarg);
+                windowResolution.y = atoi(optarg);
                 break;
 
             case 'r':
@@ -71,8 +71,8 @@ public:
         cout << "Parameters for " << argv[0] << endl;
         cout << "	-v [level]           Verbosity level (default: 0)" << endl;
         cout << "	-f                   Enable fullscreen" << endl;
-        cout << "	-w [width]           Screen height (default: 800)" << endl;
-        cout << "	-h [height]          Screen width (default: 600)" << endl;
+        cout << "	-w [width]           Screen width (default: 800)" << endl;
+        cout << "	-h [height]          Screen height (default: 600)" << endl;
         cout << "	-r [frameRate]       Max. frame rate (default: 30)" << endl;
         cout << "	-s [simulationRate]  Simulation rate (default: 30)" << endl;
         cout << "	-l [name]            Name of the level (default: testLevel2.txt)" << endl;

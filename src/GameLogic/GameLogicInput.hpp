@@ -3,13 +3,14 @@
 
 #include <vector>
 
-#include "UserInput/UserInputOutput.hpp"
-#include "Physics/Physics.hpp"
+#include <UserInput/UserInputOutput.hpp>
+#include <Physics/Physics.hpp>
 
 class GameLogicInput {
 public:
     bool quit;
     const std::vector<Transform*> *rigidBodies;
+    const Array2D<Level::CellType> *grid_objects;
 
     GameLogicInput() {}
 
@@ -17,6 +18,7 @@ public:
 	{
         quit = userInputOutput.quit;
         rigidBodies = &physicsOutput.rigidBodyPhysicsOutput.rigid_bodies;
+        grid_objects = &physicsOutput.rigidBodyPhysicsOutput.grid_objects;
     }
 };
 

@@ -25,7 +25,7 @@ private:
     string levelName;
     unique_ptr<GameComponent<UserInput, void, UserInputOutput>> userInput;
 
-    float simulation();
+    int simulation();
 
 public:
     SimulationScene(Scene::Context context, string levelName,

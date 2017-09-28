@@ -3,12 +3,12 @@
 
 #include <vector>
 
-#include "Visualization/RenderObject.hpp"
+#include <Visualization/RenderObject.hpp>
 
 class GameLogicOutput {
 public:
-    bool running;
-    float score;
+    bool running, showMiniMap;
+    int score;
     std::vector<RenderObject> objectsToRender;
     TexturedMesh* fluid_mesh;
 	const std::unordered_map<int, Mesh*>* rigid_body_meshes;

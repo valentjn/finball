@@ -221,9 +221,6 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
             case SDLK_RIGHT:
                 rightPressed = true;
                 break;
-            case SDLK_ESCAPE:
-                userInputOutput.quit = true;
-                return;
             }
             break;
         case SDL_KEYUP:
@@ -244,6 +241,9 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
                 tryInitializingKinect = false;
 #endif
                 break;
+            case SDLK_ESCAPE:
+                userInputOutput.quit = true;
+                return;
             }
             break;
         case SDL_MOUSEMOTION:
@@ -503,7 +503,7 @@ void UserInput::compute(UserInputOutput &userInputOutput) {
         break;
 #ifdef KINECT_LIBS
     case KINECT:
-		Log::debug("UserInput: Source: KINECT");		
+		Log::debug("UserInput: Source: KINECT");
         getSDLInput(userInputOutput, delta);
         getKinectInput(userInputOutput, delta);
         break;

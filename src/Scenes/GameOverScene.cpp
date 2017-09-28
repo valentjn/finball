@@ -1,13 +1,13 @@
 #include "Scenes/GameOverScene.hpp"
 
-#include <memory>
 #include <SDL2/SDL.h>
+#include <memory>
 
 #include "Log.hpp"
+#include "SDL/SDLEvents.hpp"
 #include "Scenes/MainMenuScene.hpp"
 #include "Scenes/MenuRenderer.hpp"
 #include "Scenes/Scene.hpp"
-#include "SDL/SDLEvents.hpp"
 
 std::unique_ptr<Scene> GameOverScene::show() {
     render();
@@ -23,7 +23,7 @@ void GameOverScene::render() {
     bool newHighscore = context.highscores->checkNewHighscore(score);
 
     if (newHighscore) {
-    	menuRenderer.addTitle("New HAIscore!!!");
+        menuRenderer.addTitle("New HAIscore!!!");
         menuRenderer.addLeftText("Enter your name:\n__________________");
         context.music->play("data/WinningOutro.mp3", 1);
     } else {
@@ -44,7 +44,7 @@ void GameOverScene::listen(MenuRenderer &menuRenderer, bool newHighscore) {
     SDLEvents events;
     events.setListener(SDL_KEYDOWN, [&](SDL_Event &event) {
         if (!newHighscore) {
-    		return false;
+            return true;
         }
 
         SDL_Keycode sym = event.key.keysym.sym;
@@ -61,6 +61,12 @@ void GameOverScene::listen(MenuRenderer &menuRenderer, bool newHighscore) {
             menuRenderer.render();
         }
 
+        return true;
+    });
+    events.setListener(SDL_KEYUP, [&](SDL_Event &event) {
+        if (!newHighscore) {
+            return false;
+        }
         return true;
     });
     events.setListener(SDL_QUIT, [&](SDL_Event &event) {

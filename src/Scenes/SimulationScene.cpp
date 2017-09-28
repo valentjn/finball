@@ -24,12 +24,12 @@
 using namespace chrono;
 
 std::unique_ptr<Scene> SimulationScene::show() {
-    float score = simulation();
+    int score = simulation();
 
     return std::make_unique<GameOverScene>(context, score);
 }
 
-float SimulationScene::simulation()
+int SimulationScene::simulation()
 {
 	context.music->play("data/GameTheme.mp3");
 
@@ -42,7 +42,7 @@ float SimulationScene::simulation()
     renderer.getComp().setCameraTransformFromLevel(level);
 
 	GameComponent<Physics, PhysicsInput, PhysicsOutput> physics{ "Physics", level };
-	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ "GameLogic", level };
+	GameComponent<GameLogic, GameLogicInput, GameLogicOutput> gameLogic{ "GameLogic", level, context.parameters->showMiniMap };
 
 	physics.bindInput(*userInput);
 	gameLogic.bindInput(*userInput, physics);

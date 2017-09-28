@@ -10,10 +10,10 @@
 
 class GameOverScene : public Scene {
 private:
-    float score;
+    int score;
 
 public:
-	GameOverScene(Scene::Context context, float score) : Scene(context), score(score) {}
+	GameOverScene(Scene::Context context, int score) : Scene(context), score(score) {}
 
 	std::unique_ptr<Scene> show();
 

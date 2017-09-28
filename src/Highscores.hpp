@@ -17,10 +17,10 @@ using namespace std;
 class Highscores {
 public:
     struct Highscore {
-        float score;
+        int score;
         string name;
 
-        Highscore(float score, string name) : score(score), name(name) {}
+        Highscore(int score, string name) : score(score), name(name) {}
     };
 
 private:
@@ -32,18 +32,18 @@ public:
         loadHighscores();
     }
 
-    void saveHighscore(float score, string name) {
+    void saveHighscore(int score, string name) {
         highscores.push_back(Highscore(score, name));
         sortHighscores(highscores);
         saveHighscores(highscores);
-        Log::info("Saved haiscore: %f %s", score, name.c_str());
+        Log::info("Saved haiscore: %d %s", score, name.c_str());
     }
 
     const vector<Highscore> &getHighscores() const {
         return highscores;
     }
 
-    bool checkNewHighscore(float score) {
+    bool checkNewHighscore(int score) {
     	size_t i = 0;
     	for(; i < HIGHSCORE_CUTOFF && i < highscores.size(); i++){
     		if (score > highscores[i].score){
@@ -65,7 +65,7 @@ private:
             return;
         }
 
-        float score;
+        int score;
         string name;
         string line;
         while(getline(file,line)){

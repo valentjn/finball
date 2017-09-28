@@ -18,10 +18,11 @@ public:
     int simulationRate = 100;
     string level = "testLevel2.txt";
     string userInputSource = "AUTO";
+    bool showMiniMap = true;
 
     Parameters(int argc, char *const argv[]) {
         int optchar;
-        const char *options = "v:fw:h:r:s:l:i:";
+        const char *options = "v:fw:h:r:s:l:i:m";
 
         while ((optchar = getopt(argc, argv, options)) > 0) {
             switch (optchar) {
@@ -57,6 +58,10 @@ public:
                 userInputSource = optarg;
                 break;
 
+            case 'm':
+                showMiniMap = false;
+                break;
+
             default:
                 printHelp(argv);
                 break;
@@ -81,6 +86,7 @@ public:
         cout << ", KINECT";
 #endif
         cout << endl;
+        cout << "	-m                   Hide mini map" << endl;
         exit(EXIT_FAILURE);
     }
 };

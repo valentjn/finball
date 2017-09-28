@@ -16,11 +16,12 @@
 void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
+
     bt_rigid_body->setRestitution(1.0f);
     bt_rigid_body->setCcdMotionThreshold(0);
     bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);
     if (isFlipper(level_body.id)) {
-	   bt_rigid_body->setRestitution(2.0f);
+		bt_rigid_body->setRestitution(5.f);
         btVector3 axis;
         if (level_body.id == level.flipperLeftId) {
             axis = btVector3(0, 0, 1);
@@ -46,7 +47,8 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     }
 
 	if (level.isBall(level_body.id)) {
-		bt_rigid_body->setRestitution(0.4f);
+		bt_rigid_body->setRestitution(0.2f);
+
 	}
 
     if (level_body.mass == 0.f) {
@@ -347,8 +349,8 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 
     clearDynamicFlagFields(grid_obj);
 
-    float delta_angle_left = abs(hinge_left->getHingeAngle() - input.leftAngle);
-    float delta_angle_right = abs(hinge_left->getHingeAngle() - input.rightAngle);
+    float delta_angle_left = fabs(hinge_left->getHingeAngle() - input.leftAngle);
+    float delta_angle_right = fabs(hinge_left->getHingeAngle() - input.rightAngle);
     hinge_left->setMotorTarget(input.leftAngle, 1.);
     hinge_right->setMotorTarget(input.rightAngle, 1.);
     if (delta_angle_left < SIMD_PI / 72) { // TODO: constexpr

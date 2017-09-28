@@ -64,15 +64,20 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.score = duration.count();
 
-        bool ballInGame = false;
+		bool foundBall = false;
+        bool allBallsOutside = true;
         for (Transform const *rigidBody : *input.rigidBodies) {
-            if (level.isBall(rigidBody->id) && rigidBody->position.y > 0) {
-                ballInGame = true;
-                break;
-            }
+            if (level.isBall(rigidBody->id)) {
+				foundBall = true;
+				if (rigidBody->position.y >= 0 && rigidBody->position.y <= level.height &&
+						 rigidBody->position.x >= 0 && rigidBody->position.x <= level.width) {
+	                allBallsOutside = false;
+					break;
+				}
+			}
         }
 
-        if (input.quit || !ballInGame) {
+        if (input.quit || (allBallsOutside && foundBall)) {
             output.running = false;
             return;
         }
@@ -93,9 +98,13 @@ public:
         vector<glm::vec3> rect1 = Mesh::createRectangle({0,0}, {1,level.height});
         vector<glm::vec3> rect2 = Mesh::createRectangle({1,level.height-1}, {level.width-1,level.height});
         vector<glm::vec3> rect3 = Mesh::createRectangle({level.width-1,0}, {level.width,level.height});
+        vector<glm::vec3> rect4 = Mesh::createRectangle({1,0}, {level.getLeftFinX(),1});
+        vector<glm::vec3> rect5 = Mesh::createRectangle({level.getRightFinX(),0}, {level.width-1,1});
         verticies.insert(verticies.end(), rect1.begin(), rect1.end());
         verticies.insert(verticies.end(), rect2.begin(), rect2.end());
         verticies.insert(verticies.end(), rect3.begin(), rect3.end());
+        verticies.insert(verticies.end(), rect4.begin(), rect4.end());
+        verticies.insert(verticies.end(), rect5.begin(), rect5.end());
         inflow_mesh = make_unique<ColoredMesh>(verticies, glm::vec3{0.f, 1.f, 0.f});
 
         inflow_surface.mesh = inflow_mesh.get();

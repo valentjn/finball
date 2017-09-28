@@ -12,11 +12,11 @@ void LevelLoader::createFlippers(Level &level) {
     auto rigidBodyLeft = make_unique<RigidBodyTriangle>(level.flipperLeftId, leftX, Level::FLIPPER_Y,
                                                         vec2(Level::FLIPPER_WIDTH, -Level::FLIPPER_HEIGHT),
                                                         vec2(0.f, -Level::FLIPPER_HEIGHT),
-                                                        1);
+                                                        10);
     auto rigidBodyRight = make_unique<RigidBodyTriangle>(level.flipperRightId, rightX, Level::FLIPPER_Y,
                                                          vec2(0.f, -Level::FLIPPER_HEIGHT),
                                                          vec2(-Level::FLIPPER_WIDTH, -Level::FLIPPER_HEIGHT),
-                                                         1);
+                                                         10);
 #ifdef OPENCV_LIBS
     unique_ptr<Mesh> meshLeft, meshRight;
     if ((meshLeft = Mesh::createImageMesh("data/fin_left.png", level.leftFinTexture, Level::FLIPPER_WIDTH)) == nullptr) {

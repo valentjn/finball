@@ -120,18 +120,19 @@ public:
     void createBoundryRigidBodies(int rigidBodyId) {
         int leftX = floor(getLeftFinX());
         int rightX = ceil(getRightFinX());
-        for (int x = leftX - 5; x <= rightX + 5; x++) {
-            matrix.value(x, 0) = CellType::OBSTACLE;
+
+        if (width > (rightX - leftX + 2)) {
+            // for (int x = leftX - 5; x <= rightX + 5; x++) {
+            //     matrix.value(x, 0) = CellType::OBSTACLE;
+            // }
+            for (int x = leftX; x <= rightX; x++) {
+                matrix.value(x, 0) = CellType::OUTFLOW;
+            }
+            for (int y = 0; y <= 4; y++) {
+                matrix.value(leftX-1, y) = CellType::OBSTACLE;
+                matrix.value(rightX+1, y) = CellType::OBSTACLE;
+            }
         }
-        for (int x = leftX; x <= rightX; x++) {
-            matrix.value(x, 0) = CellType::OUTFLOW;
-        }
-        matrix.value(leftX-1, 1) = CellType::OBSTACLE;
-        matrix.value(leftX-1, 2) = CellType::OBSTACLE;
-        matrix.value(leftX-1, 3) = CellType::OBSTACLE;
-        matrix.value(rightX+1, 1) = CellType::OBSTACLE;
-        matrix.value(rightX+1, 2) = CellType::OBSTACLE;
-        matrix.value(rightX+1, 3) = CellType::OBSTACLE;
 
         for (int x = 0; x < width; x++) {
             if (createCellRigidBody(x, 0, rigidBodyId)) rigidBodyId++;

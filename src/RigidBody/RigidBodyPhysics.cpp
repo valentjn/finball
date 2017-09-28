@@ -16,8 +16,12 @@
 void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
-	bt_rigid_body->setRestitution(1.0f);
+
+    bt_rigid_body->setRestitution(0.5f);
+    bt_rigid_body->setCcdMotionThreshold(0);
+    bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);
     if (isFlipper(level_body.id)) {
+		bt_rigid_body->setRestitution(2.f);
         btVector3 axis;
         if (level_body.id == level.flipperLeftId) {
             axis = btVector3(0, 0, 1);
@@ -37,12 +41,14 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
             hinge_right = std::move(hinge);
         }
     } else {
+        bt_rigid_body->setFriction(0.0);
         bt_rigid_body->setLinearFactor(btVector3(1.f, 1.f, 0.f));
         bt_rigid_body->setAngularFactor(btVector3(0.f, 0.f, 1.f));
     }
 
 	if (level.isBall(level_body.id)) {
-		bt_rigid_body->setRestitution(0.8f);
+		bt_rigid_body->setRestitution(0.4f);
+
 	}
 
     if (level_body.mass == 0.f) {
@@ -84,7 +90,10 @@ void RigidBodyPhysics::createBoundaryRigidBody(const int x, const int y, const i
         std::make_unique<btRigidBody>(0.0f, motion_state.get(), collision_shape.get(), btVector3(0.0f, 0.0f, 0.0f));
     bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
     bt_rigid_body->setRestitution(1.0f);
+    bt_rigid_body->setFriction(0.0);
     dynamics_world->addRigidBody(bt_rigid_body.get());
+    bt_rigid_body->setCcdMotionThreshold(0);
+    bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);
     boundary_rigid_bodies.push_back(std::make_tuple<
         std::unique_ptr<btRigidBody>,
         std::unique_ptr<btCollisionShape>,
@@ -122,10 +131,10 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
     }
     // Take care of inflow that ends at the last cell
     if (len1 > 0) {
-        createBoundaryRigidBody(x, y, len1, true);
+        createBoundaryRigidBody(0, y - 1, len1, true);
     }
     if (len2 > 0) {
-        createBoundaryRigidBody(x, y, len2, true);
+        createBoundaryRigidBody(grid_static_objects_flow.width() - 1, y - 1, len2, true);
     }
     len1 = 0;
     len2 = 0;
@@ -150,10 +159,10 @@ void RigidBodyPhysics::addBoundaryRigidBodies() {
     }
     // Take care of inflow that ends at the last cell
     if (len1 > 0) {
-        createBoundaryRigidBody(x, y, len1, false);
+        createBoundaryRigidBody(x - 1, 0, len1, false);
     }
     if (len2 > 0) {
-        createBoundaryRigidBody(x, y, len2, false);
+        createBoundaryRigidBody(x - 1, grid_static_objects_flow.height() - 1, len2, false);
     }
 }
 
@@ -340,8 +349,8 @@ void RigidBodyPhysics::compute(const RigidBodyPhysicsInput &input, RigidBodyPhys
 
     clearDynamicFlagFields(grid_obj);
 
-    float delta_angle_left = abs(hinge_left->getHingeAngle() - input.leftAngle);
-    float delta_angle_right = abs(hinge_left->getHingeAngle() - input.rightAngle);
+    float delta_angle_left = fabs(hinge_left->getHingeAngle() - input.leftAngle);
+    float delta_angle_right = fabs(hinge_left->getHingeAngle() - input.rightAngle);
     hinge_left->setMotorTarget(input.leftAngle, 1.);
     hinge_right->setMotorTarget(input.rightAngle, 1.);
     if (delta_angle_left < SIMD_PI / 72) { // TODO: constexpr

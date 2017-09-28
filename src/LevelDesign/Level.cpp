@@ -10,7 +10,9 @@ const float Level::SHARK_WIDTH = 7.f;
 const float Level::SHARK_HEIGHT = 14.f;
 
 const float Level::BALL_RADIUS = 2.5f;
-const float Level::BALL_MASS = 0.5f;
+
+const float Level::BALL_MASS = 0.2f;
+
 const char *Level::BALL_IMAGE_PATH = "data/ball.png";
 const vec3 Level::BALL_COLOR = vec3(1.f, 0, 0);
 const vec3 Level::OBSTACLE_COLOR = vec3(0.82f, 0.82f, 0.9f);
@@ -50,11 +52,11 @@ void Level::createFlippers() {
 	auto rigidBodyLeft = make_unique<RigidBodyTriangle>(flipperLeftId, getLeftFinX(), FLIPPER_Y,
 														vec2(FLIPPER_WIDTH, -FLIPPER_HEIGHT),
 														vec2(0.f, -FLIPPER_HEIGHT),
-														1);
+														10);
 	auto rigidBodyRight = make_unique<RigidBodyTriangle>(flipperRightId, getRightFinX(), FLIPPER_Y,
 														 vec2(0.f, -FLIPPER_HEIGHT),
 														 vec2(-FLIPPER_WIDTH, -FLIPPER_HEIGHT),
-														 1);
+														 10);
 #ifdef OPENCV_LIBS
 	unique_ptr<Mesh> meshLeft, meshRight;
     if ((meshLeft = Mesh::createImageMesh("data/fin_left.png", leftFinTexture, FLIPPER_WIDTH)) == nullptr) {
@@ -75,14 +77,12 @@ void Level::createFlippers() {
 }
 
 void Level::createSharks() {
-//	auto rigidBodyLeft = make_unique<RigidBodyTriangle>(sharkLeftId, getLeftSharkX() - SHARK_WIDTH/2, SHARK_Y + SHARK_HEIGHT/2,
-	auto rigidBodyLeft = make_unique<RigidBodyTriangle>(sharkLeftId, getLeftFinX(), Level::FLIPPER_Y,
+	auto rigidBodyLeft = make_unique<RigidBodyTriangle>(sharkLeftId, getLeftFinX(), FLIPPER_Y,
 														vec2( SHARK_WIDTH/2, SHARK_Y_OFFSET),
 														vec2(-SHARK_WIDTH/2, SHARK_Y_OFFSET),
 														vec2(          0.0f, SHARK_Y_OFFSET + SHARK_HEIGHT),
 														0);
-//	auto rigidBodyRight = make_unique<RigidBodyTriangle>(sharkRightId, getRightSharkX() + SHARK_WIDTH/2, SHARK_Y + SHARK_HEIGHT/2,
-	auto rigidBodyRight = make_unique<RigidBodyTriangle>(sharkRightId, getRightFinX(), Level::FLIPPER_Y,
+	auto rigidBodyRight = make_unique<RigidBodyTriangle>(sharkRightId, getRightFinX(), FLIPPER_Y,
 														 vec2(-SHARK_WIDTH/2, SHARK_Y_OFFSET),
 														 vec2( SHARK_WIDTH/2, SHARK_Y_OFFSET),
 														 vec2(          0.0f, SHARK_Y_OFFSET + SHARK_HEIGHT),

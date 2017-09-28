@@ -57,15 +57,20 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.score = duration.count();
 
-        bool ballInGame = false;
+		bool foundBall = false;
+        bool allBallsOutside = true;
         for (Transform const *rigidBody : *input.rigidBodies) {
-            if (level.isBall(rigidBody->id) && rigidBody->position.y > 0) {
-                ballInGame = true;
-                break;
-            }
+            if (level.isBall(rigidBody->id)) {
+				foundBall = true;
+				if (rigidBody->position.y >= 0 && rigidBody->position.y <= level.height &&
+						 rigidBody->position.x >= 0 && rigidBody->position.x <= level.width) {
+	                allBallsOutside = false;
+					break;
+				}
+			}
         }
 
-        if (input.quit || !ballInGame) {
+        if (input.quit || (allBallsOutside && foundBall)) {
             output.running = false;
             return;
         }

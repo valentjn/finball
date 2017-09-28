@@ -41,7 +41,7 @@ public:
 		// TODO: Iterate over entire grid. For now do not iterate over the borders
 		// TODO: Only one ball for now
 		// TODO: Scale impulses properly
-		const float forceScaling = 1.;
+		const float forceScaling = .2;
 		for (int y = 1; y < grid_ball.height()-1; ++y) {
 			for (int x = 1; x < grid_ball.width()-1; ++x) {
 				if (grid_ball.value(x,y) != 0)	{ // Go over only the obstacle cells

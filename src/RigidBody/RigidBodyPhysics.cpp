@@ -17,11 +17,11 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     std::unique_ptr<btRigidBody> bt_rigid_body = createBtRigidBody(level_body);
     dynamics_world->addRigidBody(bt_rigid_body.get());
 
-    bt_rigid_body->setRestitution(1.0f);
+    bt_rigid_body->setRestitution(0.5f);
     bt_rigid_body->setCcdMotionThreshold(0);
     bt_rigid_body->setCcdSweptSphereRadius(DISTANCE_GRID_CELLS * Level::BALL_RADIUS);
     if (isFlipper(level_body.id)) {
-		bt_rigid_body->setRestitution(5.f);
+		bt_rigid_body->setRestitution(2.f);
         btVector3 axis;
         if (level_body.id == level.flipperLeftId) {
             axis = btVector3(0, 0, 1);
@@ -47,7 +47,7 @@ void RigidBodyPhysics::addRigidBody(const RigidBody &level_body) {
     }
 
 	if (level.isBall(level_body.id)) {
-		bt_rigid_body->setRestitution(0.2f);
+		bt_rigid_body->setRestitution(0.4f);
 
 	}
 

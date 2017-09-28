@@ -125,8 +125,7 @@ void LatticeBoltzmann::handleBoundaries(const LatticeBoltzmannInput &input)
                                                         fi_New.value(neighborx, neighbory)[neighbori] = std::fmin(1.0f,neighborFI);
 							assert(isSane(neighborFI,neighborx,neighbory,neighbori));
 
-							fi_New.value(x, y)[z] = 0.0;
-                                                        std::cout << fi_New.value(neighborx, neighbory)[neighbori] << std::endl;
+                                                        fi_New.value(x, y)[z] = 0.0;
 						}
 					}
 					break;

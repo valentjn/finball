@@ -1,30 +1,34 @@
 #ifndef RIGID_BODY_PHYSICS_INPUT_HPP_
 #define RIGID_BODY_PHYSICS_INPUT_HPP_
 
+#include <array>
 #include <unordered_map>
 
-#include "../LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmann.hpp"
+#include "LatticeBoltzmann/LatticeBoltzmannOutput.hpp"
 #include "UserInput/UserInputOutput.hpp"
-#include "../../ext/glm/vec2.hpp"
+#include "glm/vec2.hpp"
 
 class RigidBodyPhysicsInput {
 private:
 	const Array2D<FICell>* afterStream;
 	const Array2D<FICell>* preStream;
-	const int * cx;
-	const int * cy;
-	int invI[9] = {0,3,4,1,2,7,8,5,6};
+
+	static const int invI[9];
 public:
 	float leftAngle, rightAngle;
     RigidBodyPhysicsInput() : afterStream(nullptr), preStream(nullptr),
-	cx(nullptr), cy(nullptr), leftAngle(0), rightAngle(0) {}
+	leftAngle(0), rightAngle(0) {}
+
+	bool isValid() const
+	{
+		return afterStream->width() && afterStream->height() && preStream->width() && preStream->height();
+	}
 
 	void process(const UserInputOutput &userInputOutput, const LatticeBoltzmannOutput &latticeBoltzmannOutput)
 	{	
 		afterStream = &latticeBoltzmannOutput.afterstream;
 		preStream = &latticeBoltzmannOutput.prestream;
-		cx = latticeBoltzmannOutput.cx;
-		cy = latticeBoltzmannOutput.cy;
 		leftAngle = userInputOutput.leftAngle[0];
 		rightAngle = userInputOutput.rightAngle[0];
 	}
@@ -40,11 +44,11 @@ public:
 			for (int x = 1; x < grid_ball.width()-1; ++x) {
 				if (grid_ball.value(x,y) != 0)	{ // Go over only the obstacle cells
 					for (int i = 1; i < 9; ++i) { // Go over the nbhrs
-						nbhX = x + cx[i];
-						nbhY = y + cy[i];
-						impulse.x = (-1.0f*cx[i])*(afterStream->value(nbhX,nbhY)[invI[i]]+preStream->value(nbhX,nbhY)[invI[i]]); // Needs inverse direction
-						impulse.y = (-1.0f*cy[i])*(afterStream->value(nbhX,nbhY)[invI[i]]+preStream->value(nbhX,nbhY)[invI[i]]); // Needs inverse direction
-						impulses[grid_ball.value(x,y)] += (grid_ball.value(x+cx[i],y+cy[i]) == Level::CellType::FLUID? 1.0f:0.0f)*impulse; // If nbhr is fluid accumulate impulse
+						nbhX = x + LatticeBoltzmann::cx[i];
+						nbhY = y + LatticeBoltzmann::cy[i];
+						impulse.x = (-1.0f*LatticeBoltzmann::cx[i])*(afterStream->value(nbhX,nbhY)[invI[i]]+preStream->value(nbhX,nbhY)[invI[i]]); // Needs inverse direction
+						impulse.y = (-1.0f*LatticeBoltzmann::cy[i])*(afterStream->value(nbhX,nbhY)[invI[i]]+preStream->value(nbhX,nbhY)[invI[i]]); // Needs inverse direction
+						impulses[grid_ball.value(x,y)] += (grid_ball.value(x+ LatticeBoltzmann::cx[i],y+ LatticeBoltzmann::cy[i]) == Level::CellType::FLUID? 1.0f:0.0f)*impulse; // If nbhr is fluid accumulate impulse
 					}
 				}
 			}

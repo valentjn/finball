@@ -134,6 +134,8 @@ public:
     void processRigidBody(btCollisionObject *&obj, RigidBodyPhysicsOutput &output,
                           Array2D<glm::vec2> &grid_vel);
 
+	void initOutput(RigidBodyPhysicsOutput& output);
+
     void compute(const RigidBodyPhysicsInput &input, RigidBodyPhysicsOutput &output);
 
     void setGravity(bool on);

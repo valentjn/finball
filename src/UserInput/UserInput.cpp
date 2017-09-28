@@ -493,6 +493,8 @@ void UserInput::getFakeInput(UserInputOutput &userInputOutput, double delta) {
     }
 }
 
+void UserInput::initOutput(UserInputOutput& userInputOutput) {}
+
 // process input
 void UserInput::compute(UserInputOutput &userInputOutput) {
     // get timing information

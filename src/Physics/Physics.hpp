@@ -42,20 +42,16 @@ public:
 		: level(level)
 		, latticeBoltzmann(level)
 		, rigidBodyPhysics(level)
+	{}
+
+	void initOutput(PhysicsOutput& output)
 	{
-		latticeBoltzmannOutput.velocity = Array2D<glm::vec2>(level.width, level.height);
-		latticeBoltzmannOutput.density = Array2D<float>(level.width, level.height);
-		latticeBoltzmannOutput.prestream = Array2D<FICell>(level.width, level.height);
-		latticeBoltzmannOutput.afterstream = Array2D<FICell>(level.width, level.height);
+		rigidBodyPhysics.initOutput(output.rigidBodyPhysicsOutput);
+		latticeBoltzmann.initOutput(output.latticeBoltzmannOutput);
 	}
 
 	void compute(const PhysicsInput& input, PhysicsOutput& output)
 	{
-		if (output.rigidBodyPhysicsOutput.grid_objects.width() == 0) {
-			output.rigidBodyPhysicsOutput.grid_objects = Array2D<Level::CellType>(level.width, level.height);
-			output.rigidBodyPhysicsOutput.grid_velocities = Array2D<glm::vec2>(level.width, level.height);
-		}
-
 		rigidBodyPhysicsInput.process(input.userInputOutput, latticeBoltzmannOutput);
 		rigidBodyPhysics.compute(rigidBodyPhysicsInput, output.rigidBodyPhysicsOutput);
 

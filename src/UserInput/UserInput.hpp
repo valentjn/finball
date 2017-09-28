@@ -115,6 +115,7 @@ public:
 	UserInput(std::string mUsedInputSource)
 		: UserInput(getInputSourceFromName(mUsedInputSource)) {}
 	~UserInput();
+	void initOutput(UserInputOutput &userInputOutput);
     void compute(UserInputOutput &userInputOutput);
 
 	InputSource getUsedInputSource() { return usedInputSource; }

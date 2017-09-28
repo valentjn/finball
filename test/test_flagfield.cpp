@@ -137,6 +137,7 @@ TEST(RigidBodyTest, gravity64) {
 
   RigidBodyPhysics sut(level);
   sut.setGravity(true);
+  sut.initOutput(output);
 
   sut.compute(input, output);
 

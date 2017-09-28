@@ -77,7 +77,11 @@ public:
 	template<class... Args>
 	GameComponent<Comp, Input, Output>(const char* name, Args&&... args)
 		: m_name(name), m_comp(std::forward<Args>(args)...)
-	{}
+	{
+		m_comp.initOutput(m_output.writeBuffer());
+		m_output.swap();
+		m_output.writeBuffer() = m_output.readBuffer();
+	}
 
 	~GameComponent<Comp, Input, Output>()
 	{
@@ -144,7 +148,11 @@ public:
 	template<class... Args>
 	GameComponent<Comp, void, Output>(const char* name, Args&&... args)
 		: m_name(name), m_comp(std::forward<Args>(args)...)
-	{}
+	{
+		m_comp.initOutput(m_output.writeBuffer());
+		m_output.swap();
+		m_output.writeBuffer() = m_output.readBuffer();
+	}
 
 	~GameComponent<Comp, void, Output>()
 	{

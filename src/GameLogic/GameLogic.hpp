@@ -36,7 +36,6 @@ private:
 	RenderObject shark_surface_right;
 	RenderObject inflow_surface;
 
-	bool foundBall = false;
 	const Level &level;
 	steady_clock::time_point startTime;
 	const unordered_map<int, Mesh*>& rigid_body_meshes;
@@ -65,22 +64,20 @@ public:
         duration<float> duration = steady_clock::now() - startTime;
         output.score = duration.count();
 
-        bool ballInGame = false;
+		bool foundBall = false;
+        bool allBallsOutside = true;
         for (Transform const *rigidBody : *input.rigidBodies) {
             if (level.isBall(rigidBody->id)) {
-				if (!foundBall) {
-					foundBall = ballInGame = true;
-					break;
-				}
-				else if (rigidBody->position.y > 0 && rigidBody->position.y < level.height &&
-						 rigidBody->position.x > 0 && rigidBody->position.x < level.width) {
-	                ballInGame = true;
+				foundBall = true;
+				if (rigidBody->position.y >= 0 && rigidBody->position.y <= level.height &&
+						 rigidBody->position.x >= 0 && rigidBody->position.x <= level.width) {
+	                allBallsOutside = false;
 					break;
 				}
 			}
         }
 
-        if (input.quit || !ballInGame) {
+        if (input.quit || (allBallsOutside && foundBall)) {
             output.running = false;
             return;
         }

@@ -5,13 +5,13 @@ OPT_OBJ_FILES:=     $(patsubst src/%.cpp, build/optimal/%.o, $(CPP_FILES))
 DEBUG_OBJ_FILES:=   $(patsubst src/%.cpp, build/debug/%.o,   $(CPP_FILES))
 
 ifdef kinect
-KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite
-KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2 -D KINECT_LIBS
+KINECT_CFLAGS:= -I/usr/include/ni -I/usr/include/nite -D KINECT_LIBS
+KINECT_LDFLAGS:= -lOpenNI -lXnVNite_1_5_2
 endif
 
 ifdef opencv
-OPENCV_CFLAGS:= -I/usr/local/include/opencv -I/usr/local/include
-OPENCV_LDFLAGS:= -L/usr/local/lib -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -D OPENCV_LIBS
+OPENCV_CFLAGS:= -I/usr/local/include/opencv -I/usr/local/include -D OPENCV_LIBS
+OPENCV_LDFLAGS:= -L/usr/local/lib -lopencv_core -lopencv_imgproc -lopencv_imgcodecs
 endif
 
 COMMON_CFLAGS:= -pedantic \

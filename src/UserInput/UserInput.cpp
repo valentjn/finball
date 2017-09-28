@@ -176,7 +176,6 @@ UserInput::UserInput(InputSource mUsedInputSource){
         leftDifferenceTooBig[k] = false;
         rightDifferenceTooBig[k] = false;
     }
-    // TODO: parse from cli parameters
     usedInputSource = mUsedInputSource;
 }
 
@@ -298,11 +297,11 @@ void UserInput::getSDLInput(UserInputOutput &userInputOutput, double delta) {
     }
 
     if (usedInputSource == KEYBOARD) {
-        userInputOutput.leftAngle[0]=anl;
-        userInputOutput.rightAngle[0]=anr;
-        if (PLAYERS >= 2) {
-            userInputOutput.leftVelocity[1]=avl;
-            userInputOutput.rightVelocity[1]=avr;
+        userInputOutput.leftAngle[0] = anl;
+        userInputOutput.rightAngle[0] = anr;
+        if (PLAYERS >= 2) { // TODO: What the hell?
+            userInputOutput.leftVelocity[1] = avl;
+            userInputOutput.rightVelocity[1] = avr;
         }
     }
 }
@@ -518,7 +517,7 @@ void UserInput::compute(const UserInputInput&, UserInputOutput &userInputOutput)
 #endif
         break;
     case FAKE:
-        // getSDLInput(userInputOutput, delta);
+        getSDLInput(userInputOutput, delta);
         getFakeInput(userInputOutput, delta);
         break;
     default:

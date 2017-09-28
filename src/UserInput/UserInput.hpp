@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <string>
+#include <array>
 
 #include <SDL2/SDL.h>
 
@@ -96,18 +97,17 @@ private:
 	void getFakeInput(UserInputOutput& userInputOutput, double delta);
 
 	InputSource getInputSourceFromName(std::string name) {
-		if(name == "CHOOSING" || name == "AUTO") {
-			return CHOOSING;
-		} else if(name == "FAKE") {
+		if (name == "FAKE") {
 			return FAKE;
-		} else if(name == "KEYBOARD") {
+		} else if (name == "KEYBOARD") {
 			return KEYBOARD;
 		}
 #ifdef KINECT_LIBS
-		else if(name == "KINECT") {
+		else if (name == "KINECT") {
 			return KINECT;
 		}
 #endif
+		return CHOOSING;
 	}
 
 public:

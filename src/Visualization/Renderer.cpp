@@ -170,7 +170,7 @@ Renderer::~Renderer() {
 
 void Renderer::compute(const RendererInput &input) {
     // clear the framebuffer to black
-    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClearColor(.08f, .08f, .08f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // setup for the rendering of the fluid
@@ -213,7 +213,7 @@ void Renderer::compute(const RendererInput &input) {
     glViewport(0, 0, m_resolution.x, m_resolution.y);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(m_shader_program_world);
-    
+
 	if (input.fluid_mesh)
 		input.fluid_mesh->setTexture(*m_tex_fluid_output);
 

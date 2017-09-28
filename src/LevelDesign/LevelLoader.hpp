@@ -14,9 +14,6 @@
 using namespace std;
 
 class LevelLoader {
-public:
-    static const float FLIPPER_Y, FLIPPER_WIDTH, FLIPPER_HEIGHT, FLIPPER_GAP;
-
 private:
     ASCIIArtLevelParser asciiParser;
     ImageRecLevelParser imageParser;

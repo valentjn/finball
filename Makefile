@@ -11,31 +11,31 @@ OPENCV_LDFLAGS:= `pkg-config opencv --libs` -D OPENCV_LIBS
 endif
 
 COMMON_CFLAGS:= -pedantic \
-		       -Wall \
-		       -Wextra \
-		       -fmessage-length=0 \
-		       -Wno-unused-parameter \
-		       -fmessage-length=0 \
-		       -std=gnu++14 \
-			   -fopenmp \
-		       `pkg-config sdl2 --cflags` \
-		       `pkg-config bullet --cflags` \
-		       -I src \
-		       -I ext \
-               -pthread \
-		       $(KINECT_CFLAGS) $(OPENCV_CFLAGS)
+				 -Wall \
+				 -Wextra \
+				 -fmessage-length=0 \
+				 -Wno-unused-parameter \
+				 -fmessage-length=0 \
+				 -std=gnu++14 \
+				 -fopenmp \
+				 `pkg-config sdl2 --cflags` \
+				 `pkg-config bullet --cflags` \
+				 -I src \
+				 -I ext \
+				 -pthread \
+				 $(KINECT_CFLAGS) $(OPENCV_CFLAGS)
 
 DEBUG_CFLAGS:=-g3 -O0 $(COMMON_CFLAGS)
 RELEASE_CFLAGS:= -O3 -mtune=native -DNDEBUG -march=native $(COMMON_CFLAGS)
 OPT_CFLAGS:= -flto -ffast-math -DNDEBUG $(RELEASE_CFLAGS)
 
 LDFLAGS:= -lSDL2_image \
-		  -lSDL2_ttf \
-		  -lSDL2_mixer \
-		  -lGL \
-		  `pkg-config sdl2 --libs` \
-		  `pkg-config bullet --libs` \
-          $(KINECT_LDFLAGS) $(OPENCV_LDFLAGS)
+		-lSDL2_ttf \
+		-lSDL2_mixer \
+		-lGL \
+		`pkg-config sdl2 --libs` \
+		`pkg-config bullet --libs` \
+		$(KINECT_LDFLAGS) $(OPENCV_LDFLAGS)
 
 .PHONY: test_all
 

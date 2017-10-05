@@ -90,7 +90,7 @@ void RigidBodyPhysics::createBoundaryRigidBody(const int x, const int y, const i
     auto bt_rigid_body =
         std::make_unique<btRigidBody>(0.0f, motion_state.get(), collision_shape.get(), btVector3(0.0f, 0.0f, 0.0f));
     bt_rigid_body->setUserIndex(-1); // Set user index to -1 to distinguish from obstacles
-    bt_rigid_body->setRestitution(1.0f);
+    bt_rigid_body->setRestitution(.1f);
     bt_rigid_body->setFriction(0.1f);
     dynamics_world->addRigidBody(bt_rigid_body.get());
     bt_rigid_body->setCcdMotionThreshold(0);
